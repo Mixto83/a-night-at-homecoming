@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Teacher
+  - OrgStudent
+  - CalmStudent
+  - MessyStudent
   layers:
   - Default
   - TransparentFX
