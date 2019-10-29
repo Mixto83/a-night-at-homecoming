@@ -7,11 +7,19 @@ public enum Genders { Male, Female, Other }
 
 public class GameManager : MonoBehaviour
 {
+    protected readonly int MALENAMES_NUM = 7;
+    protected readonly int FOODS_NUM = 10;
+    protected readonly int ANIMALS_NUM = 12;
+    protected readonly int HOBBIES_NUM = 12;
+
     [SerializeField] List<GameObject> Agents;
     List<Character> People;
     public bool debugMode = true;
 
     string[] Names = new string[] { "Diego", "Mario", "Juan", "Cesar", "Daniel", "Pedro", "Manuel", "Maria", "Marta", "Carmen", "Raquel", "Lucia", "Ana", "Laura" };
+    string[] Hobbies = new string[] { "Comic books", "Videogames", "Movies", "Books", "Cooking", "Board games", "Trading card games", "Sports", "School shooting", "Music", "Dancing", "Gym" };
+    string[] Animals = new string[] { "Dog", "Cat", "Bird", "Bee", "Sheep", "Whale", "Possum", "Crocodile", "Bat", "Spider", "Lizard", "Turtle" };
+    string[] Foods = new string[] { "Hamburgers", "Pizza", "Pasta", "Sandwich", "Fish", "Eggs", "Salad", "Chocolate", "Children", "Apple" };
 
     private void Awake()
     {
@@ -32,23 +40,51 @@ public class GameManager : MonoBehaviour
             switch (gender)
             {
                 case Genders.Male:
-                    name = Names[Random.Range(0, 7)];
+                    name = Names[Random.Range(0, MALENAMES_NUM)];
                     break;
                 case Genders.Female:
-                    name = Names[Random.Range(7, Names.Length)];
+                    name = Names[Random.Range(MALENAMES_NUM, Names.Length)];
                     break;
                 default:
                     name = Names[Random.Range(0, Names.Length)];
                     break;
             }
 
+            string[] hobbies = new string[] { };
+            string[] animals = new string[] { };
+            string[] foods = new string[] { };
+
             switch (child.tag)
             {
                 case "CalmStudent":
-                    People.Add(new CalmStudent(name, gender, child.position));
+                    CalmStudent newStudent = new CalmStudent(name, gender, child.position);             
+                    for (int i = 0; i < 3; i++)
+                    {
+                        string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];                   
+                        string newAnimal = Animals[Random.Range(0, ANIMALS_NUM)];
+                        string newFood = Foods[Random.Range(0, FOODS_NUM)];
+
+                        //Should be checked to avoid duplicates!
+                        newStudent.Hobbies.Add(newHobbie);
+                        newStudent.FavAnimals.Add(newAnimal);
+                        newStudent.FavFoods.Add(newFood);
+                    }
+                    People.Add(newStudent);
                     break;
                 case "MessyStudent":
-                    People.Add(new MessyStudent(name, gender, child.position));
+                    MessyStudent newStudent2 = new MessyStudent(name, gender, child.position);
+                    for (int i = 0; i < 3; i++)
+                    {
+                        string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];
+                        string newAnimal = Animals[Random.Range(0, ANIMALS_NUM)];
+                        string newFood = Foods[Random.Range(0, FOODS_NUM)];
+
+                        //Should be checked to avoid duplicates!
+                        newStudent2.Hobbies.Add(newHobbie);
+                        newStudent2.FavAnimals.Add(newAnimal);
+                        newStudent2.FavFoods.Add(newFood);
+                    }
+                    People.Add(newStudent2);
                     break;
                 case "Teacher":
                     People.Add(new Teacher(name, gender, child.position));
@@ -152,7 +188,6 @@ public class GameManager : MonoBehaviour
         //Behaviour HFSM (Messy, Calm, Organizer)
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            //The foreach for CalmStudent, OrganizerStudent and Pro
             foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.lookForMess;
         }
         if (Input.GetKeyDown(KeyCode.W))

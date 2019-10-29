@@ -5,6 +5,19 @@ using UnityEngine;
 public class Student : Character
 {
     //parameters
+    #region Interests
+    public List<string> FavFoods;
+    public List<string> FavAnimals;
+    public List<string> Hobbies;
+    #endregion
+
+    #region Stats
+    protected float fatigue;
+    protected float amusement;
+    protected float thirst;
+    #endregion
+
+    #region HFSM States
     public enum drinkStates { walkToBar, waitQueue, drinking}
     public enum restStates { walkToBenches, satInBench}
     public enum breathStates { walkOutside, stayOutside}
@@ -14,6 +27,7 @@ public class Student : Character
     public restStates currentRest;
     public breathStates currentBreath;
     public punishmentStates currentPunishment;
+    #endregion
 
     //methods
     protected Student(string name, Genders gender, Vector2 position) : base(name, gender, position)
@@ -22,6 +36,10 @@ public class Student : Character
         this.currentRest = restStates.walkToBenches;
         this.currentBreath = breathStates.walkOutside;
         this.currentPunishment = punishmentStates.waitEndOfPunishment;
+
+        this.FavFoods = new List<string>();
+        this.FavAnimals = new List<string>();
+        this.Hobbies = new List<string>();
     }
 
     public override void Enjoying()
