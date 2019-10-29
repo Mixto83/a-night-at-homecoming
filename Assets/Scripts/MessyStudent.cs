@@ -7,43 +7,64 @@ public class MessyStudent : Student
     //parameters
     public enum messStates
     {
+        start, rest, drink, breath, punishment,
         lookForMess, sabotageDrink, negotiateOrganizer, runAway,
         botherTeacher, checkAffinity, fightStudent
     }
-    public messStates currentMessState;
+    public messStates currentState;
 
     //methods
     public MessyStudent(string name, Genders gender, Vector2 position) : base(name, gender, position)
     {
         this.role = Roles.MessyStudent;
-        this.currentMessState = messStates.lookForMess;
+        this.currentState = messStates.lookForMess;
     }
 
-    protected override void RoleHFSM()
+    public override void FSM()
     {
         //Messy Student's FSM
-        switch (currentMessState)
+        switch (currentState)
         {
+            case messStates.start:
+                Debug.Log("[" + name + ", " + currentState + "] Just Starting!");
+                Enjoying();
+                break;
+            case messStates.breath:
+                Debug.Log("[" + name + ", " + currentState + "] Breathing state");
+                Breathing();
+                break;
+            case messStates.drink:
+                Debug.Log("[" + name + ", " + currentState + "] Drinking state");
+                Drinking();
+                break;
+            case messStates.punishment:
+                Debug.Log("[" + name + ", " + currentState + "] Punishment state");
+                Punishment();
+                break;
+            case messStates.rest:
+                Debug.Log("[" + name + ", " + currentState + "] Resting state");
+                Resting();
+                break;
             case messStates.lookForMess:
-                Debug.Log("[" + name + ", " + currentMessState + "] Looking for some trouble...");
+                Trouble();
                 break;
             case messStates.sabotageDrink:
-                Debug.Log("[" + name + ", " + currentMessState + "] Drinking should be fun!");
+                SabotageDrink();
                 break;
             case messStates.botherTeacher:
-                Debug.Log("[" + name + ", " + currentMessState + "] Hey, teacher! Leave those kids alone!");
+                BotherTeacher();
                 break;
             case messStates.checkAffinity:
-                Debug.Log("[" + name + ", " + currentMessState + "] Is this one chad or virgin?");
+                CheckAffinity();
                 break;
             case messStates.fightStudent:
-                Debug.Log("[" + name + ", " + currentMessState + "] Take this Billy!");
+                Fight();
                 break;
             case messStates.negotiateOrganizer:
-                Debug.Log("[" + name + ", " + currentMessState + "] Don't sneak!");
+                Negotiate();
                 break;
             case messStates.runAway:
-                Debug.Log("[" + name + ", " + currentMessState + "] Run run run!");
+                Run();
                 break;
             default:
                 break;
@@ -52,7 +73,38 @@ public class MessyStudent : Student
 
     public override void Trouble()
     {
-        //Debug.Log("[" + name + "] Messy HFSM");
+        Debug.Log("[" + name + ", " + currentState + "] Looking for some trouble...");
+    }
+
+    protected void SabotageDrink()
+    {
+        Debug.Log("[" + name + ", " + currentState + "] Drinking should be fun!");
+    }
+
+    protected void BotherTeacher()
+    {
+        Debug.Log("[" + name + ", " + currentState + "] Hey, teacher! Leave those kids alone!");
+
+    }
+
+    protected void CheckAffinity()
+    {
+        Debug.Log("[" + name + ", " + currentState + "] Is this one chad or virgin?");
+    }
+
+    protected void Fight()
+    {
+        Debug.Log("[" + name + ", " + currentState + "] Take this Billy!");
+    }
+
+    protected void Negotiate()
+    {
+        Debug.Log("[" + name + ", " + currentState + "] Don't sneak!");
+    }
+
+    protected void Run()
+    {
+        Debug.Log("[" + name + ", " + currentState + "] Run run run!");
     }
 
 }

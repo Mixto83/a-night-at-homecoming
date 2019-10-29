@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] List<GameObject> Agents;
     List<Character> People;
-    bool debugMode = true;
+    public bool debugMode = true;
 
     string[] Names = new string[] { "Diego", "Mario", "Juan", "Cesar", "Daniel", "Pedro", "Manuel", "Maria", "Marta", "Carmen", "Raquel", "Lucia", "Ana", "Laura" };
 
@@ -85,27 +85,23 @@ public class GameManager : MonoBehaviour
         //General Student FSM
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            foreach (Student student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = Student.studentStates.start;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.start;
         }
         if (Input.GetKeyDown(KeyCode.X))
         {
-            foreach (Student student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = Student.studentStates.roleBehaviour;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.rest;
         }
         if (Input.GetKeyDown(KeyCode.C))
         {
-            foreach (Student student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = Student.studentStates.rest;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.drink;
         }
         if (Input.GetKeyDown(KeyCode.V))
         {
-            foreach (Student student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = Student.studentStates.drink;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.breath;
         }
         if (Input.GetKeyDown(KeyCode.B))
         {
-            foreach (Student student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = Student.studentStates.breath;
-        }
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            foreach (Student student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = Student.studentStates.punishment;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.punishment;
         }
 
         //Drink HFSM
@@ -157,31 +153,31 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Q))
         {
             //The foreach for CalmStudent, OrganizerStudent and Pro
-            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentMessState = MessyStudent.messStates.lookForMess;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.lookForMess;
         }
         if (Input.GetKeyDown(KeyCode.W))
         {
-            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentMessState = MessyStudent.messStates.sabotageDrink;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.sabotageDrink;
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
-            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentMessState = MessyStudent.messStates.negotiateOrganizer;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.negotiateOrganizer;
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
-            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentMessState = MessyStudent.messStates.runAway;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.runAway;
         }
         if (Input.GetKeyDown(KeyCode.T))
         {
-            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentMessState = MessyStudent.messStates.botherTeacher;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.botherTeacher;
         }
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentMessState = MessyStudent.messStates.checkAffinity;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.checkAffinity;
         }
         if (Input.GetKeyDown(KeyCode.U))
         {
-            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentMessState = MessyStudent.messStates.fightStudent;
+            foreach (MessyStudent student in People.FindAll(x => x.getRole() == Roles.MessyStudent)) student.currentState = MessyStudent.messStates.fightStudent;
         }
     }
 }
