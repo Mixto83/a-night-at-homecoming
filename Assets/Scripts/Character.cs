@@ -38,6 +38,11 @@ public class Character
     }
 
     //Overrides
+
+    public virtual void FSM()
+    {
+        Debug.Log("[" + name + "] Behaviour not defined");
+    }
     public virtual void Patrol() {
         Debug.Log("[" + name + "] Behaviour not defined");
     }

@@ -5,17 +5,17 @@ using UnityEngine;
 public class Student : Character
 {
     //parameters
-    protected enum studentStates {start, roleBehaviour, rest, drink, breath, punishment}
-    protected enum drinkStates { walkToBar, waitQueue, drinking}
-    protected enum restStates { walkToBenches, satInBench}
-    protected enum breathStates { walkOutside, stayOutside}
-    protected enum punishmentStates { waitEndOfPunishment, scapeFromPunishment}
+    public enum studentStates {start, roleBehaviour, rest, drink, breath, punishment}
+    public enum drinkStates { walkToBar, waitQueue, drinking}
+    public enum restStates { walkToBenches, satInBench}
+    public enum breathStates { walkOutside, stayOutside}
+    public enum punishmentStates { waitEndOfPunishment, scapeFromPunishment}
 
-    protected studentStates currentState;
-    protected drinkStates currentDrink;
-    protected restStates currentRest;
-    protected breathStates currentBreath;
-    protected punishmentStates currentPunishment;
+    public studentStates currentState;
+    public drinkStates currentDrink;
+    public restStates currentRest;
+    public breathStates currentBreath;
+    public punishmentStates currentPunishment;
 
     //methods
     protected Student(string name, Genders gender, Vector2 position) : base(name, gender, position)
@@ -27,34 +27,43 @@ public class Student : Character
         this.currentPunishment = punishmentStates.waitEndOfPunishment;
     }
 
-    public override void Enjoying()
+    public override void FSM()
     {
-        Debug.Log("[" + name + "] I'm having fun!");
-
         //Student FSM
         switch (currentState)
         {
             case studentStates.start:
-                Debug.Log("[" + name + "] Changing to my behaviour state");
+                Debug.Log("[" + name + ", " + currentState + "] Just Starting!");
+                Enjoying();
                 break;
             case studentStates.breath:
-                Debug.Log("[" + name + "] Breathing state");
+                Debug.Log("[" + name + ", " + currentState + "] Breathing state");
+                Breathing();
                 break;
             case studentStates.drink:
-                Debug.Log("[" + name + "] Drinking state");
+                Debug.Log("[" + name + ", " + currentState + "] Drinking state");
+                Drinking();
                 break;
             case studentStates.punishment:
-                Debug.Log("[" + name + "] Punishment state");
+                Debug.Log("[" + name + ", " + currentState + "] Punishment state");
+                Punishment();
                 break;
             case studentStates.rest:
-                Debug.Log("[" + name + "] Resting state");
+                Debug.Log("[" + name + ", " + currentState + "] Resting state");
+                Resting();
                 break;
             case studentStates.roleBehaviour:
-                Debug.Log("[" + name + "] This is my special behaviour");
+                Debug.Log("[" + name + ", " + currentState + "] This is my special behaviour");
+                RoleHFSM();
                 break;
             default:
                 break;
         }
+    }
+
+    public override void Enjoying()
+    {
+        //Debug.Log("[" + name + "] I'm having fun!");
     }
 
     //Drinking State FSM: Messy and Calm Students
@@ -63,13 +72,13 @@ public class Student : Character
         switch (currentDrink)
         {
             case drinkStates.walkToBar:
-                Debug.Log("[" + name + "] Walking to the bar...");
+                Debug.Log("[" + name + ", " + currentDrink + "] Walking to the bar...");
                 break;
             case drinkStates.waitQueue:
-                Debug.Log("[" + name + "] Waiting queue...");
+                Debug.Log("[" + name + ", " + currentDrink + "] Waiting queue...");
                 break;
             case drinkStates.drinking:
-                Debug.Log("[" + name + "] Actually drinking!");
+                Debug.Log("[" + name + ", " + currentDrink + "] Actually drinking!");
                 break;
             default:
                 break;
@@ -82,10 +91,10 @@ public class Student : Character
         switch (currentRest)
         {
             case restStates.walkToBenches:
-                Debug.Log("[" + name + "] Walking to benches");
+                Debug.Log("[" + name + ", " + currentRest + "] Walking to benches");
                 break;
             case restStates.satInBench:
-                Debug.Log("[" + name + "] Sat in the bench");
+                Debug.Log("[" + name + ", " + currentRest + "] Sat in the bench");
                 break;
             default:
                 break;
@@ -98,10 +107,10 @@ public class Student : Character
         switch (currentBreath)
         {
             case breathStates.walkOutside:
-                Debug.Log("[" + name + "] Walking outside...");
+                Debug.Log("[" + name + ", " + currentBreath + "] Walking outside...");
                 break;
             case breathStates.stayOutside:
-                Debug.Log("[" + name + "] I'm outside!");
+                Debug.Log("[" + name + ", " + currentBreath + "] I'm outside!");
                 break;
             default:
                 break;
@@ -114,14 +123,20 @@ public class Student : Character
         switch (currentPunishment)
         {
             case punishmentStates.waitEndOfPunishment:
-                Debug.Log("[" + name + "] Waiting for being free...");
+                Debug.Log("[" + name + ", " + currentPunishment + "] Waiting for being free...");
                 break;
             case punishmentStates.scapeFromPunishment:
-                Debug.Log("[" + name + "] Now it's my chance!");
+                Debug.Log("[" + name + ", " + currentPunishment + "] Now it's my chance!");
                 break;
             default:
                 break;
         }
     }
-    
+
+    //HFSM of each role
+    protected virtual void RoleHFSM()
+    {
+        Debug.Log("[" + name + "] Behaviour not defined");
+    }
+
 }

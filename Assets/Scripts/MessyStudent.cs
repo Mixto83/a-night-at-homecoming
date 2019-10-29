@@ -5,12 +5,12 @@ using UnityEngine;
 public class MessyStudent : Student
 {
     //parameters
-    protected enum messStates
+    public enum messStates
     {
         lookForMess, sabotageDrink, negotiateOrganizer, runAway,
         botherTeacher, checkAffinity, fightStudent
     }
-    protected messStates currentMessState;
+    public messStates currentMessState;
 
     //methods
     public MessyStudent(string name, Genders gender, Vector2 position) : base(name, gender, position)
@@ -19,44 +19,40 @@ public class MessyStudent : Student
         this.currentMessState = messStates.lookForMess;
     }
 
-    public override void Trouble()
+    protected override void RoleHFSM()
     {
-        Debug.Log("[" + name + "] Ni**er");
-        
         //Messy Student's FSM
         switch (currentMessState)
         {
             case messStates.lookForMess:
-                Debug.Log("[" + name + "] Looking for some trouble...");
-                this.currentMessState = messStates.sabotageDrink;
+                Debug.Log("[" + name + ", " + currentMessState + "] Looking for some trouble...");
                 break;
             case messStates.sabotageDrink:
-                Debug.Log("[" + name + "] Drinking should be fun!");
-                this.currentMessState = messStates.botherTeacher;
+                Debug.Log("[" + name + ", " + currentMessState + "] Drinking should be fun!");
                 break;
             case messStates.botherTeacher:
-                Debug.Log("[" + name + "] Hey, teacher! Leave those kids alone!");
-                this.currentMessState = messStates.checkAffinity;
+                Debug.Log("[" + name + ", " + currentMessState + "] Hey, teacher! Leave those kids alone!");
                 break;
             case messStates.checkAffinity:
-                Debug.Log("[" + name + "] Is this one chad or virgin?");
-                this.currentMessState = messStates.fightStudent;
+                Debug.Log("[" + name + ", " + currentMessState + "] Is this one chad or virgin?");
                 break;
             case messStates.fightStudent:
-                Debug.Log("[" + name + "] Take this Billy!");
-                this.currentMessState = messStates.negotiateOrganizer;
+                Debug.Log("[" + name + ", " + currentMessState + "] Take this Billy!");
                 break;
             case messStates.negotiateOrganizer:
-                Debug.Log("[" + name + "] Don't sneak!");
-                this.currentMessState = messStates.runAway;
+                Debug.Log("[" + name + ", " + currentMessState + "] Don't sneak!");
                 break;
             case messStates.runAway:
-                Debug.Log("[" + name + "] Run run run!");
-                this.currentMessState = messStates.sabotageDrink;
+                Debug.Log("[" + name + ", " + currentMessState + "] Run run run!");
                 break;
             default:
                 break;
         }
+    }
+
+    public override void Trouble()
+    {
+        //Debug.Log("[" + name + "] Messy HFSM");
     }
 
 }
