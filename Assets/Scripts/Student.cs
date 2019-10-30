@@ -19,12 +19,10 @@ public class Student : Character
     #endregion
 
     #region HFSM States
-    public enum drinkStates { walkToBar, waitQueue, drinking}
     public enum restStates { walkToBenches, satInBench}
     public enum breathStates { walkOutside, stayOutside}
     public enum punishmentStates { waitEndOfPunishment, scapeFromPunishment}
 
-    public drinkStates currentDrink;
     public restStates currentRest;
     public breathStates currentBreath;
     public punishmentStates currentPunishment;
@@ -46,25 +44,6 @@ public class Student : Character
     public override void Enjoying()
     {
         //Debug.Log("[" + name + "] I'm having fun!");
-    }
-
-    //Drinking State FSM: Messy and Calm Students
-    protected void Drinking()
-    {
-        switch (currentDrink)
-        {
-            case drinkStates.walkToBar:
-                Debug.Log("[" + name + ", " + currentDrink + "] Walking to the bar...");
-                break;
-            case drinkStates.waitQueue:
-                Debug.Log("[" + name + ", " + currentDrink + "] Waiting queue...");
-                break;
-            case drinkStates.drinking:
-                Debug.Log("[" + name + ", " + currentDrink + "] Actually drinking!");
-                break;
-            default:
-                break;
-        }
     }
 
     //Resting State FSM: Messy and Calm Students
