@@ -15,6 +15,7 @@ public class Student : Character
     protected float fatigue;
     protected float amusement;
     protected float thirst;
+    protected int affinityTolerance = 5;
     #endregion
 
     #region HFSM States

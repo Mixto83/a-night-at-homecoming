@@ -15,7 +15,7 @@ public class MessyStudent : Student
     public messStates currentState;
     #endregion
 
-    protected int affinityTolerance = 5;
+    
 
     //methods
     public MessyStudent(string name, Genders gender, Vector2 position) : base(name, gender, position)
