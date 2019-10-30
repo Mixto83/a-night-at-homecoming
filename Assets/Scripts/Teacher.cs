@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Teacher : Character
+public class Teacher : Authority
 {
     //parameters
-    protected float strictness;
-
     #region States
 
     public enum teacherStates
