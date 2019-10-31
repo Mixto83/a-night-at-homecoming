@@ -44,7 +44,7 @@ public class Character
     }
 
     //Drinking State FSM: Messy and Calm Students and Teachers
-    protected void Drinking()
+    protected string Drinking()
     {
         switch (currentDrink)
         {
@@ -60,6 +60,8 @@ public class Character
             default:
                 break;
         }
+
+        return "" + currentDrink;
     }
 
     //Overrides
@@ -70,17 +72,20 @@ public class Character
         return false;
     }
 
-    public virtual void FSM()
+    public virtual string FSM()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
+        return "NOT DEFINED";
     }
 
-    public virtual void Patrol() {
+    public virtual string Patrol() {
         Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
+        return "NOT DEFINED";
     }
 
-    public virtual void Flirt() {
+    public virtual string Flirt() {
         Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
+        return "NOT DEFINED";
     }
 
     public virtual void Trouble() {

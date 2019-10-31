@@ -47,7 +47,7 @@ public class Student : Character
     }
 
     //Resting State FSM: Messy and Calm Students
-    protected void Resting()
+    protected string Resting()
     {
         switch (currentRest)
         {
@@ -60,10 +60,12 @@ public class Student : Character
             default:
                 break;
         }
+
+        return "" + currentRest;
     }
 
     //Breathing State FSM: Messy and Calm Students
-    protected void Breathing()
+    protected string Breathing()
     {
         switch (currentBreath)
         {
@@ -76,10 +78,12 @@ public class Student : Character
             default:
                 break;
         }
+
+        return "" + currentBreath;
     }
 
     //Punishment State FSM: Messy and Calm Students
-    protected void Punishment()
+    protected string Punishment()
     {
         switch (currentPunishment)
         {
@@ -92,5 +96,7 @@ public class Student : Character
             default:
                 break;
         }
+
+        return "" + currentPunishment;
     }
 }

@@ -6,6 +6,7 @@ public class Authority : Character
 {
     //parameters
     protected int targetReached = 0; //0: None, 1: Door, 2: Bar, 3: Patrol initial position
+    protected int timeInWelcome = 0;
 
     #region Stats
     protected float strictness;
@@ -52,19 +53,43 @@ public class Authority : Character
     }
 
     //Door State FSM: Organizer Students and Teachers
-    protected void AtDoor()
+    protected string AtDoor()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Door state");
         switch (currentDoor)
         {
             case doorStates.wait:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentDoor + "] Waiting at the door...");
+                if(Waiting()) {
+                    currentDoor = doorStates.welcome;
+                }
                 break;
             case doorStates.welcome:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentDoor + "] Welcome to the party!");
+                if (timeInWelcome >= 100)
+                {
+                    timeInWelcome = 0;
+                    currentDoor = doorStates.wait;
+                } else
+                {
+                    timeInWelcome++;
+                }
                 break;
             default:
                 break;
         }
+
+        return "" + currentDoor;
+    }
+
+    protected bool Waiting()
+    {
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentDoor + "] Waiting for someone to come...");
+
+        if(Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

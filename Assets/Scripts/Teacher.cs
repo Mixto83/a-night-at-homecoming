@@ -40,8 +40,10 @@ public class Teacher : Authority
         this.strictness = 1;
     }
 
-    public override void FSM()
+    public override string FSM()
     {
+        string extraState = "";
+
         //Teacher's FSM
         switch (currentState)
         {
@@ -50,31 +52,33 @@ public class Teacher : Authority
                 break;
             case teacherStates.patrol:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Patrol State");
-                Patrol();
+                extraState = Patrol();
                 break;
             case teacherStates.drink:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking state");
-                Drinking();
+                extraState = Drinking();
                 break;
             case teacherStates.door:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Door state");
-                AtDoor();
+                extraState = AtDoor();
                 break;
             case teacherStates.chase:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Chasing state");
-                Chasing();
+                extraState = Chasing();
                 break;
             case teacherStates.punishment:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Punishing state");
-                Punishing();
+                extraState = Punishing();
                 break;
             default:
                 break;
         }
+
+        return "" + currentState + "  " + extraState;
     }
 
     //Patrolling State FSM: Teachers
-    public override void Patrol()
+    public override string Patrol()
     {
         switch (currentPatrol)
         {
@@ -87,11 +91,13 @@ public class Teacher : Authority
             default:
                 break;
         }
+
+        return "" + currentPatrol;
         
     }
 
     //Chasing State FSM: Teachers
-    protected void Chasing()
+    protected string Chasing()
     {
         switch (currentChase)
         {
@@ -107,10 +113,12 @@ public class Teacher : Authority
             default:
                 break;
         }
+
+        return "" + currentChase;
     }
 
     //Punishment Room State FSM: Teachers
-    protected void Punishing()
+    protected string Punishing()
     {
         switch (currentPunishment)
         {
@@ -123,5 +131,7 @@ public class Teacher : Authority
             default:
                 break;
         }
+
+        return "" + currentPunishment;
     }
 }

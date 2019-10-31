@@ -109,9 +109,12 @@ public class GameManager : MonoBehaviour
             debugKeyboard();
         }
 
-        if (Input.anyKeyDown)
+        if (true)
         {
-            foreach (Character character in People) character.FSM();
+            foreach (Character character in People)
+            {
+                Agents[People.IndexOf(character)].GetComponentInChildren<UnityEngine.UI.Text>().text = character.FSM();
+            }
         }
     }
 

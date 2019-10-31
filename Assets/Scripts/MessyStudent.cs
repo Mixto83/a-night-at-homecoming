@@ -24,8 +24,10 @@ public class MessyStudent : Student
         //this.currentState = messStates.lookForMess;
     }
 
-    public override void FSM()
+    public override string FSM()
     {
+        string extraState = "";
+
         //Messy Student's FSM
         switch (currentState)
         {
@@ -35,19 +37,19 @@ public class MessyStudent : Student
                 break;
             case messStates.breath:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Breathing state");
-                Breathing();
+                extraState = Breathing();
                 break;
             case messStates.drink:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking state");
-                Drinking();
+                extraState = Drinking();
                 break;
             case messStates.punishment:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Punishment state");
-                Punishment();
+                extraState = Punishment();
                 break;
             case messStates.rest:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Resting state");
-                Resting();
+                extraState = Resting();
                 break;
             case messStates.lookForMess:
                 Trouble();
@@ -74,6 +76,8 @@ public class MessyStudent : Student
             default:
                 break;
         }
+
+        return "" + currentState + "  " + extraState;
     }
 
     public override void Trouble()
@@ -81,7 +85,7 @@ public class MessyStudent : Student
         Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Looking for some trouble...");
         //Debug.Log("[" + name + "] Hobbies: " + Hobbies[0] + ", " + Hobbies[1] + " and " + Hobbies[2]);
         //Debug.Log("[" + name + "] Fav Foods: " + FavFoods[0] + ", " + FavFoods[1] + " and " + FavFoods[2]);
-        //Debug.Log("[" + name + "] Fav Animals: " + FavAnimals[0] + ", " + FavAnimals[1] + " and " + FavAnimals[2]);           
+        //Debug.Log("[" + name + "] Fav Animals: " + FavAnimals[0] + ", " + FavAnimals[1] + " and " + FavAnimals[2]);  
     }
 
     protected void SabotageDrink()

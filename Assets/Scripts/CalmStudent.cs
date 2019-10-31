@@ -32,8 +32,10 @@ public class CalmStudent : Student
         //this.currentState = calmStates.enjoy;
     }
 
-    public override void FSM()
+    public override string FSM()
     {
+        string extraState = "";
+
         //Calm Student's FSM
         switch (currentState)
         {
@@ -46,34 +48,36 @@ public class CalmStudent : Student
                 break;
             case calmStates.rest:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Resting state");
-                Resting();
+                extraState = Resting();
                 break;
             case calmStates.drink:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking state");
-                Drinking();
+                extraState = Drinking();
                 break;
             case calmStates.breath:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Breathing state");
-                Breathing();
+                extraState = Breathing();
                 break;
             case calmStates.flirt:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Flirt state");
-                Flirt();
+                extraState = Flirt();
                 break;
             case calmStates.fightStudent:
                 Fight();
                 break;
             case calmStates.punishment:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Punishment state");
-                Punishment();
+                extraState = Punishment();
                 break;
             default:
                 break;
         }
+
+        return "" + currentState + "  " + extraState;
     }
 
     //Flirting State FSM: Calm Students
-    public override void Flirt()
+    public override string Flirt()
     {
         switch (currentFlirtState)
         {
@@ -87,6 +91,8 @@ public class CalmStudent : Student
                 Kissing();
                 break;
         }
+
+        return "" + currentFlirtState;
     }
 
     protected void CheckAffinity(Student targetStudent)

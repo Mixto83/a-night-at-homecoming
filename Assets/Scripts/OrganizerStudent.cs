@@ -5,6 +5,8 @@ using UnityEngine;
 public class OrganizerStudent : Authority
 {
     //parameters
+    private int timeInServing = 0;
+
     #region States
 
     public enum organizerStates
@@ -34,33 +36,35 @@ public class OrganizerStudent : Authority
         this.strictness = 0.5f;
     }
 
-    public override void FSM()
+    public override string FSM()
     {
+        string extraState = "";
+
         //Organizer Student's FSM
         switch (currentState)
         {
             case organizerStates.start:
                 if (Start())
-                {
                     currentState = (organizerStates) targetReached;
-                }
                 break;
             case organizerStates.door:
-                AtDoor();
+                extraState = AtDoor();
                 break;
             case organizerStates.serveDrink:
-                ServeDrink();
+                extraState = ServeDrink();
                 break;
             case organizerStates.patrol:
-                Patrol();
+                extraState = Patrol();
                 break;
             default:
                 break;
         }
+
+        return "" + currentState + " " + extraState;
     }
 
     //Patrolling State FSM: Organizer Student
-    public override void Patrol()
+    public override string Patrol()
     {
         Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Door state");
         switch (currentPatrol)
@@ -81,22 +85,38 @@ public class OrganizerStudent : Authority
                 break;
         }
 
+        return "" + currentPatrol;
+
     }
 
     //Chasing State FSM: Teachers
-    protected void ServeDrink()
+    protected string ServeDrink()
     {
         Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Serve Drink state");
         switch (currentServeDrink)
         {
             case serveDrinkStates.waiting:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentServeDrink + "] Waiting at the bar...");
+                if (Waiting())
+                {
+                    currentServeDrink = serveDrinkStates.serve;
+                }
                 break;
             case serveDrinkStates.serve:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentServeDrink + "] Here you go, enjoy your drink!");
+                if (timeInServing >= 100)
+                {
+                    timeInServing = 0;
+                    currentServeDrink = serveDrinkStates.waiting;
+                }
+                else
+                {
+                    timeInServing++;
+                }
                 break;
             default:
                 break;
         }
+
+        return "" + currentServeDrink;
     }
 }
