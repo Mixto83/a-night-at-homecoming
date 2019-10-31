@@ -46,26 +46,26 @@ public class Teacher : Authority
         switch (currentState)
         {
             case teacherStates.start:
-                Debug.Log("[" + name + ", " + currentState + "] Just Starting!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Just Starting!");
                 break;
             case teacherStates.patrol:
-                Debug.Log("[" + name + ", " + currentState + "] Patrol State");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Patrol State");
                 Patrol();
                 break;
             case teacherStates.drink:
-                Debug.Log("[" + name + ", " + currentState + "] Drinking state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking state");
                 Drinking();
                 break;
             case teacherStates.door:
-                Debug.Log("[" + name + ", " + currentState + "] Door state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Door state");
                 AtDoor();
                 break;
             case teacherStates.chase:
-                Debug.Log("[" + name + ", " + currentState + "] Chasing state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Chasing state");
                 Chasing();
                 break;
             case teacherStates.punishment:
-                Debug.Log("[" + name + ", " + currentState + "] Punishing state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Punishing state");
                 Punishing();
                 break;
             default:
@@ -79,10 +79,10 @@ public class Teacher : Authority
         switch (currentPatrol)
         {
             case patrolStates.patrolling:
-                Debug.Log("[" + name + ", " + currentPatrol + "] I'm watching you...");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentPatrol + "] I'm watching you...");
                 break;
             case patrolStates.talking:
-                Debug.Log("[" + name + ", " + currentPatrol + "] Who did what??");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentPatrol + "] Who did what??");
                 break;
             default:
                 break;
@@ -96,13 +96,13 @@ public class Teacher : Authority
         switch (currentChase)
         {
             case chaseStates.chaseStudent:
-                Debug.Log("[" + name + ", " + currentChase + "] You can't get away from me!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentChase + "] You can't get away from me!");
                 break;
             case chaseStates.yellAtMessy:
-                Debug.Log("[" + name + ", " + currentChase + "] You are gonna face the consecuences");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentChase + "] You are gonna face the consecuences");
                 break;
             case chaseStates.bringToPunishment:
-                Debug.Log("[" + name + ", " + currentChase + "] Come to the punishment room, you punk!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentChase + "] Come to the punishment room, you punk!");
                 break;
             default:
                 break;
@@ -115,10 +115,10 @@ public class Teacher : Authority
         switch (currentPunishment)
         {
             case punishmentStates.looking:
-                Debug.Log("[" + name + ", " + currentChase + "] I'm watching you...(punishment room)");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentChase + "] I'm watching you...(punishment room)");
                 break;
             case punishmentStates.readingNews:
-                Debug.Log("[" + name + ", " + currentChase + "] President Tremp did what again?");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentChase + "] President Tremp did what again?");
                 break;
             default:
                 break;

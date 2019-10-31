@@ -21,7 +21,7 @@ public class MessyStudent : Student
     public MessyStudent(string name, Genders gender, Vector2 position) : base(name, gender, position)
     {
         this.role = Roles.MessyStudent;
-        this.currentState = messStates.lookForMess;
+        //this.currentState = messStates.lookForMess;
     }
 
     public override void FSM()
@@ -30,23 +30,23 @@ public class MessyStudent : Student
         switch (currentState)
         {
             case messStates.start:
-                Debug.Log("[" + name + ", " + currentState + "] Just Starting!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Just Starting!");
                 Enjoying();
                 break;
             case messStates.breath:
-                Debug.Log("[" + name + ", " + currentState + "] Breathing state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Breathing state");
                 Breathing();
                 break;
             case messStates.drink:
-                Debug.Log("[" + name + ", " + currentState + "] Drinking state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking state");
                 Drinking();
                 break;
             case messStates.punishment:
-                Debug.Log("[" + name + ", " + currentState + "] Punishment state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Punishment state");
                 Punishment();
                 break;
             case messStates.rest:
-                Debug.Log("[" + name + ", " + currentState + "] Resting state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Resting state");
                 Resting();
                 break;
             case messStates.lookForMess:
@@ -59,7 +59,7 @@ public class MessyStudent : Student
                 BotherTeacher();
                 break;
             case messStates.checkAffinity:
-                Debug.Log("[" + name + ", " + currentState + "] Is this one chad or virgin?");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Is this one chad or virgin?");
                 //CheckAffinity();
                 break;
             case messStates.fightStudent:
@@ -78,7 +78,7 @@ public class MessyStudent : Student
 
     public override void Trouble()
     {
-        Debug.Log("[" + name + ", " + currentState + "] Looking for some trouble...");
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Looking for some trouble...");
         //Debug.Log("[" + name + "] Hobbies: " + Hobbies[0] + ", " + Hobbies[1] + " and " + Hobbies[2]);
         //Debug.Log("[" + name + "] Fav Foods: " + FavFoods[0] + ", " + FavFoods[1] + " and " + FavFoods[2]);
         //Debug.Log("[" + name + "] Fav Animals: " + FavAnimals[0] + ", " + FavAnimals[1] + " and " + FavAnimals[2]);           
@@ -86,12 +86,12 @@ public class MessyStudent : Student
 
     protected void SabotageDrink()
     {
-        Debug.Log("[" + name + ", " + currentState + "] Drinking should be fun!");
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking should be fun!");
     }
 
     protected void BotherTeacher()
     {
-        Debug.Log("[" + name + ", " + currentState + "] Hey, teacher! Leave those kids alone!");
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Hey, teacher! Leave those kids alone!");
 
     }
 
@@ -122,27 +122,27 @@ public class MessyStudent : Student
 
         if (affinity > affinityTolerance)
         {
-            Debug.Log("[" + name + ", " + currentState + "] This dude is a total chad!");
+            Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] This dude is a total chad!");
         } else
         {
-            Debug.Log("[" + name + ", " + currentState + "] What a virgin!");
+            Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] What a virgin!");
             Fight();
         }
     }
 
     protected void Fight()
     {
-        Debug.Log("[" + name + ", " + currentState + "] Take this Billy!");
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Take this Billy!");
     }
 
     protected void Negotiate()
     {
-        Debug.Log("[" + name + ", " + currentState + "] Don't sneak!");
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Don't sneak!");
     }
 
     protected void Run()
     {
-        Debug.Log("[" + name + ", " + currentState + "] Run run run!");
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Run run run!");
     }
 
 }

@@ -49,13 +49,13 @@ public class Character
         switch (currentDrink)
         {
             case drinkStates.walkToBar:
-                Debug.Log("[" + name + ", " + currentDrink + "] Walking to the bar...");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentDrink + "] Walking to the bar...");
                 break;
             case drinkStates.waitQueue:
-                Debug.Log("[" + name + ", " + currentDrink + "] Waiting queue...");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentDrink + "] Waiting queue...");
                 break;
             case drinkStates.drinking:
-                Debug.Log("[" + name + ", " + currentDrink + "] Actually drinking!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentDrink + "] Actually drinking!");
                 break;
             default:
                 break;
@@ -64,23 +64,30 @@ public class Character
 
     //Overrides
 
+    public virtual bool Start()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
+        return false;
+    }
+
     public virtual void FSM()
     {
-        Debug.Log("[" + name + "] Behaviour not defined");
+        Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
     }
+
     public virtual void Patrol() {
-        Debug.Log("[" + name + "] Behaviour not defined");
+        Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
     }
 
     public virtual void Flirt() {
-        Debug.Log("[" + name + "] Behaviour not defined");
+        Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
     }
 
     public virtual void Trouble() {
-        Debug.Log("[" + name + "] Behaviour not defined");
+        Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
     }
 
     public virtual void Enjoying() {
-        Debug.Log("[" + name + "] Behaviour not defined");
+        Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");   
     }
 }

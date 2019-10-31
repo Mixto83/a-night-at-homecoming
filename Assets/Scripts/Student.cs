@@ -52,10 +52,10 @@ public class Student : Character
         switch (currentRest)
         {
             case restStates.walkToBenches:
-                Debug.Log("[" + name + ", " + currentRest + "] Walking to benches");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentRest + "] Walking to benches");
                 break;
             case restStates.satInBench:
-                Debug.Log("[" + name + ", " + currentRest + "] Sat in the bench");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentRest + "] Sat in the bench");
                 break;
             default:
                 break;
@@ -68,10 +68,10 @@ public class Student : Character
         switch (currentBreath)
         {
             case breathStates.walkOutside:
-                Debug.Log("[" + name + ", " + currentBreath + "] Walking outside...");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentBreath + "] Walking outside...");
                 break;
             case breathStates.stayOutside:
-                Debug.Log("[" + name + ", " + currentBreath + "] I'm outside!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentBreath + "] I'm outside!");
                 break;
             default:
                 break;
@@ -84,10 +84,10 @@ public class Student : Character
         switch (currentPunishment)
         {
             case punishmentStates.waitEndOfPunishment:
-                Debug.Log("[" + name + ", " + currentPunishment + "] Waiting for being free...");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentPunishment + "] Waiting for being free...");
                 break;
             case punishmentStates.scapeFromPunishment:
-                Debug.Log("[" + name + ", " + currentPunishment + "] Now is my chance!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentPunishment + "] Now is my chance!");
                 break;
             default:
                 break;

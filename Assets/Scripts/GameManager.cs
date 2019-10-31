@@ -95,10 +95,10 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        foreach (Character character in People.FindAll(x => x.getRole() == Roles.CalmStudent)) character.Flirt();
+        /*foreach (Character character in People.FindAll(x => x.getRole() == Roles.CalmStudent)) character.Flirt();
         foreach (Character character in People.FindAll(x => x.getRole() == Roles.MessyStudent)) character.Trouble();
         foreach (Character character in People.FindAll(x => x.getRole() == Roles.Teacher)) character.Patrol();
-        foreach (Character character in People.FindAll(x => x.getRole() == Roles.OrganizerStudent)) character.Enjoying();
+        foreach (Character character in People.FindAll(x => x.getRole() == Roles.OrganizerStudent)) character.Enjoying();*/
     }
 
     // Update is called once per frame

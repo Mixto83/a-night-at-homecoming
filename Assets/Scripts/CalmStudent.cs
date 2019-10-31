@@ -29,7 +29,7 @@ public class CalmStudent : Student
     public CalmStudent(string name, Genders gender, Vector2 position) : base(name, gender, position)
     {
         this.role = Roles.CalmStudent;
-        this.currentState = calmStates.enjoy;
+        //this.currentState = calmStates.enjoy;
     }
 
     public override void FSM()
@@ -38,33 +38,33 @@ public class CalmStudent : Student
         switch (currentState)
         {
             case calmStates.start:
-                Debug.Log("[" + name + ", " + currentState + "] Just Starting!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Just Starting!");
                 //currentState = calmStates.enjoy;
                 break;
             case calmStates.enjoy:
                 Enjoying();
                 break;
             case calmStates.rest:
-                Debug.Log("[" + name + ", " + currentState + "] Resting state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Resting state");
                 Resting();
                 break;
             case calmStates.drink:
-                Debug.Log("[" + name + ", " + currentState + "] Drinking state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking state");
                 Drinking();
                 break;
             case calmStates.breath:
-                Debug.Log("[" + name + ", " + currentState + "] Breathing state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Breathing state");
                 Breathing();
                 break;
             case calmStates.flirt:
-                Debug.Log("[" + name + ", " + currentState + "] Flirt state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Flirt state");
                 Flirt();
                 break;
             case calmStates.fightStudent:
                 Fight();
                 break;
             case calmStates.punishment:
-                Debug.Log("[" + name + ", " + currentState + "] Punishment state");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Punishment state");
                 Punishment();
                 break;
             default:
@@ -116,27 +116,27 @@ public class CalmStudent : Student
 
         if (affinity > affinityTolerance)
         {
-            Debug.Log("[" + name + ", " + currentState + "] This dude is a total chad!");
+            Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] This dude is a total chad!");
         }
         else
         {
-            Debug.Log("[" + name + ", " + currentState + "] What a virgin!");
+            Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] What a virgin!");
             Fight();
         }
     }
 
     protected void Fight()
     {
-        Debug.Log("[" + name + ", " + currentState + "] Take this Billy!");
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Take this Billy!");
     }
 
     protected void Dancing()
     {
-        Debug.Log("[" + name + ", " + currentState + "] I'm the dancing queen!");
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] I'm the dancing queen!");
     }
 
     protected void Kissing()
     {
-        Debug.Log("[" + name + ", " + currentState + "] Chuu");
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Chuu");
     }
 }

@@ -5,6 +5,8 @@ using UnityEngine;
 public class Authority : Character
 {
     //parameters
+    protected int targetReached = 0; //0: None, 1: Door, 2: Bar, 3: Patrol initial position
+
     #region Stats
     protected float strictness;
     protected float thirst;
@@ -22,16 +24,44 @@ public class Authority : Character
 
     }
 
+    //Start State Common behaviour: Organizer Students and Teachers
+    public override bool Start()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Just Starting!");
+
+        //Move towards target (door, bar or patrol inital position)
+
+        //Esto es para debug solo, en la version final habrá que mover el personaje
+        //hacia el target que le toque, y cuando llegue se pone targetReached a 1, 2, 3 (segun que target sea)
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            targetReached = 1;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            targetReached = 2;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            targetReached = 3;
+        }
+
+        if (targetReached == 1 || targetReached == 2 || targetReached == 3)
+            return true;
+        return false;
+    }
+
     //Door State FSM: Organizer Students and Teachers
     protected void AtDoor()
     {
+        Debug.Log("[" + name + ", " + getRole() + "] Door state");
         switch (currentDoor)
         {
             case doorStates.wait:
-                Debug.Log("[" + name + ", " + currentDoor + "] Waiting at the door...");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentDoor + "] Waiting at the door...");
                 break;
             case doorStates.welcome:
-                Debug.Log("[" + name + ", " + currentDoor + "] Welcome to the party!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentDoor + "] Welcome to the party!");
                 break;
             default:
                 break;

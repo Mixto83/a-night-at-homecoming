@@ -40,18 +40,18 @@ public class OrganizerStudent : Authority
         switch (currentState)
         {
             case organizerStates.start:
-                Debug.Log("[" + name + ", " + currentState + "] Just Starting!");
+                if (Start())
+                {
+                    currentState = (organizerStates) targetReached;
+                }
                 break;
             case organizerStates.door:
-                Debug.Log("[" + name + ", " + currentState + "] Door state");
                 AtDoor();
                 break;
             case organizerStates.serveDrink:
-                Debug.Log("[" + name + ", " + currentState + "] Serve Drink state");
                 ServeDrink();
                 break;
             case organizerStates.patrol:
-                Debug.Log("[" + name + ", " + currentState + "] Door state");
                 Patrol();
                 break;
             default:
@@ -62,19 +62,20 @@ public class OrganizerStudent : Authority
     //Patrolling State FSM: Organizer Student
     public override void Patrol()
     {
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Door state");
         switch (currentPatrol)
         {
             case patrolStates.patrolling:
-                Debug.Log("[" + name + ", " + currentPatrol + "] I'm watching you...");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentPatrol + "] I'm watching you...");
                 break;
             case patrolStates.chaseStudent:
-                Debug.Log("[" + name + ", " + currentPatrol + "] You can't get away from me!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentPatrol + "] You can't get away from me!");
                 break;
             case patrolStates.negotiate:
-                Debug.Log("[" + name + ", " + currentPatrol + "] I'm not sure if I should call a teacher");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentPatrol + "] I'm not sure if I should call a teacher");
                 break;
             case patrolStates.callTeacher:
-                Debug.Log("[" + name + ", " + currentPatrol + "] Hey, teacher! This kid made a mess");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentPatrol + "] Hey, teacher! This kid made a mess");
                 break;
             default:
                 break;
@@ -85,13 +86,14 @@ public class OrganizerStudent : Authority
     //Chasing State FSM: Teachers
     protected void ServeDrink()
     {
+        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Serve Drink state");
         switch (currentServeDrink)
         {
             case serveDrinkStates.waiting:
-                Debug.Log("[" + name + ", " + currentServeDrink + "] Waiting at the bar...");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentServeDrink + "] Waiting at the bar...");
                 break;
             case serveDrinkStates.serve:
-                Debug.Log("[" + name + ", " + currentServeDrink + "] Here you go, enjoy your drink!");
+                Debug.Log("[" + name + ", " + getRole() + ", " + currentServeDrink + "] Here you go, enjoy your drink!");
                 break;
             default:
                 break;
