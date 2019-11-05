@@ -5,6 +5,12 @@ using UnityEngine;
 public class Student : Character
 {
     //parameters
+    #region const
+    protected const int thirstThreshold = 5;
+    protected const int fatigueThreshold = 5;
+    protected const int amusementThreshold = 5;
+    #endregion
+
     #region Interests
     public List<string> FavFoods;
     public List<string> FavAnimals;
@@ -16,6 +22,7 @@ public class Student : Character
     protected float amusement;
     protected float thirst;
     protected int affinityTolerance = 5;
+    protected Vector2 initPos;
     #endregion
 
     #region HFSM States
@@ -35,6 +42,7 @@ public class Student : Character
         this.currentRest = restStates.walkToBenches;
         this.currentBreath = breathStates.walkOutside;
         this.currentPunishment = punishmentStates.waitEndOfPunishment;
+        this.initPos = new Vector2(Random.Range(-200,200), Random.Range(-200, 200));
 
         this.FavFoods = new List<string>();
         this.FavAnimals = new List<string>();

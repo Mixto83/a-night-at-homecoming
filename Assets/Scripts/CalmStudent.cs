@@ -21,9 +21,14 @@ public class CalmStudent : Student
     public flirtStates currentFlirtState;
     #endregion
 
-    protected Vector2 initPos;
-    protected Vector2 meetPos;
+    #region Stats
 
+    protected Vector2 meetPos;
+    protected const int affinityThreshold = 6;
+    protected const int DanceAffinityThreshold = 8;
+    protected Student targetStudent;
+
+    #endregion
 
     //methods
     public CalmStudent(string name, Genders gender, Vector2 position) : base(name, gender, position)
@@ -41,33 +46,40 @@ public class CalmStudent : Student
         {
             case calmStates.start:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Just Starting!");
-                //currentState = calmStates.enjoy;
+                findFriends();
+                currentState = calmStates.enjoy;
                 break;
             case calmStates.enjoy:
                 Enjoying();
+                if (this.amusement < amusementThreshold) currentState = calmStates.rest;
+                if (this.thirst < thirstThreshold) currentState = calmStates.drink;
+                if (this.fatigue > fatigueThreshold) currentState = calmStates.breath;
                 break;
             case calmStates.rest:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Resting state");
-                extraState = Resting();
+                Resting();
                 break;
             case calmStates.drink:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking state");
-                extraState = Drinking();
+                Drinking();
                 break;
             case calmStates.breath:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Breathing state");
-                extraState = Breathing();
+                Breathing();
+                if (this.fatigue < fatigueThreshold) currentState = calmStates.enjoy;
                 break;
             case calmStates.flirt:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Flirt state");
-                extraState = Flirt();
+                Flirt();
+                if (this.CheckAffinity(targetStudent) < affinityThreshold) currentState = calmStates.enjoy;
+                if (this.CheckAffinity(targetStudent) < DanceAffinityThreshold) currentState = calmStates.enjoy;//Para baile
                 break;
             case calmStates.fightStudent:
                 Fight();
                 break;
             case calmStates.punishment:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Punishment state");
-                extraState = Punishment();
+                Punishment();
                 break;
             default:
                 break;
@@ -82,9 +94,20 @@ public class CalmStudent : Student
         switch (currentFlirtState)
         {
             case flirtStates.checkAffinity:
-                //CheckAffinity();
+                
+                if (this.CheckAffinity(targetStudent) > affinityThreshold)
+                {
+                    Debug.Log("[" + name + ", " + getRole() + ", " + currentFlirtState + "] I like you!");
+                    currentFlirtState = flirtStates.dance;
+                }
                 break;
             case flirtStates.dance:
+
+                if (this.CheckAffinity(targetStudent) > DanceAffinityThreshold)
+                {
+                    Debug.Log("[" + name + ", " + getRole() + ", " + currentFlirtState + "] I like you so much!");
+                    currentFlirtState = flirtStates.kiss;
+                }
                 Dancing();
                 break;
             case flirtStates.kiss:
@@ -95,7 +118,7 @@ public class CalmStudent : Student
         return "" + currentFlirtState;
     }
 
-    protected void CheckAffinity(Student targetStudent)
+    protected int CheckAffinity(Student targetStudent)
     {
         int affinity = 0;
 
@@ -129,6 +152,8 @@ public class CalmStudent : Student
             Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] What a virgin!");
             Fight();
         }
+
+        return affinity;
     }
 
     protected void Fight()
@@ -144,5 +169,10 @@ public class CalmStudent : Student
     protected void Kissing()
     {
         Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Chuu");
+    }
+
+    protected void findFriends()
+    {
+
     }
 }
