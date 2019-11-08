@@ -37,10 +37,8 @@ public class CalmStudent : Student
         //this.currentState = calmStates.enjoy;
     }
 
-    public override string FSM()
+    public override void Update()
     {
-        string extraState = "";
-
         //Calm Student's FSM
         switch (currentState)
         {
@@ -57,7 +55,7 @@ public class CalmStudent : Student
                 break;
             case calmStates.rest:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Resting state");
-                Resting();
+                InBench();
                 break;
             case calmStates.drink:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking state");
@@ -65,7 +63,7 @@ public class CalmStudent : Student
                 break;
             case calmStates.breath:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Breathing state");
-                Breathing();
+                Outside();
                 if (this.fatigue < fatigueThreshold) currentState = calmStates.enjoy;
                 break;
             case calmStates.flirt:
@@ -79,17 +77,15 @@ public class CalmStudent : Student
                 break;
             case calmStates.punishment:
                 Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Punishment state");
-                Punishment();
+                Punished();
                 break;
             default:
                 break;
         }
-
-        return "" + currentState + "  " + extraState;
     }
 
     //Flirting State FSM: Calm Students
-    public override string Flirt()
+    public override void Flirt()
     {
         switch (currentFlirtState)
         {
@@ -114,8 +110,6 @@ public class CalmStudent : Student
                 Kissing();
                 break;
         }
-
-        return "" + currentFlirtState;
     }
 
     protected int CheckAffinity(Student targetStudent)
@@ -145,11 +139,10 @@ public class CalmStudent : Student
 
         if (affinity > affinityTolerance)
         {
-            Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] This dude is a total chad!");
-        }
-        else
+            Debug.Log("[" + name + ", " + getRole() + "] This dude is a total chad!");
+        } else
         {
-            Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] What a virgin!");
+            Debug.Log("[" + name + ", " + getRole() + "] What a virgin!");
             Fight();
         }
 
@@ -173,6 +166,11 @@ public class CalmStudent : Student
 
     protected void findFriends()
     {
+        Debug.Log("[" + name + ", " + getRole() + "] Finding friends");
+    }
 
+    protected void Outside()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Chilling outside");
     }
 }
