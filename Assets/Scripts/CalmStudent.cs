@@ -31,7 +31,7 @@ public class CalmStudent : Student
     #endregion
 
     //methods
-    public CalmStudent(string name, Genders gender, Vector2 position) : base(name, gender, position)
+    public CalmStudent(string name, Genders gender, Vector3 position) : base(name, gender, position)
     {
         this.role = Roles.CalmStudent;
         //this.currentState = calmStates.enjoy;

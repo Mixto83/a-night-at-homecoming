@@ -13,15 +13,15 @@ public class Teacher : Authority
 
     State patrolState;
 
-    float randomizer;
+    float distractionRandom;
 
     //methods
-    public Teacher(string name, Genders gender, Vector2 position) : base(name, gender, position)
+    public Teacher(string name, Genders gender, Vector3 position) : base(name, gender, position)
     {
         this.role = Roles.Teacher;
         this.strictness = 1;
 
-        this.randomizer = Random.Range(2, 5);
+        this.distractionRandom = Random.Range(2, 5);
     }
 
     private void CreatePatrolSubStateMachine()
@@ -62,7 +62,7 @@ public class Teacher : Authority
 
         // Perceptions
         Perception push = punishmentRoomSubFSM.CreatePerception<PushPerception>(); //temporal
-        Perception randomTimer = punishmentRoomSubFSM.CreatePerception<TimerPerception>(randomizer); //temporal
+        Perception randomTimer = punishmentRoomSubFSM.CreatePerception<TimerPerception>(distractionRandom); //temporal
 
         // States
         State watchingState = punishmentRoomSubFSM.CreateEntryState("Watching", Watching);
@@ -154,7 +154,7 @@ public class Teacher : Authority
     protected void ReadingNewspaper()
     {
         Debug.Log("[" + name + ", " + getRole() + "] President Tremp did what again?");
-        randomizer = Random.Range(2, 5);
+        distractionRandom = Random.Range(2, 5);
     }
 
 }

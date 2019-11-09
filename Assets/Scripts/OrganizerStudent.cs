@@ -9,8 +9,10 @@ public class OrganizerStudent : Authority
     private StateMachineEngine servingSubFSM;
     private StateMachineEngine patrolSubFSM;
 
+    float negotiateRandom;
+
     //methods
-    public OrganizerStudent(string name, Genders gender, Vector2 position) : base(name, gender, position)
+    public OrganizerStudent(string name, Genders gender, Vector3 position) : base(name, gender, position)
     {
         this.role = Roles.OrganizerStudent;
         this.strictness = 0.5f;
@@ -18,6 +20,8 @@ public class OrganizerStudent : Authority
         CreateServingSubStateMachine();
         CreatePatrolSubStateMachine();
         CreateStateMachine();
+
+        this.negotiateRandom = Random.value;
     }
 
     private void CreateServingSubStateMachine()
@@ -43,6 +47,12 @@ public class OrganizerStudent : Authority
 
         // Perceptions
         Perception push = servingSubFSM.CreatePerception<PushPerception>(); //temporal
+        Perception convinced = servingSubFSM.CreatePerception<ValuePerception>(() => CheckConvinced());
+        Perception notConvinced = servingSubFSM.CreatePerception<ValuePerception>(() => !CheckConvinced());
+        Perception negotiationEnd = servingSubFSM.CreatePerception<TimerPerception>(2);
+
+        Perception negotiationEndConvinced = servingSubFSM.CreateAndPerception<AndPerception>(convinced, negotiationEnd);
+        Perception negotiationEndNotConvinced = servingSubFSM.CreateAndPerception<AndPerception>(notConvinced, negotiationEnd);
 
         // States
         State patrollingState = patrolSubFSM.CreateEntryState("Patroling", Patrol);
@@ -56,8 +66,8 @@ public class OrganizerStudent : Authority
         servingSubFSM.CreateTransition("Student lost", chaseState, push, patrollingState);
         servingSubFSM.CreateTransition("Messy Student Caught", chaseState, push, negotiateState);
 
-        servingSubFSM.CreateTransition("Convinced", negotiateState, push, patrollingState);
-        servingSubFSM.CreateTransition("Not convinced", negotiateState, push, callTeacherState);
+        servingSubFSM.CreateTransition("Convinced", negotiateState, negotiationEndConvinced, patrollingState);
+        servingSubFSM.CreateTransition("Not convinced", negotiateState, negotiationEndNotConvinced, callTeacherState);
 
         servingSubFSM.CreateTransition("Teacher got the call", callTeacherState, push, patrollingState);
     }
@@ -75,7 +85,7 @@ public class OrganizerStudent : Authority
         Perception push6 = organizerStudentFSM.CreatePerception<PushPerception>(); //temporal
 
         // States
-        State startState = organizerStudentFSM.CreateEntryState("Start");
+        State startState = organizerStudentFSM.CreateEntryState("Start", () => Move(new Vector3(0, 0, 0)));
         State doorState = organizerStudentFSM.CreateSubStateMachine("Door", doorSubFSM);
         State serveDrinkState = organizerStudentFSM.CreateSubStateMachine("Serve Drink", servingSubFSM);
         State patrolState = organizerStudentFSM.CreateSubStateMachine("Patrol", patrolSubFSM);
@@ -124,15 +134,22 @@ public class OrganizerStudent : Authority
     protected void ServeDrink()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Serving drink");
+
     }
 
     protected void Negotiate()
     {
         Debug.Log("[" + name + ", " + getRole() + "] I shouldn't let you go, but...");
+        negotiateRandom = Random.value;
     }
 
     protected void CallTeacher()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Sir, get that kid!");
+    }
+
+    private bool CheckConvinced()
+    {
+        return negotiateRandom > 0.5f;
     }
 }

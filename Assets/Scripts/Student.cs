@@ -27,7 +27,7 @@ public class Student : Character
 
 
     //methods
-    protected Student(string name, Genders gender, Vector2 position) : base(name, gender, position)
+    protected Student(string name, Genders gender, Vector3 position) : base(name, gender, position)
     {
         this.initPos = new Vector2(Random.Range(-200, 200), Random.Range(-200, 200));
 

@@ -10,11 +10,11 @@ public class Character
     protected string name;
     protected Roles role;
     protected Genders gender;
-    protected Vector2 position;
-    protected float movementSpeed = 0.5f;
+    protected Vector3 position;
+    protected float movementSpeed = 1f;
 
     //methods
-    protected Character(string name, Genders gender, Vector2 position)
+    protected Character(string name, Genders gender, Vector3 position)
     {
         this.name = name;
         this.gender = gender;
@@ -45,15 +45,24 @@ public class Character
         return this.name;
     }
 
+    public Vector3 getPos()
+    {
+        return this.position;
+    }
+
     public Roles getRole()
     {
         return this.role;
     }
 
-    public void Move()
+    public float getMovementSpeed()
     {
-        this.position.x += movementSpeed;
-        Debug.Log(name + "'s pos is " + position);
+        return movementSpeed;
+    }
+
+    public void Move(Vector3 to)
+    {
+        this.position = to;
     }
 
     //Common behaviours to be overridden

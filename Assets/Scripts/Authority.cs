@@ -15,7 +15,7 @@ public class Authority : Character
     #endregion
 
     //methods
-    public Authority(string name, Genders gender, Vector2 position) : base(name, gender, position)
+    public Authority(string name, Genders gender, Vector3 position) : base(name, gender, position)
     {
         CreateDoorSubStateMachine();
     }
@@ -41,6 +41,7 @@ public class Authority : Character
     protected void Waiting()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Waiting for someone to come...");
+        this.Move(new Vector3(2, 2, 0));
     }
 
     protected void Welcome()

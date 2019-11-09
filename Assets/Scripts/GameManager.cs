@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     protected readonly int ANIMALS_NUM = 12;
     protected readonly int HOBBIES_NUM = 12;
 
+    [SerializeField] bool paused = false;
+
     [SerializeField] List<GameObject> Agents;
     List<Character> People;
     [SerializeField] bool debugMode;
@@ -104,9 +106,17 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        foreach (Character character in People)
-        {
-            character.Update();
+        if (!paused) {
+            foreach (Character character in People)
+            {
+                character.Update();
+
+                GameObject characterObject = Agents[People.IndexOf(character)];
+                if(characterObject.transform.position != character.getPos())
+                {
+                    characterObject.transform.position = Vector3.MoveTowards(characterObject.transform.position, character.getPos(), character.getMovementSpeed() * Time.deltaTime);
+                }
+            }
         }
     }
 }

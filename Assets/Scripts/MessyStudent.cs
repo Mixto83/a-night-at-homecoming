@@ -12,7 +12,7 @@ public class MessyStudent : Student
     private Student targetStudent;
 
     //methods
-    public MessyStudent(string name, Genders gender, Vector2 position) : base(name, gender, position)
+    public MessyStudent(string name, Genders gender, Vector3 position) : base(name, gender, position)
     {
         this.role = Roles.MessyStudent;
 
