@@ -12,7 +12,7 @@ public class OrganizerStudent : Authority
     float negotiateRandom;
 
     //methods
-    public OrganizerStudent(string name, Genders gender, Vector3 position) : base(name, gender, position)
+    public OrganizerStudent(string name, Genders gender, Transform obj) : base(name, gender, obj)
     {
         this.role = Roles.OrganizerStudent;
         this.strictness = 0.5f;
@@ -85,7 +85,7 @@ public class OrganizerStudent : Authority
         Perception push6 = organizerStudentFSM.CreatePerception<PushPerception>(); //temporal
 
         // States
-        State startState = organizerStudentFSM.CreateEntryState("Start", () => Move(new Vector3(0, 0, 0)));
+        State startState = organizerStudentFSM.CreateEntryState("Start", () => Move(initPos));
         State doorState = organizerStudentFSM.CreateSubStateMachine("Door", doorSubFSM);
         State serveDrinkState = organizerStudentFSM.CreateSubStateMachine("Serve Drink", servingSubFSM);
         State patrolState = organizerStudentFSM.CreateSubStateMachine("Patrol", patrolSubFSM);
@@ -120,10 +120,6 @@ public class OrganizerStudent : Authority
         }
 
         //Subs
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            newSomeone = true;
-        }
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
             organizerStudentFSM.Fire("Back");

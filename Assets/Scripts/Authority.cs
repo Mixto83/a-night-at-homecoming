@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Authority : Character
 {
     //parameters
     protected StateMachineEngine doorSubFSM;
+    private bool isNew = true;
 
     protected bool newSomeone = false;
 
@@ -15,7 +17,7 @@ public class Authority : Character
     #endregion
 
     //methods
-    public Authority(string name, Genders gender, Vector3 position) : base(name, gender, position)
+    public Authority(string name, Genders gender, Transform obj) : base(name, gender, obj)
     {
         CreateDoorSubStateMachine();
     }
@@ -25,7 +27,9 @@ public class Authority : Character
         doorSubFSM = new StateMachineEngine(true);
 
         // Perceptions
-        Perception push = doorSubFSM.CreatePerception<ValuePerception>(() => newSomeone == true); //temporal
+        WatchingPerception seeCalmStudent = doorSubFSM.CreatePerception<WatchingPerception>(new WatchingPerception(this.gameObject, "CalmStudent", this.gameObject.GetComponent<PolygonCollider2D>()));
+        Perception isNewStudent = doorSubFSM.CreatePerception<ValuePerception>(() => isNew);
+        Perception seeNewStudent = doorSubFSM.CreateAndPerception<AndPerception>(seeCalmStudent, isNewStudent);
         Perception timer = doorSubFSM.CreatePerception<TimerPerception>(2);
 
         // States
@@ -33,7 +37,7 @@ public class Authority : Character
         State welcomeState = doorSubFSM.CreateState("Welcome", Welcome);
 
         // Transitions
-        doorSubFSM.CreateTransition("Someone new arrives", waitingState, push, welcomeState);
+        doorSubFSM.CreateTransition("Someone new arrives", waitingState, seeNewStudent, welcomeState);
         doorSubFSM.CreateTransition("Welcome finished", welcomeState, timer, waitingState);
     }
 
@@ -41,13 +45,23 @@ public class Authority : Character
     protected void Waiting()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Waiting for someone to come...");
-        this.Move(new Vector3(2, 2, 0));
+        this.Move(new Vector3(-7, -1));
+
+        Text[] texts = GameObject.FindObjectsOfType<Text>();
+        foreach (Text txt in texts)
+        {
+            if(txt.text == "Welcome to the party!")
+            {
+                GameObject.Destroy(txt);
+            }
+        }
     }
 
     protected void Welcome()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Welcome to the party!");
-        newSomeone = false;
+        createMessage("Welcome to the party!", Color.blue);
+        isNew = false;
     }
 
     protected void Patrol()
@@ -58,5 +72,31 @@ public class Authority : Character
     protected void ChaseStudent()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Come back here, you little...");
+    }
+
+    public void createMessage(string text, Color color)
+    {
+        if (color == null)
+        {
+            color = Color.green;
+        }
+        if (text == null)
+        {
+            text = "";
+        }
+
+        GameObject newText = new GameObject(text.Replace(" ", "-"), typeof(RectTransform));
+        var newTextComp = newText.AddComponent<Text>();
+        //newText.AddComponent<CanvasRenderer>();
+
+        //Text newText = transform.gameObject.AddComponent<Text>();
+        newTextComp.text = text;
+        newTextComp.color = color;
+        newTextComp.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        newTextComp.alignment = TextAnchor.MiddleCenter;
+        newTextComp.fontSize = 10;
+
+        newText.transform.SetParent(GameObject.FindObjectOfType<Canvas>().transform);
+        newText.transform.localPosition = new Vector3(-255, -18);
     }
 }

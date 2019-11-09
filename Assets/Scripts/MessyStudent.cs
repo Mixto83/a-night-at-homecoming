@@ -12,7 +12,7 @@ public class MessyStudent : Student
     private Student targetStudent;
 
     //methods
-    public MessyStudent(string name, Genders gender, Vector3 position) : base(name, gender, position)
+    public MessyStudent(string name, Genders gender, Transform obj) : base(name, gender, obj)
     {
         this.role = Roles.MessyStudent;
 
@@ -75,13 +75,13 @@ public class MessyStudent : Student
 
         // States
         State toPunishmentRoom = punishmentSubFSM.CreateEntryState("Being taken to punishment room");
-        State punishedState = punishmentSubFSM.CreateState("Punished");
-        State scapeState = punishmentSubFSM.CreateState("Scape");
+        State punishedState = punishmentSubFSM.CreateState("Punished", Punished);
+        State escapeState = punishmentSubFSM.CreateState("Escape", Escape);
 
         // Transitions
         punishmentSubFSM.CreateTransition("Reached punishment room", toPunishmentRoom, push, punishedState);
-        punishmentSubFSM.CreateTransition("Teacher distracted", punishedState, push, scapeState);
-        punishmentSubFSM.CreateTransition("Teacher busts student", scapeState, push, punishedState);
+        punishmentSubFSM.CreateTransition("Teacher distracted", punishedState, push, escapeState);
+        punishmentSubFSM.CreateTransition("Teacher busts student", escapeState, push, punishedState);
     }
 
     private void CreateStateMachine()
@@ -179,11 +179,6 @@ public class MessyStudent : Student
         }
     }
 
-    protected void Fight()
-    {
-        Debug.Log("[" + name + ", " + getRole() + "] Take this Billy!");
-    }
-
     protected void Negotiate()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Don't sneak!");
@@ -202,10 +197,5 @@ public class MessyStudent : Student
     protected void Arguing()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Arguing with teacher");
-    }
-
-    protected void CheckingAffinity()
-    {
-        Debug.Log("[" + name + ", " + getRole() + "] Checking Affinity");
     }
 }

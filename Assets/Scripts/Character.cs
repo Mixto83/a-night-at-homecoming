@@ -11,14 +11,19 @@ public class Character
     protected Roles role;
     protected Genders gender;
     protected Vector3 position;
-    protected float movementSpeed = 1f;
+    protected float movementSpeed = 3f;
+    protected GameObject gameObject;
+    protected Vector3 initPos;
 
     //methods
-    protected Character(string name, Genders gender, Vector3 position)
+    protected Character(string name, Genders gender, Transform obj)
     {
+        this.initPos = new Vector3(Random.Range(-5, 5), Random.Range(-5, 5));
+
         this.name = name;
         this.gender = gender;
-        this.position = position;
+        this.position = obj.position;
+        this.gameObject = obj.gameObject;
 
         CreateDrinkSubStateMachine();
     }

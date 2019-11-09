@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
             switch (child.tag)
             {
                 case "CalmStudent":
-                    CalmStudent newStudent = new CalmStudent(name, gender, child.position);             
+                    CalmStudent newStudent = new CalmStudent(name, gender, child);             
                     for (int i = 0; i < 3; i++)
                     {
                         string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];                   
@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
                     People.Add(newStudent);
                     break;
                 case "MessyStudent":
-                    MessyStudent newStudent2 = new MessyStudent(name, gender, child.position);
+                    MessyStudent newStudent2 = new MessyStudent(name, gender, child);
                     for (int i = 0; i < 3; i++)
                     {
                         string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];
@@ -89,18 +89,15 @@ public class GameManager : MonoBehaviour
                     People.Add(newStudent2);
                     break;
                 case "Teacher":
-                    People.Add(new Teacher(name, gender, child.position));
+                    Teacher newTeacher = new Teacher(name, gender, child);
+                    People.Add(newTeacher);
                     break;
                 case "OrgStudent":
-                    People.Add(new OrganizerStudent(name, gender, child.position));
+                    OrganizerStudent newOrgStudent = new OrganizerStudent(name, gender, child);
+                    People.Add(newOrgStudent);
                     break;
             }
         }
-
-        /*foreach (Character character in People.FindAll(x => x.getRole() == Roles.CalmStudent)) character.Flirt();
-        foreach (Character character in People.FindAll(x => x.getRole() == Roles.MessyStudent)) character.Trouble();
-        foreach (Character character in People.FindAll(x => x.getRole() == Roles.Teacher)) character.Patrol();
-        foreach (Character character in People.FindAll(x => x.getRole() == Roles.OrganizerStudent)) character.Enjoying();*/
     }
 
     // Update is called once per frame

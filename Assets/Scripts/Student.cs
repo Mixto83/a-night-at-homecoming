@@ -22,15 +22,12 @@ public class Student : Character
     protected float amusement;
     protected float thirst;
     protected int affinityTolerance = 5;
-    protected Vector2 initPos;
     #endregion
 
 
     //methods
-    protected Student(string name, Genders gender, Vector3 position) : base(name, gender, position)
+    protected Student(string name, Genders gender, Transform obj) : base(name, gender, obj)
     {
-        this.initPos = new Vector2(Random.Range(-200, 200), Random.Range(-200, 200));
-
         this.FavFoods = new List<string>();
         this.FavAnimals = new List<string>();
         this.Hobbies = new List<string>();
@@ -39,6 +36,7 @@ public class Student : Character
     public override void Enjoying()
     {
         Debug.Log("[" + name + ", " + getRole() + "] I'm having fun!");
+        Move(new Vector3(1, 3));
     }
 
     protected void InBench()
@@ -46,8 +44,18 @@ public class Student : Character
         Debug.Log("[" + name + ", " + getRole() + "] Sat in the bench");
     }
 
+    protected void Fight()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Take this Billy!");
+    }
+
     protected void Punished()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Punished :(");
+    }
+
+    protected void CheckingAffinity()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Checking Affinity");
     }
 }

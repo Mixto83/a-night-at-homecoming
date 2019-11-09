@@ -16,7 +16,7 @@ public class Teacher : Authority
     float distractionRandom;
 
     //methods
-    public Teacher(string name, Genders gender, Vector3 position) : base(name, gender, position)
+    public Teacher(string name, Genders gender, Transform obj) : base(name, gender, obj)
     {
         this.role = Roles.Teacher;
         this.strictness = 1;
