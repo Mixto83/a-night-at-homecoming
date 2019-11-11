@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class Character
 {
@@ -14,6 +16,7 @@ public class Character
     protected float movementSpeed = 3f;
     protected GameObject gameObject;
     protected Vector3 initPos;
+    protected NavMeshAgent agent;
 
     //methods
     protected Character(string name, Genders gender, Transform obj)
@@ -24,6 +27,7 @@ public class Character
         this.gender = gender;
         this.position = obj.position;
         this.gameObject = obj.gameObject;
+        this.agent = this.gameObject.GetComponent<NavMeshAgent>();
 
         CreateDrinkSubStateMachine();
     }
@@ -67,7 +71,12 @@ public class Character
 
     public void Move(Vector3 to)
     {
-        this.position = to;
+        agent.SetDestination(to);
+    }
+
+    public void LookAt(Transform target)
+    {
+        agent.transform.LookAt(target);
     }
 
     //Common behaviours to be overridden
@@ -101,5 +110,34 @@ public class Character
     protected void Drinking()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Drinking!");
+    }
+
+    protected void createMessage(string text, Color color)
+    {
+        if (color == null)
+        {
+            color = Color.green;
+        }
+        if (text == null)
+        {
+            text = "";
+        }
+
+        GameObject newText = new GameObject(text.Replace(" ", "-"), typeof(RectTransform));
+        var newTextComp = newText.AddComponent<Text>();
+        newText.AddComponent<CanvasRenderer>();
+
+        newTextComp.text = text;
+        newTextComp.color = color;
+        newTextComp.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        newTextComp.alignment = TextAnchor.MiddleCenter;
+        newTextComp.fontSize = 30;
+
+        newText.transform.SetParent(this.gameObject.GetComponentInChildren<Canvas>().transform);
+
+        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 200);
+        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 100);
+        newText.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+        newText.transform.localPosition = new Vector3(0, 0, 0);
     }
 }

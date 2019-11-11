@@ -9,11 +9,11 @@ public class WatchingPerception : Perception
 
     private GameObject watcher;
     private string target;
-    private PolygonCollider2D colliderVision;
+    private MeshCollider colliderVision;
 
     #endregion variables
 
-    public WatchingPerception(GameObject watcher, string target, PolygonCollider2D colliderVision)
+    public WatchingPerception(GameObject watcher, string target, MeshCollider colliderVision)
     {
         this.watcher = watcher;
         this.target = target;

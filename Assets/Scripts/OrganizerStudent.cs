@@ -106,6 +106,8 @@ public class OrganizerStudent : Authority
         patrolSubFSM.Update();
         organizerStudentFSM.Update();
 
+        distanceToDoor = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Door").transform.position - new Vector3(1, 0, 0));
+
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             organizerStudentFSM.Fire("Door unattended");

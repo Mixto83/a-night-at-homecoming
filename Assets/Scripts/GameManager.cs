@@ -107,12 +107,6 @@ public class GameManager : MonoBehaviour
             foreach (Character character in People)
             {
                 character.Update();
-
-                GameObject characterObject = Agents[People.IndexOf(character)];
-                if(characterObject.transform.position != character.getPos())
-                {
-                    characterObject.transform.position = Vector3.MoveTowards(characterObject.transform.position, character.getPos(), character.getMovementSpeed() * Time.deltaTime);
-                }
             }
         }
     }
