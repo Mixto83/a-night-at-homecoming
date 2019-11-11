@@ -1,95 +1,102 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Authority : Character
 {
     //parameters
-    protected int targetReached = 0; //0: None, 1: Door, 2: Bar, 3: Patrol initial position
-    protected int timeInWelcome = 0;
+    protected StateMachineEngine doorSubFSM;
+    private bool isNew = true;
+
+    protected bool newSomeone = false;
 
     #region Stats
     protected float strictness;
     protected float thirst;
     #endregion
 
-    #region HFSM States
-    public enum doorStates { wait, welcome }
-
-    public doorStates currentDoor;
-    #endregion
-
     //methods
-    public Authority(string name, Genders gender, Vector2 position) : base(name, gender, position)
+    public Authority(string name, Genders gender, Transform obj) : base(name, gender, obj)
     {
-
+        CreateDoorSubStateMachine();
     }
 
-    //Start State Common behaviour: Organizer Students and Teachers
-    public override bool Start()
+    private void CreateDoorSubStateMachine()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Just Starting!");
+        doorSubFSM = new StateMachineEngine(true);
 
-        //Move towards target (door, bar or patrol inital position)
+        // Perceptions
+        WatchingPerception seeCalmStudent = doorSubFSM.CreatePerception<WatchingPerception>(new WatchingPerception(this.gameObject, "CalmStudent", this.gameObject.GetComponent<PolygonCollider2D>()));
+        Perception isNewStudent = doorSubFSM.CreatePerception<ValuePerception>(() => isNew);
+        Perception seeNewStudent = doorSubFSM.CreateAndPerception<AndPerception>(seeCalmStudent, isNewStudent);
+        Perception timer = doorSubFSM.CreatePerception<TimerPerception>(2);
 
-        //Esto es para debug solo, en la version final habrá que mover el personaje
-        //hacia el target que le toque, y cuando llegue se pone targetReached a 1, 2, 3 (segun que target sea)
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            targetReached = 1;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            targetReached = 2;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            targetReached = 3;
-        }
+        // States
+        State waitingState = doorSubFSM.CreateEntryState("Waiting for someone", Waiting);
+        State welcomeState = doorSubFSM.CreateState("Welcome", Welcome);
 
-        if (targetReached == 1 || targetReached == 2 || targetReached == 3)
-            return true;
-        return false;
+        // Transitions
+        doorSubFSM.CreateTransition("Someone new arrives", waitingState, seeNewStudent, welcomeState);
+        doorSubFSM.CreateTransition("Welcome finished", welcomeState, timer, waitingState);
     }
 
-    //Door State FSM: Organizer Students and Teachers
-    protected string AtDoor()
+    //Common behaviours: Organizer Students and Teachers
+    protected void Waiting()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Door state");
-        switch (currentDoor)
-        {
-            case doorStates.wait:
-                if(Waiting()) {
-                    currentDoor = doorStates.welcome;
-                }
-                break;
-            case doorStates.welcome:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentDoor + "] Welcome to the party!");
-                if (timeInWelcome >= 100)
-                {
-                    timeInWelcome = 0;
-                    currentDoor = doorStates.wait;
-                } else
-                {
-                    timeInWelcome++;
-                }
-                break;
-            default:
-                break;
-        }
+        Debug.Log("[" + name + ", " + getRole() + "] Waiting for someone to come...");
+        this.Move(new Vector3(-7, -1));
 
-        return "" + currentDoor;
+        Text[] texts = GameObject.FindObjectsOfType<Text>();
+        foreach (Text txt in texts)
+        {
+            if(txt.text == "Welcome to the party!")
+            {
+                GameObject.Destroy(txt);
+            }
+        }
     }
 
-    protected bool Waiting()
+    protected void Welcome()
     {
-        Debug.Log("[" + name + ", " + getRole() + ", " + currentDoor + "] Waiting for someone to come...");
+        Debug.Log("[" + name + ", " + getRole() + "] Welcome to the party!");
+        createMessage("Welcome to the party!", Color.blue);
+        isNew = false;
+    }
 
-        if(Input.GetKeyDown(KeyCode.Alpha4))
+    protected void Patrol()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] I'm watching you!");
+    }
+
+    protected void ChaseStudent()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Come back here, you little...");
+    }
+
+    public void createMessage(string text, Color color)
+    {
+        if (color == null)
         {
-            return true;
+            color = Color.green;
+        }
+        if (text == null)
+        {
+            text = "";
         }
 
-        return false;
+        GameObject newText = new GameObject(text.Replace(" ", "-"), typeof(RectTransform));
+        var newTextComp = newText.AddComponent<Text>();
+        //newText.AddComponent<CanvasRenderer>();
+
+        //Text newText = transform.gameObject.AddComponent<Text>();
+        newTextComp.text = text;
+        newTextComp.color = color;
+        newTextComp.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        newTextComp.alignment = TextAnchor.MiddleCenter;
+        newTextComp.fontSize = 10;
+
+        newText.transform.SetParent(GameObject.FindObjectOfType<Canvas>().transform);
+        newText.transform.localPosition = new Vector3(-255, -18);
     }
 }

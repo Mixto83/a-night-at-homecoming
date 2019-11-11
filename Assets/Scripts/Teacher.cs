@@ -5,133 +5,156 @@ using UnityEngine;
 public class Teacher : Authority
 {
     //parameters
-    #region States
+    private StateMachineEngine teacherFSM;
+    private StateMachineEngine teacherSubFSM;
+    private StateMachineEngine patrolSubFSM;
+    private StateMachineEngine chaseSubFSM;
+    private StateMachineEngine punishmentRoomSubFSM;
 
-    public enum teacherStates
-    {
-        start, door, patrol, chase, punishment, drink
-    }
+    State patrolState;
 
-    public enum patrolStates
-    {
-        patrolling, talking
-    }
-
-    public enum chaseStates
-    {
-        chaseStudent, yellAtMessy, bringToPunishment
-    }
-
-    public enum punishmentStates
-    {
-        looking, readingNews
-    }
-
-    public teacherStates currentState;
-    public patrolStates currentPatrol;
-    public chaseStates currentChase;
-    public punishmentStates currentPunishment;
-    #endregion
+    float distractionRandom;
 
     //methods
-    public Teacher(string name, Genders gender, Vector2 position) : base(name, gender, position)
+    public Teacher(string name, Genders gender, Transform obj) : base(name, gender, obj)
     {
         this.role = Roles.Teacher;
         this.strictness = 1;
+
+        this.distractionRandom = Random.Range(2, 5);
     }
 
-    public override string FSM()
+    private void CreatePatrolSubStateMachine()
     {
-        string extraState = "";
+        patrolSubFSM = new StateMachineEngine(true);
 
-        //Teacher's FSM
-        switch (currentState)
-        {
-            case teacherStates.start:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Just Starting!");
-                break;
-            case teacherStates.patrol:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Patrol State");
-                extraState = Patrol();
-                break;
-            case teacherStates.drink:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking state");
-                extraState = Drinking();
-                break;
-            case teacherStates.door:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Door state");
-                extraState = AtDoor();
-                break;
-            case teacherStates.chase:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Chasing state");
-                extraState = Chasing();
-                break;
-            case teacherStates.punishment:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Punishing state");
-                extraState = Punishing();
-                break;
-            default:
-                break;
-        }
+        // Perceptions
+        Perception push = patrolSubFSM.CreatePerception<PushPerception>(); //temporal
 
-        return "" + currentState + "  " + extraState;
+        // States
+        State patrolingState = patrolSubFSM.CreateEntryState("Patroling", Patrol);
+        State talkingState = patrolSubFSM.CreateState("Talking to Organizer", Talking);
+
+        // Transitions
+        patrolSubFSM.CreateTransition("Sees organizer call", patrolingState, push, talkingState);
     }
 
-    //Patrolling State FSM: Teachers
-    public override string Patrol()
+    private void CreateChaseSubStateMachine()
     {
-        switch (currentPatrol)
-        {
-            case patrolStates.patrolling:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentPatrol + "] I'm watching you...");
-                break;
-            case patrolStates.talking:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentPatrol + "] Who did what??");
-                break;
-            default:
-                break;
-        }
+        chaseSubFSM = new StateMachineEngine(true);
 
-        return "" + currentPatrol;
-        
+        // Perceptions
+        Perception push = chaseSubFSM.CreatePerception<PushPerception>(); //temporal
+
+        // States
+        State chasingStudentState = chaseSubFSM.CreateEntryState("Chasing Student", ChaseStudent);
+        State arguingState = chaseSubFSM.CreateState("Arguing", Arguing);
+        State toPunishmentRoomState = chaseSubFSM.CreateState("Taking student to punishment room", ToPunishmentRoom);
+
+        // Transitions
+        chaseSubFSM.CreateTransition("Caught", chasingStudentState, push, arguingState);
+        chaseSubFSM.CreateTransition("Finish arguing", chasingStudentState, push, toPunishmentRoomState);
     }
 
-    //Chasing State FSM: Teachers
-    protected string Chasing()
+    private void CreatePunishmentSubStateMachine()
     {
-        switch (currentChase)
-        {
-            case chaseStates.chaseStudent:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentChase + "] You can't get away from me!");
-                break;
-            case chaseStates.yellAtMessy:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentChase + "] You are gonna face the consecuences");
-                break;
-            case chaseStates.bringToPunishment:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentChase + "] Come to the punishment room, you punk!");
-                break;
-            default:
-                break;
-        }
+        punishmentRoomSubFSM = new StateMachineEngine(true);
 
-        return "" + currentChase;
+        // Perceptions
+        Perception push = punishmentRoomSubFSM.CreatePerception<PushPerception>(); //temporal
+        Perception randomTimer = punishmentRoomSubFSM.CreatePerception<TimerPerception>(distractionRandom); //temporal
+
+        // States
+        State watchingState = punishmentRoomSubFSM.CreateEntryState("Watching", Watching);
+        State distractedState = punishmentRoomSubFSM.CreateState("Reading newspaper", ReadingNewspaper);
+
+        // Transitions
+        punishmentRoomSubFSM.CreateTransition("TimerRandom1", watchingState, randomTimer, distractedState);
+        punishmentRoomSubFSM.CreateTransition("TimerRandom2", distractedState, randomTimer, watchingState);
+    }
+
+    private void CreateSubStateMachine()
+    {
+        teacherSubFSM = new StateMachineEngine(true);
+
+        // Perceptions
+        Perception push = teacherSubFSM.CreatePerception<PushPerception>(); //temporal
+
+        // States
+        patrolState = teacherSubFSM.CreateSubStateMachine("Patrol", patrolSubFSM);
+        State doorState = teacherSubFSM.CreateSubStateMachine("Door", doorSubFSM);
+        State drinkState = teacherSubFSM.CreateSubStateMachine("Drink", drinkSubFSM);
+
+        // Transitions
+        patrolSubFSM.CreateExitTransition("Door unattended", patrolState, push, doorState);
+        patrolSubFSM.CreateExitTransition("Thirsty", patrolState, push, drinkState);
+
+        drinkSubFSM.CreateExitTransition("Not thirsty", drinkState, push, patrolState);
+    }
+
+    private void CreateStateMachine()
+    {
+        teacherFSM = new StateMachineEngine(false);
+
+        // Perceptions
+        Perception push = teacherFSM.CreatePerception<PushPerception>(); //temporal
+        Perception escaped = teacherFSM.CreatePerception<PushPerception>(); //temporal
+        Perception reachedPR = teacherFSM.CreatePerception<PushPerception>(); //temporal
+        Perception alreadyTecherAtPR = teacherFSM.CreatePerception<PushPerception>(); //temporal
+        Perception noTecherAtPR = teacherFSM.CreatePerception<PushPerception>(); //temporal
+
+        Perception haveToStayAtPR = teacherFSM.CreateAndPerception<AndPerception>(reachedPR, noTecherAtPR);
+        Perception notHaveToStayAtPR = teacherFSM.CreateAndPerception<AndPerception>(reachedPR, alreadyTecherAtPR);
+        Perception endChasingState = teacherFSM.CreateOrPerception<OrPerception>(escaped, notHaveToStayAtPR);
+
+        // States
+        State startState = teacherFSM.CreateEntryState("Start");
+        State subFSMState = teacherFSM.CreateSubStateMachine("SubState", teacherSubFSM, patrolState);
+        State chaseState = teacherFSM.CreateSubStateMachine("Chase", chaseSubFSM);
+        State punihsmentRoomState = teacherFSM.CreateSubStateMachine("Punishment room", punishmentRoomSubFSM);
+
+        // Transitions
+        teacherFSM.CreateTransition("Start", startState, push, subFSMState);
+        teacherSubFSM.CreateExitTransition("Sees trouble / Finishes talking to organizer", subFSMState, push, chaseState);
+
+        chaseSubFSM.CreateExitTransition("Student escaped or reached punishment room. There's already a teacher", chaseState, endChasingState, subFSMState);
+        chaseSubFSM.CreateExitTransition("Reached punishment room. There's no techer", chaseState, haveToStayAtPR, punihsmentRoomState);
+        punishmentRoomSubFSM.CreateExitTransition("No more students at punishment room", punihsmentRoomState, push, subFSMState);
+
+        teacherFSM.Fire("Start");
+    }
+
+    public override void Update()
+    {
+        doorSubFSM.Update();
+        patrolSubFSM.Update();
+    }
+
+    protected void Talking()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] I'm watching you...");
+    }
+
+    protected void Arguing()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] You're going to be punished for this!!");
+    }
+
+    protected void ToPunishmentRoom()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Taking student to punishment room");
     }
 
     //Punishment Room State FSM: Teachers
-    protected string Punishing()
+    protected void Watching()
     {
-        switch (currentPunishment)
-        {
-            case punishmentStates.looking:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentChase + "] I'm watching you...(punishment room)");
-                break;
-            case punishmentStates.readingNews:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentChase + "] President Tremp did what again?");
-                break;
-            default:
-                break;
-        }
-
-        return "" + currentPunishment;
+        Debug.Log("[" + name + ", " + getRole() + "] Don't think you're gonna escape...");
     }
+
+    protected void ReadingNewspaper()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] President Tremp did what again?");
+        distractionRandom = Random.Range(2, 5);
+    }
+
 }

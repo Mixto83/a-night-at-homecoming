@@ -5,102 +5,145 @@ using UnityEngine;
 public class MessyStudent : Student
 {
     //parameters
-    #region States
-    public enum messStates
-    {
-        start, rest, drink, breath, punishment,
-        lookForMess, sabotageDrink, negotiateOrganizer, runAway,
-        botherTeacher, checkAffinity, fightStudent
-    }
-    public messStates currentState;
-    #endregion
+    private StateMachineEngine messyStudentFSM;
+    private StateMachineEngine punishmentSubFSM;
+    private StateMachineEngine troubleSubFSM;
 
-    
+    private Student targetStudent;
 
     //methods
-    public MessyStudent(string name, Genders gender, Vector2 position) : base(name, gender, position)
+    public MessyStudent(string name, Genders gender, Transform obj) : base(name, gender, obj)
     {
         this.role = Roles.MessyStudent;
-        //this.currentState = messStates.lookForMess;
+
+        CreateTroubleSubStateMachine();
+        CreatePunishmentSubStateMachine();
+        CreateStateMachine();
     }
 
-    public override string FSM()
+    private void CreateTroubleSubStateMachine()
     {
-        string extraState = "";
+        troubleSubFSM = new StateMachineEngine(true);
 
-        //Messy Student's FSM
-        switch (currentState)
-        {
-            case messStates.start:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Just Starting!");
-                Enjoying();
-                break;
-            case messStates.breath:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Breathing state");
-                extraState = Breathing();
-                break;
-            case messStates.drink:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking state");
-                extraState = Drinking();
-                break;
-            case messStates.punishment:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Punishment state");
-                extraState = Punishment();
-                break;
-            case messStates.rest:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Resting state");
-                extraState = Resting();
-                break;
-            case messStates.lookForMess:
-                Trouble();
-                break;
-            case messStates.sabotageDrink:
-                SabotageDrink();
-                break;
-            case messStates.botherTeacher:
-                BotherTeacher();
-                break;
-            case messStates.checkAffinity:
-                Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Is this one chad or virgin?");
-                //CheckAffinity();
-                break;
-            case messStates.fightStudent:
-                Fight();
-                break;
-            case messStates.negotiateOrganizer:
-                Negotiate();
-                break;
-            case messStates.runAway:
-                Run();
-                break;
-            default:
-                break;
-        }
+        // Perceptions
+        Perception push = troubleSubFSM.CreatePerception<PushPerception>(); //temporal
+        Perception seesStudent = troubleSubFSM.CreatePerception<PushPerception>(); //temporal
+        Perception timer = troubleSubFSM.CreatePerception<TimerPerception>(2);
+        Perception affinityCheck = troubleSubFSM.CreatePerception<ValuePerception>(() => CheckAffinity());
+        Perception fightStudent = troubleSubFSM.CreateOrPerception<OrPerception>(timer, affinityCheck);
 
-        return "" + currentState + "  " + extraState;
+        // States
+        State lookingForTroubleState = troubleSubFSM.CreateEntryState("Looking for trouble", LookForTrouble);
+        State sabotageDrinkState = troubleSubFSM.CreateState("Sabotage drink", SabotageDrink);
+        State negotiationState = troubleSubFSM.CreateState("Negotiating", Negotiate);
+        State chaseState = troubleSubFSM.CreateState("Being chased", Run);
+        State botherTeacherState = troubleSubFSM.CreateState("Bothering teacher", BotherTeacher);
+        State arguingState = troubleSubFSM.CreateState("Arguing", Arguing);
+        State checkAffinityState = troubleSubFSM.CreateState("CheckingAffinity", CheckingAffinity);
+        State fightState = troubleSubFSM.CreateState("Fighting", Fight);
+
+        // Transitions
+        troubleSubFSM.CreateTransition("Sees bar unattended", lookingForTroubleState, push, sabotageDrinkState);
+        troubleSubFSM.CreateTransition("Sees teacher", lookingForTroubleState, push, botherTeacherState);
+        troubleSubFSM.CreateTransition("Sees student", lookingForTroubleState, seesStudent, checkAffinityState); //This perception will return in some way a Student, and assign it to this.targetStudent
+
+        troubleSubFSM.CreateTransition("Didn't get busted", sabotageDrinkState, push, lookingForTroubleState);
+        troubleSubFSM.CreateTransition("Busted by organizer", sabotageDrinkState, push, negotiationState);
+        troubleSubFSM.CreateTransition("Busted by teacher", sabotageDrinkState, push, chaseState);
+
+        troubleSubFSM.CreateTransition("Convinced organizer", negotiationState, push, lookingForTroubleState);
+        troubleSubFSM.CreateTransition("Didn't convince organizer", negotiationState, push, chaseState);
+
+        troubleSubFSM.CreateTransition("Escaped", chaseState, push, lookingForTroubleState);
+        troubleSubFSM.CreateTransition("Busted by teacher", chaseState, push, arguingState);
+
+        troubleSubFSM.CreateTransition("Finished bothering teacher", botherTeacherState, push, chaseState);
+
+        troubleSubFSM.CreateTransition("Affinity is positive", checkAffinityState, push, lookingForTroubleState);
+        troubleSubFSM.CreateTransition("Affinity is negative", checkAffinityState, fightStudent, fightState);
+
+        troubleSubFSM.CreateTransition("Fight ends", fightState, push, lookingForTroubleState);
+        troubleSubFSM.CreateTransition("Busted by teacher", fightState, push, arguingState);
     }
 
-    public override void Trouble()
+    private void CreatePunishmentSubStateMachine()
     {
-        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Looking for some trouble...");
-        //Debug.Log("[" + name + "] Hobbies: " + Hobbies[0] + ", " + Hobbies[1] + " and " + Hobbies[2]);
-        //Debug.Log("[" + name + "] Fav Foods: " + FavFoods[0] + ", " + FavFoods[1] + " and " + FavFoods[2]);
-        //Debug.Log("[" + name + "] Fav Animals: " + FavAnimals[0] + ", " + FavAnimals[1] + " and " + FavAnimals[2]);  
+        punishmentSubFSM = new StateMachineEngine(true);
+
+        // Perceptions
+        Perception push = punishmentSubFSM.CreatePerception<PushPerception>(); //temporal
+
+        // States
+        State toPunishmentRoom = punishmentSubFSM.CreateEntryState("Being taken to punishment room");
+        State punishedState = punishmentSubFSM.CreateState("Punished", Punished);
+        State escapeState = punishmentSubFSM.CreateState("Escape", Escape);
+
+        // Transitions
+        punishmentSubFSM.CreateTransition("Reached punishment room", toPunishmentRoom, push, punishedState);
+        punishmentSubFSM.CreateTransition("Teacher distracted", punishedState, push, escapeState);
+        punishmentSubFSM.CreateTransition("Teacher busts student", escapeState, push, punishedState);
+    }
+
+    private void CreateStateMachine()
+    {
+        messyStudentFSM = new StateMachineEngine(false);
+
+        // Perceptions
+        Perception push = messyStudentFSM.CreatePerception<PushPerception>(); //temporal
+
+        // States
+        State startState = messyStudentFSM.CreateEntryState("Start");
+        State drinkingState = messyStudentFSM.CreateSubStateMachine("Drink", drinkSubFSM);
+        State benchState = messyStudentFSM.CreateState("Bench", InBench);
+        State troubleState = messyStudentFSM.CreateSubStateMachine("Trouble", troubleSubFSM);
+        State punishmentState = messyStudentFSM.CreateSubStateMachine("Punishment", punishmentSubFSM);
+
+        // Transitions
+        messyStudentFSM.CreateTransition("More thirsty than tired (1)", startState, push, drinkingState);
+        messyStudentFSM.CreateTransition("More tired than thirsty", startState, push, benchState);
+        messyStudentFSM.CreateTransition("Not thirsty, not tired (1)", startState, push, troubleState);
+
+        drinkSubFSM.CreateExitTransition("Not thirsty, tired", drinkingState, push, benchState);
+        drinkSubFSM.CreateExitTransition("Not thirsty, not tired (2)", drinkingState, push, troubleState);
+
+        messyStudentFSM.CreateTransition("Not tired, thirsty", benchState, push, drinkingState);
+        messyStudentFSM.CreateTransition("Not thirsty, not tired (3)", benchState, push, troubleState);
+
+        troubleSubFSM.CreateExitTransition("Not tired, thirsty", troubleState, push, drinkingState);
+        troubleSubFSM.CreateExitTransition("More thirsty than tired (2)", troubleState, push, benchState);
+        troubleSubFSM.CreateExitTransition("Finished arguing", troubleState, push, punishmentState);
+
+        punishmentSubFSM.CreateExitTransition("End of punishment", punishmentState, push, startState);
+    }
+
+    public override void Update()
+    {
+        drinkSubFSM.Update();
+        troubleSubFSM.Update();
+        punishmentSubFSM.Update();
+        messyStudentFSM.Update();
+    }
+
+    public override void LookForTrouble()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Looking for some trouble...");
     }
 
     protected void SabotageDrink()
     {
-        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Drinking should be fun!");
+        Debug.Log("[" + name + ", " + getRole() + "] Drinking should be fun!");
     }
 
     protected void BotherTeacher()
     {
-        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Hey, teacher! Leave those kids alone!");
+        Debug.Log("[" + name + ", " + getRole() + "] Bothering teacher");
 
     }
 
-    protected void CheckAffinity(Student targetStudent)
+    protected bool CheckAffinity()
     {
+        Debug.Log("[" + name + ", " + getRole() + "] Is this one chad or virgin?");
+
         int affinity = 0;
 
         if (Hobbies[0] == targetStudent.Hobbies[0] || Hobbies[0] == targetStudent.Hobbies[1] || Hobbies[0] == targetStudent.Hobbies[2])
@@ -126,27 +169,33 @@ public class MessyStudent : Student
 
         if (affinity > affinityTolerance)
         {
-            Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] This dude is a total chad!");
-        } else
-        {
-            Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] What a virgin!");
-            Fight();
+            Debug.Log("[" + name + ", " + getRole() + "] This dude is a total chad!");
+            return false;
         }
-    }
-
-    protected void Fight()
-    {
-        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Take this Billy!");
+        else
+        {
+            Debug.Log("[" + name + ", " + getRole() + "] What a virgin!");
+            return true;
+        }
     }
 
     protected void Negotiate()
     {
-        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Don't sneak!");
+        Debug.Log("[" + name + ", " + getRole() + "] Don't sneak!");
     }
 
     protected void Run()
     {
-        Debug.Log("[" + name + ", " + getRole() + ", " + currentState + "] Run run run!");
+        Debug.Log("[" + name + ", " + getRole() + "] Run run run!");
     }
 
+    protected void Escape()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Ight imma head out");
+    }
+
+    protected void Arguing()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Arguing with teacher");
+    }
 }
