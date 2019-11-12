@@ -229,10 +229,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62818ba75f4fd5343a0bbb24cac3da38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  forceDoorAttended: 0
+  doorAttended: 0
+  barAttended: 0
   paused: 0
   Agents:
   - {fileID: 0}
   debugMode: 0
+  door: {fileID: 241125566}
+  bar: {fileID: 424376491}
 --- !u!212 &212705368
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -310,7 +315,7 @@ GameObject:
   - component: {fileID: 241125568}
   - component: {fileID: 241125567}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: Door
   m_TagString: Door
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -401,8 +406,8 @@ GameObject:
   - component: {fileID: 424376493}
   - component: {fileID: 424376492}
   m_Layer: 0
-  m_Name: Cube
-  m_TagString: Untagged
+  m_Name: Bar
+  m_TagString: Bar
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -473,8 +478,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 424376491}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.82, y: -2.01, z: -0.5}
-  m_LocalScale: {x: 3.0375, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 3.49, z: -0.5}
+  m_LocalScale: {x: 2.425, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
@@ -590,7 +595,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.9056604, g: 0.83952653, b: 0.6707013, a: 0}
+  m_BackGroundColor: {r: 0.5943396, g: 0.5943396, b: 0.5943396, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1012,7 +1017,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.06666667
+  m_VoxelSize: 0.1
   m_BuildHeightMesh: 0
   m_NavMeshData: {fileID: 23800000, guid: 072ef6678baff0a478b6fa912f521265, type: 2}
 --- !u!4 &1572338511

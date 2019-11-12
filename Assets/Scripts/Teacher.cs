@@ -16,7 +16,7 @@ public class Teacher : Authority
     float distractionRandom;
 
     //methods
-    public Teacher(string name, Genders gender, Transform obj) : base(name, gender, obj)
+    public Teacher(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
     {
         this.role = Roles.Teacher;
         this.strictness = 1;
@@ -128,6 +128,26 @@ public class Teacher : Authority
     {
         doorSubFSM.Update();
         patrolSubFSM.Update();
+        teacherFSM.Update();
+    }
+
+    public override bool isInState(string subFSM, string subState)
+    {
+        Perception isIn;
+        switch (subFSM)
+        {
+            case "Door":
+                isIn = patrolSubFSM.CreatePerception<IsInStatePerception>(doorSubFSM, subState);
+                break;
+            case "Patrol":
+                isIn = patrolSubFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, subState);
+                break;
+            default:
+                isIn = patrolSubFSM.CreatePerception<PushPerception>();
+                break;
+        }
+
+        return isIn.Check();
     }
 
     protected void Talking()

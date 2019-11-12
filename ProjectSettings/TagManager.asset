@@ -9,6 +9,7 @@ TagManager:
   - CalmStudent
   - MessyStudent
   - Door
+  - Bar
   layers:
   - Default
   - TransparentFX

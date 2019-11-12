@@ -7,7 +7,10 @@ public class Authority : Character
 {
     //parameters
     protected StateMachineEngine doorSubFSM;
-    private bool isNew = true;
+    private bool isNewBool = true;
+    protected Perception pushBack;
+    protected Perception pushBack2;
+    protected bool shouldGoBool;
 
     protected bool newSomeone = false;
     protected float distanceToDoor;
@@ -18,7 +21,7 @@ public class Authority : Character
     #endregion
 
     //methods
-    public Authority(string name, Genders gender, Transform obj) : base(name, gender, obj)
+    public Authority(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
     {
         CreateDoorSubStateMachine();
     }
@@ -29,50 +32,69 @@ public class Authority : Character
 
         // Perceptions
         Perception gotToDoor = doorSubFSM.CreatePerception<ValuePerception>(() => distanceToDoor < 0.3f);
-        WatchingPerception seeCalmStudent = doorSubFSM.CreatePerception<WatchingPerception>(new WatchingPerception(this.gameObject, "CalmStudent", this.gameObject.GetComponentInChildren<MeshCollider>()));
-        Perception isNewStudent = doorSubFSM.CreatePerception<ValuePerception>(() => isNew);
-        Perception seeNewStudent = doorSubFSM.CreateAndPerception<AndPerception>(seeCalmStudent, isNewStudent);
+        WatchingPerception seeSomeone = doorSubFSM.CreatePerception<WatchingPerception>(new WatchingPerception(this.gameObject, "CalmStudent", this.gameObject.GetComponentInChildren<MeshCollider>()));
+        Perception isNew = doorSubFSM.CreatePerception<ValuePerception>(() => isNewBool);
+        Perception seeSomoneNew = doorSubFSM.CreateAndPerception<AndPerception>(seeSomeone, isNew);
         Perception timer = doorSubFSM.CreatePerception<TimerPerception>(2);
+        pushBack = doorSubFSM.CreatePerception<PushPerception>();
+        pushBack2 = doorSubFSM.CreatePerception<PushPerception>();
 
         // States
-        State walkingState = doorSubFSM.CreateEntryState("Walking to door", Walking);
-        State waitingState = doorSubFSM.CreateState("Waiting for someone", Waiting);
+        State walkingState = doorSubFSM.CreateEntryState("Walking to door", () => Walking("Door", new Vector3(-1, 0, 0), !gameState.getDoorAttended()));
+        State waitingState = doorSubFSM.CreateState("Waiting for someone", ()=> WaitingAt("Door"));
         State welcomeState = doorSubFSM.CreateState("Welcome", Welcome);
+        State outState = doorSubFSM.CreateState("Out State");
 
         // Transitions
         doorSubFSM.CreateTransition("Got to the door", walkingState, gotToDoor, waitingState);
-        doorSubFSM.CreateTransition("Someone new arrives", waitingState, seeNewStudent, welcomeState);
+        doorSubFSM.CreateTransition("Someone new arrives", waitingState, seeSomoneNew, welcomeState);
         doorSubFSM.CreateTransition("Welcome finished", welcomeState, timer, waitingState);
+        doorSubFSM.CreateTransition("Back out", walkingState, pushBack, outState);
+        doorSubFSM.CreateTransition("Back out from wait", waitingState, pushBack, outState);
     }
 
     //Common behaviours: Organizer Students and Teachers
-    protected void Waiting()
+    protected void WaitingAt(string tag)
     {
         Debug.Log("[" + name + ", " + getRole() + "] Waiting for someone to come...");
 
-        this.LookAt(GameObject.FindGameObjectWithTag("Door").transform);
+        this.LookAt(GameObject.FindGameObjectWithTag(tag).transform);
+
+        if (!shouldGoBool)
+        {
+            Debug.Log("Nevermind, someone's already there");
+            pushBack2.Fire();
+        }
 
         foreach (Text txt in GameObject.FindObjectsOfType<Text>())
         {
-            if(txt.text == "Welcome to the party!")
+            if(txt.text == "Welcome to the party!" || txt.text == "Have a drink!")
             {
                 GameObject.Destroy(txt.gameObject);
             }
         }
     }
 
-    protected void Walking()
+    protected void Walking(string tag, Vector3 offset, bool shouldGo)
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Walking to door at: ");
+        Debug.Log("[" + name + ", " + getRole() + "] Walking to " + tag);
 
-        this.Move(GameObject.FindGameObjectWithTag("Door").transform.position - new Vector3(1, 0, 0));
+        this.shouldGoBool = shouldGo;
+
+        if (shouldGoBool) {
+            this.Move(GameObject.FindGameObjectWithTag(tag).transform.position + offset);
+        } else
+        {
+            Debug.Log("Nevermind, someone's already there");
+            pushBack.Fire();
+        }
     }
 
     protected void Welcome()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Welcome to the party!");
         createMessage("Welcome to the party!", Color.blue);
-        isNew = false;
+        isNewBool = false;
     }
 
     protected void Patrol()

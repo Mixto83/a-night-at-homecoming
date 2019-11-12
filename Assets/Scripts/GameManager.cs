@@ -12,11 +12,17 @@ public class GameManager : MonoBehaviour
     protected readonly int ANIMALS_NUM = 12;
     protected readonly int HOBBIES_NUM = 12;
 
+    [SerializeField] private bool forceDoorAttended = false;
+    [SerializeField] private bool doorAttended = false;
+    [SerializeField] private bool barAttended = false;
+
     [SerializeField] bool paused = false;
 
     [SerializeField] List<GameObject> Agents;
     List<Character> People;
     [SerializeField] bool debugMode;
+    [SerializeField] GameObject door;
+    [SerializeField] GameObject bar;
 
     string[] Names = new string[] { "Diego", "Mario", "Juan", "Cesar", "Daniel", "Pedro", "Manuel", "Maria", "Marta", "Carmen", "Raquel", "Lucia", "Ana", "Laura" };
     string[] Hobbies = new string[] { "Comic books", "Videogames", "Movies", "Books", "Cooking", "Board games", "Trading card games", "Sports", "School shooting", "Music", "Dancing", "Gym" };
@@ -59,7 +65,7 @@ public class GameManager : MonoBehaviour
             switch (child.tag)
             {
                 case "CalmStudent":
-                    CalmStudent newStudent = new CalmStudent(name, gender, child);             
+                    CalmStudent newStudent = new CalmStudent(name, gender, child, this);             
                     for (int i = 0; i < 3; i++)
                     {
                         string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];                   
@@ -74,7 +80,7 @@ public class GameManager : MonoBehaviour
                     People.Add(newStudent);
                     break;
                 case "MessyStudent":
-                    MessyStudent newStudent2 = new MessyStudent(name, gender, child);
+                    MessyStudent newStudent2 = new MessyStudent(name, gender, child, this);
                     for (int i = 0; i < 3; i++)
                     {
                         string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];
@@ -89,11 +95,11 @@ public class GameManager : MonoBehaviour
                     People.Add(newStudent2);
                     break;
                 case "Teacher":
-                    Teacher newTeacher = new Teacher(name, gender, child);
+                    Teacher newTeacher = new Teacher(name, gender, child, this);
                     People.Add(newTeacher);
                     break;
                 case "OrgStudent":
-                    OrganizerStudent newOrgStudent = new OrganizerStudent(name, gender, child);
+                    OrganizerStudent newOrgStudent = new OrganizerStudent(name, gender, child, this);
                     People.Add(newOrgStudent);
                     break;
             }
@@ -103,11 +109,47 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!paused) {
+        if (!paused)
+        {
+            var changeDoorState = false;
+            var changeBarState = false;
+
             foreach (Character character in People)
             {
                 character.Update();
+                character.lockCanvasRotation();
+                character.RotateIfNeeded();
+
+                if (character.isInState("Door", "Waiting for someone"))
+                {
+                    changeDoorState = true;
+                }
+
+                if (character.isInState("Bar", "Waiting for client"))
+                {
+                    changeBarState = true;
+                }
             }
+
+            if (forceDoorAttended)
+            {
+                doorAttended = true;
+            } else
+            {
+                doorAttended = changeDoorState;
+            }
+
+            barAttended = changeBarState;
         }
+    }
+
+    public bool getDoorAttended()
+    {
+        return doorAttended;
+    }
+
+    public bool getBarAttended()
+    {
+        return barAttended;
     }
 }

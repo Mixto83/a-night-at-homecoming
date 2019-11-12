@@ -14,20 +14,29 @@ public class Character
     protected Genders gender;
     protected Vector3 position;
     protected float movementSpeed = 3f;
+    protected float rotSpeed = 0.1f;
     protected GameObject gameObject;
     protected Vector3 initPos;
     protected NavMeshAgent agent;
 
+    private Quaternion fixedRotation;
+    private bool rotating = false;
+    Quaternion lookRotation;
+
+    protected GameManager gameState;
+
     //methods
-    protected Character(string name, Genders gender, Transform obj)
+    protected Character(string name, Genders gender, Transform obj, GameManager gameState)
     {
         this.initPos = new Vector3(Random.Range(-5, 5), Random.Range(-5, 5));
+        this.fixedRotation = obj.rotation;
 
         this.name = name;
         this.gender = gender;
         this.position = obj.position;
         this.gameObject = obj.gameObject;
         this.agent = this.gameObject.GetComponent<NavMeshAgent>();
+        this.gameState = gameState;
 
         CreateDrinkSubStateMachine();
     }
@@ -76,7 +85,37 @@ public class Character
 
     public void LookAt(Transform target)
     {
-        agent.transform.LookAt(target);
+        Vector3 direction = (target.position - this.gameObject.transform.position).normalized;
+        direction.z = 0;
+        Debug.Log(direction);
+        lookRotation = Quaternion.LookRotation(direction);
+        rotating = true;
+    }
+
+    public void RotateIfNeeded()
+    {
+        if (rotating)
+        {
+            if (Mathf.Abs(this.gameObject.transform.rotation.z - lookRotation.z) > 0.55f)
+            {
+                this.gameObject.transform.rotation = Quaternion.Lerp(this.gameObject.transform.rotation, lookRotation, rotSpeed);
+            }
+            else
+            {
+                this.gameObject.transform.rotation = lookRotation;
+                rotating = false;
+            }
+        }
+    }
+
+    public void lockCanvasRotation()
+    {
+        this.gameObject.GetComponentInChildren<Canvas>().gameObject.transform.rotation = fixedRotation;
+    }
+
+    public virtual bool isInState(string subFSM, string subState)
+    {
+        return false;
     }
 
     //Common behaviours to be overridden
@@ -138,6 +177,6 @@ public class Character
         newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 200);
         newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 100);
         newText.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-        newText.transform.localPosition = new Vector3(0, 0, 0);
+        newText.transform.localPosition = new Vector3(0, 1, 0);
     }
 }

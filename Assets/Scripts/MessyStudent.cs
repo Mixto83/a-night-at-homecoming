@@ -12,7 +12,7 @@ public class MessyStudent : Student
     private Student targetStudent;
 
     //methods
-    public MessyStudent(string name, Genders gender, Transform obj) : base(name, gender, obj)
+    public MessyStudent(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
     {
         this.role = Roles.MessyStudent;
 
@@ -122,6 +122,28 @@ public class MessyStudent : Student
         troubleSubFSM.Update();
         punishmentSubFSM.Update();
         messyStudentFSM.Update();
+    }
+
+    public override bool isInState(string subFSM, string subState)
+    {
+        Perception isIn;
+        switch (subFSM)
+        {
+            case "Drink":
+                isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, subState);
+                break;
+            case "Trouble":
+                isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(troubleSubFSM, subState);
+                break;
+            case "Punsihment":
+                isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(punishmentSubFSM, subState);
+                break;
+            default:
+                isIn = messyStudentFSM.CreatePerception<PushPerception>();
+                break;
+        }
+
+        return isIn.Check();
     }
 
     public override void LookForTrouble()

@@ -18,7 +18,7 @@ public class CalmStudent : Student
     #endregion
 
     //methods
-    public CalmStudent(string name, Genders gender, Transform obj) : base(name, gender, obj)
+    public CalmStudent(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
     {
         this.role = Roles.CalmStudent;
 
@@ -99,6 +99,25 @@ public class CalmStudent : Student
         {
             calmStudentFSM.Fire("Look for friends");
         }
+    }
+
+    public override bool isInState(string subFSM, string subState)
+    {
+        Perception isIn;
+        switch (subFSM)
+        {
+            case "Drink":
+                isIn = calmStudentFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, subState);
+                break;
+            case "Flirt":
+                isIn = calmStudentFSM.CreatePerception<IsInStatePerception>(flirtSubFSM, subState);
+                break;
+            default:
+                isIn = calmStudentFSM.CreatePerception<PushPerception>();
+                break;
+        }
+
+        return isIn.Check();
     }
 
     protected int CheckAffinity(Student targetStudent)

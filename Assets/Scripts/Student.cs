@@ -26,7 +26,7 @@ public class Student : Character
 
 
     //methods
-    protected Student(string name, Genders gender, Transform obj) : base(name, gender, obj)
+    protected Student(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
     {
         this.FavFoods = new List<string>();
         this.FavAnimals = new List<string>();
