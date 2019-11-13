@@ -75,6 +75,11 @@ public class Character
         return this.role;
     }
 
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
+
     public bool getGreeted()
     {
         return greetedAtDoor;
@@ -139,7 +144,17 @@ public class Character
         return false;
     }
 
+    public virtual void setGroup(Group group)
+    {
+
+    }
+
     //Common behaviours to be overridden
+    public virtual void CreateStateMachine()
+    {
+
+    }
+
     public virtual void Update()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
@@ -151,10 +166,6 @@ public class Character
 
     public virtual void LookForTrouble() {
         Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
-    }
-
-    public virtual void Enjoying() {
-        Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");   
     }
 
     protected void WalkingToBar()

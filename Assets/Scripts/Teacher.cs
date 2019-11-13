@@ -92,7 +92,7 @@ public class Teacher : Authority
         drinkSubFSM.CreateExitTransition("Not thirsty", drinkState, push, patrolState);
     }
 
-    private void CreateStateMachine()
+    public override void CreateStateMachine()
     {
         teacherFSM = new StateMachineEngine(false);
 

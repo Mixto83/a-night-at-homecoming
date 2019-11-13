@@ -29,15 +29,23 @@ public class GameManager : MonoBehaviour
     string[] Animals = new string[] { "Dog", "Cat", "Bird", "Bee", "Sheep", "Whale", "Possum", "Crocodile", "Bat", "Spider", "Lizard", "Turtle" };
     string[] Foods = new string[] { "Hamburgers", "Pizza", "Pasta", "Sandwich", "Fish", "Eggs", "Salad", "Chocolate", "Children", "Apple" };
 
+    [SerializeField] List<int> friendsGroups;
+    List<Group> groups;
+
     private void Awake()
     {
         Agents = new List<GameObject>();
         People = new List<Character>();
+        groups = new List<Group>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        foreach (int i in friendsGroups)
+        {
+            groups.Add(new Group(i));
+        }
         foreach (Transform child in transform)
         {
             Agents.Add(child.gameObject);
@@ -65,7 +73,7 @@ public class GameManager : MonoBehaviour
             switch (child.tag)
             {
                 case "CalmStudent":
-                    CalmStudent newStudent = new CalmStudent(name, gender, child, this);             
+                    CalmStudent newStudent = new CalmStudent(name, gender, child, this);
                     for (int i = 0; i < 3; i++)
                     {
                         string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];                   
@@ -77,7 +85,24 @@ public class GameManager : MonoBehaviour
                         newStudent.FavAnimals.Add(newAnimal);
                         newStudent.FavFoods.Add(newFood);
                     }
+                    
+                    var j = 0;
+                    foreach (Group g in groups)
+                    {
+                        j++;
+                        if (g.pushFriend(newStudent))
+                        {
+                            newStudent.setGroup(g);
+                            break;
+                        }
+
+                        if(j >= groups.Count)
+                        {
+                            Debug.Log("[Error] All groups are full");
+                        }
+                    }
                     People.Add(newStudent);
+
                     break;
                 case "MessyStudent":
                     MessyStudent newStudent2 = new MessyStudent(name, gender, child, this);
@@ -103,6 +128,15 @@ public class GameManager : MonoBehaviour
                     People.Add(newOrgStudent);
                     break;
             }
+        }
+        foreach (Group g in groups) {
+            Debug.Log(g.toString());
+        }
+        foreach (Character c in People)
+        {
+            c.CreateStateMachine();
+            if(c.getRole() == Roles.CalmStudent )
+                Debug.Log(c.getName());
         }
     }
 

@@ -24,7 +24,6 @@ public class OrganizerStudent : Authority
 
         CreateServingSubStateMachine();
         CreatePatrolSubStateMachine();
-        CreateStateMachine();
 
         this.negotiateRandom = Random.value;
     }
@@ -83,7 +82,7 @@ public class OrganizerStudent : Authority
         patrolSubFSM.CreateTransition("Teacher got the call", callTeacherState, push, patrollingState);
     }
 
-    private void CreateStateMachine()
+    public override void CreateStateMachine()
     {
         organizerStudentFSM = new StateMachineEngine(false);
 

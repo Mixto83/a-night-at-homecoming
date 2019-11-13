@@ -33,12 +33,6 @@ public class Student : Character
         this.Hobbies = new List<string>();
     }
 
-    public override void Enjoying()
-    {
-        Debug.Log("[" + name + ", " + getRole() + "] I'm having fun!");
-        Move(new Vector3(0, 1));
-    }
-
     protected void InBench()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Sat in the bench");

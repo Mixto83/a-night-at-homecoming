@@ -18,7 +18,6 @@ public class MessyStudent : Student
 
         CreateTroubleSubStateMachine();
         CreatePunishmentSubStateMachine();
-        CreateStateMachine();
     }
 
     private void CreateTroubleSubStateMachine()
@@ -84,7 +83,7 @@ public class MessyStudent : Student
         punishmentSubFSM.CreateTransition("Teacher busts student", escapeState, push, punishedState);
     }
 
-    private void CreateStateMachine()
+    public override void CreateStateMachine()
     {
         messyStudentFSM = new StateMachineEngine(false);
 
