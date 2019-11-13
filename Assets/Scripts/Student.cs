@@ -36,7 +36,7 @@ public class Student : Character
     public override void Enjoying()
     {
         Debug.Log("[" + name + ", " + getRole() + "] I'm having fun!");
-        Move(new Vector3(1, 3));
+        Move(new Vector3(0, 1));
     }
 
     protected void InBench()

@@ -9,8 +9,9 @@ public class OrganizerStudent : Authority
     private StateMachineEngine servingSubFSM;
     private StateMachineEngine patrolSubFSM;
 
+    private WatchingPerception watching;
+
     float negotiateRandom;
-    private bool isNewBool = true;
     protected float distanceToBar;
 
     //methods
@@ -18,6 +19,8 @@ public class OrganizerStudent : Authority
     {
         this.role = Roles.OrganizerStudent;
         this.strictness = 0.5f;
+
+        this.watching = new WatchingPerception(this.gameObject, "CalmStudent", this.gameObject.GetComponentInChildren<MeshCollider>(), "Bar");
 
         CreateServingSubStateMachine();
         CreatePatrolSubStateMachine();
@@ -32,20 +35,21 @@ public class OrganizerStudent : Authority
 
         // Perceptions
         Perception gotToBar = servingSubFSM.CreatePerception<ValuePerception>(() => distanceToBar < 0.3f);
-        WatchingPerception seeSomeone = servingSubFSM.CreatePerception<WatchingPerception>(new WatchingPerception(this.gameObject, "CalmStudent", this.gameObject.GetComponentInChildren<MeshCollider>()));
-        Perception isNew = servingSubFSM.CreatePerception<ValuePerception>(() => isNewBool);
-        Perception seeSomoneNew = servingSubFSM.CreateAndPerception<AndPerception>(seeSomeone, isNew);
+        WatchingPerception seeSomeone = servingSubFSM.CreatePerception<WatchingPerception>(watching);
         Perception timer = servingSubFSM.CreatePerception<TimerPerception>(2);
+        Perception barAttended = doorSubFSM.CreatePerception<ValuePerception>(() => this.gameState.getBarAttended());
 
         // States
-        State walkingState = servingSubFSM.CreateEntryState("Walking to bar", () => Walking("Bar", new Vector3(0, 1, 0), !gameState.getBarAttended()));
+        State walkingState = servingSubFSM.CreateEntryState("Walking to bar", () => Walking("Bar", new Vector3(0, 0.75f, 0)));
         State waitingState = servingSubFSM.CreateState("Waiting for client", () => WaitingAt("Bar"));
         State serveState = servingSubFSM.CreateState("Serve", ServeDrink);
+        State outState = servingSubFSM.CreateState("Out Bar State");
 
         // Transitions
         servingSubFSM.CreateTransition("Got to bar", walkingState, gotToBar, waitingState);
-        servingSubFSM.CreateTransition("New client arrives", waitingState, seeSomoneNew, serveState);
+        servingSubFSM.CreateTransition("New client arrives", waitingState, seeSomeone, serveState);
         servingSubFSM.CreateTransition("Drink served", serveState, timer, waitingState);
+        servingSubFSM.CreateTransition("Back out", walkingState, barAttended, outState);
     }
 
     private void CreatePatrolSubStateMachine()
@@ -84,18 +88,21 @@ public class OrganizerStudent : Authority
         organizerStudentFSM = new StateMachineEngine(false);
 
         // Perceptions
-        Perception rest = organizerStudentFSM.CreatePerception<TimerPerception>(5);
+        Perception rest = organizerStudentFSM.CreatePerception<TimerPerception>(10);
         Perception doorAttended = organizerStudentFSM.CreatePerception<ValuePerception>(() => this.gameState.getDoorAttended());
         Perception doorUnattended = organizerStudentFSM.CreatePerception<ValuePerception>(() => !this.gameState.getDoorAttended());
         Perception barAttended = organizerStudentFSM.CreatePerception<ValuePerception>(() => this.gameState.getBarAttended());
         Perception barUnattended = organizerStudentFSM.CreatePerception<ValuePerception>(() => !this.gameState.getBarAttended());
         Perception doorNBar = organizerStudentFSM.CreateAndPerception<AndPerception>(doorAttended, barUnattended);
         Perception doorBar = organizerStudentFSM.CreateAndPerception<AndPerception>(doorAttended, barAttended);
-        Perception outOfDoor = organizerStudentFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Out State");
+        Perception outOfDoor = organizerStudentFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Out Door State");
+        Perception outOfBar = organizerStudentFSM.CreatePerception<IsInStatePerception>(servingSubFSM, "Out Bar State");
+        Perception isWaiting = organizerStudentFSM.CreatePerception<IsInStatePerception>(servingSubFSM, "Waiting for client");
 
         Perception goToDoor = organizerStudentFSM.CreateAndPerception<AndPerception>(doorUnattended, rest);
+        Perception goToDoorNow = organizerStudentFSM.CreateAndPerception<AndPerception>(goToDoor, isWaiting);
         Perception goToBar = organizerStudentFSM.CreateAndPerception<AndPerception>(doorNBar, rest);
-        OrPerception goBack = organizerStudentFSM.CreateOrPerception<OrPerception>(outOfDoor, rest);
+        Perception goBackFromDoor = organizerStudentFSM.CreateOrPerception<OrPerception>(outOfDoor, rest);
 
         // States
         State startState = organizerStudentFSM.CreateEntryState("Start", () => Move(initPos));
@@ -108,8 +115,9 @@ public class OrganizerStudent : Authority
         organizerStudentFSM.CreateTransition("Door attended, bar unattended", startState, goToBar, serveDrinkState);
         organizerStudentFSM.CreateTransition("Door attended, bar attended", startState, doorBar, patrolState);
         patrolSubFSM.CreateExitTransition("Bar unattended", patrolState, barUnattended, serveDrinkState);
-        servingSubFSM.CreateExitTransition("Door unattended from bar", serveDrinkState, goToDoor, doorState);
-        doorSubFSM.CreateExitTransition("Back", doorState, goBack, startState);
+        servingSubFSM.CreateExitTransition("Door unattended from bar", serveDrinkState, goToDoorNow, doorState);
+        doorSubFSM.CreateExitTransition("BackDoor", doorState, goBackFromDoor, startState);
+        servingSubFSM.CreateExitTransition("BackBar", serveDrinkState, outOfBar, startState);
     }
 
     public override void Update()
@@ -119,8 +127,8 @@ public class OrganizerStudent : Authority
         patrolSubFSM.Update();
         organizerStudentFSM.Update();
 
-        distanceToDoor = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Door").transform.position + new Vector3(-1, 0, 0));
-        distanceToBar = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0, 1, 0));
+        distanceToDoor = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Door").transform.position + new Vector3(-0.75f, 0, 0));
+        distanceToBar = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0, 0.75f, 0));
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
@@ -163,7 +171,7 @@ public class OrganizerStudent : Authority
     {
         Debug.Log("[" + name + ", " + getRole() + "] Serving drink");
         createMessage("Have a drink!", Color.blue);
-        isNewBool = false;
+        watching.getTargetCharacter().setServed(true);
     }
 
     protected void Negotiate()

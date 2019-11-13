@@ -118,7 +118,7 @@ public class GameManager : MonoBehaviour
             {
                 character.Update();
                 character.lockCanvasRotation();
-                character.RotateIfNeeded();
+                character.RotationUpdate();
 
                 if (character.isInState("Door", "Waiting for someone"))
                 {
@@ -151,5 +151,10 @@ public class GameManager : MonoBehaviour
     public bool getBarAttended()
     {
         return barAttended;
+    }
+
+    public Character GetCharacter(GameObject obj)
+    {
+        return People[Agents.IndexOf(obj)];
     }
 }

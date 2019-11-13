@@ -13,15 +13,16 @@ public class Character
     protected Roles role;
     protected Genders gender;
     protected Vector3 position;
-    protected float movementSpeed = 3f;
-    protected float rotSpeed = 0.1f;
     protected GameObject gameObject;
     protected Vector3 initPos;
     protected NavMeshAgent agent;
 
+    protected bool greetedAtDoor = false;
+    private bool servedRecently = false;
+
     private Quaternion fixedRotation;
-    private bool rotating = false;
-    Quaternion lookRotation;
+    Vector3 lookAt;
+    bool calledLookAt = false;
 
     protected GameManager gameState;
 
@@ -36,6 +37,7 @@ public class Character
         this.position = obj.position;
         this.gameObject = obj.gameObject;
         this.agent = this.gameObject.GetComponent<NavMeshAgent>();
+        this.agent.updateRotation = false;
         this.gameState = gameState;
 
         CreateDrinkSubStateMachine();
@@ -73,9 +75,24 @@ public class Character
         return this.role;
     }
 
-    public float getMovementSpeed()
+    public bool getGreeted()
     {
-        return movementSpeed;
+        return greetedAtDoor;
+    }
+
+    public void setGreeted(bool greeted)
+    {
+        greetedAtDoor = greeted;
+    }
+
+    public bool getServed()
+    {
+        return servedRecently;
+    }
+
+    public void setServed(bool served)
+    {
+        servedRecently = served;
     }
 
     public void Move(Vector3 to)
@@ -85,27 +102,31 @@ public class Character
 
     public void LookAt(Transform target)
     {
-        Vector3 direction = (target.position - this.gameObject.transform.position).normalized;
-        direction.z = 0;
-        Debug.Log(direction);
-        lookRotation = Quaternion.LookRotation(direction);
-        rotating = true;
+        Vector3 targetPos = new Vector3(target.position.x, target.position.y);
+        lookAt = (targetPos - this.gameObject.transform.position).normalized;
+        calledLookAt = true;
     }
 
-    public void RotateIfNeeded()
+    public void RotationUpdate()
     {
-        if (rotating)
+        Quaternion rot;
+
+        if (agent.velocity.sqrMagnitude > Mathf.Epsilon)
         {
-            if (Mathf.Abs(this.gameObject.transform.rotation.z - lookRotation.z) > 0.55f)
+            rot = Quaternion.LookRotation(agent.velocity.normalized, Vector3.back);
+        } else
+        {
+            if (calledLookAt) {
+                rot = Quaternion.LookRotation(lookAt, Vector3.back);
+            } else
             {
-                this.gameObject.transform.rotation = Quaternion.Lerp(this.gameObject.transform.rotation, lookRotation, rotSpeed);
+                rot = this.gameObject.transform.rotation;
             }
-            else
-            {
-                this.gameObject.transform.rotation = lookRotation;
-                rotating = false;
-            }
+
+            calledLookAt = false;
         }
+
+        this.gameObject.transform.rotation = rot;
     }
 
     public void lockCanvasRotation()
