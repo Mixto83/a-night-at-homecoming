@@ -11,6 +11,7 @@ public class CalmStudent : Student
     #region Stats
 
     protected Group group;
+    private int friendNumber;
     protected const int affinityThreshold = 6;
     protected const int DanceAffinityThreshold = 8;
     protected Student targetStudent;
@@ -66,7 +67,7 @@ public class CalmStudent : Student
         Perception enterParty = calmStudentFSM.CreatePerception<ValuePerception>(() => distanceToMeetPos < 1);
 
         // States
-        State startState = calmStudentFSM.CreateEntryState("Start",Start);
+        State startState = calmStudentFSM.CreateEntryState("Start", Start);
         State enjoyState = calmStudentFSM.CreateState("Enjoying", Enjoying);
         State benchState = calmStudentFSM.CreateState("Bench", InBench);
         State drinkingState = calmStudentFSM.CreateSubStateMachine("Drink", drinkSubFSM);
@@ -168,12 +169,18 @@ public class CalmStudent : Student
         this.group = group;
     }
 
+    public void setFriendNumber(int number)
+    {
+        friendNumber = number;
+    }
+
     //Behaviours
     private void Start()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Start");
-        Vector3 offset = this.gameObject.transform.position - this.group.getMeetPos();
-        Move(this.group.getMeetPos() + offset.normalized * 1);
+        Vector3 destination = group.getMyPos(this.friendNumber);
+        Debug.Log(this.friendNumber + " -> " + destination);
+        Move(destination);
     }
 
     private void Enjoying()

@@ -7,11 +7,12 @@ public class Group
     private int groupSize;
     private Vector3 meetPos;
     private List<CalmStudent> friends;
+    private int consistentID = 0;
 
     public Group(int groupSize)
     {
         this.groupSize = groupSize;
-        this.meetPos = new Vector3(Random.Range(-5, 5), Random.Range(-5, 5));
+        this.meetPos = new Vector3(Random.Range(-4, 4), Random.Range(-4, 4));
         this.friends = new List<CalmStudent>();
     }
 
@@ -29,6 +30,8 @@ public class Group
     {
         if (friends.Count < groupSize)
         {
+            f.setFriendNumber(consistentID);
+            consistentID++;
             friends.Add(f);
             return true;
         } else
@@ -48,6 +51,16 @@ public class Group
         return result;
     }
 
+    public Vector3 getMyPos(int id)
+    {
+        Vector3 baseDir = new Vector3(-1, 0, 0);
+        Vector3 localDir = Quaternion.Euler(0, 0, id * 360/groupSize) * baseDir;
+
+        Vector3 offset = localDir - meetPos;
+
+        return meetPos + localDir.normalized * groupSize * 0.3f;
+    }
+
     public void reuniteFriends()
     {
         foreach (CalmStudent c in friends)
@@ -55,5 +68,4 @@ public class Group
             c.Move(meetPos);
         }
     }
-
 }
