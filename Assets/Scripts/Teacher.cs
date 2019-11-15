@@ -79,6 +79,9 @@ public class Teacher : Authority
 
         // Perceptions
         Perception push = teacherSubFSM.CreatePerception<PushPerception>(); //temporal
+        timeOut = teacherSubFSM.CreatePerception<TimerPerception>(2);
+        isInStateDrink = teacherSubFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, "Drink");
+        Perception exitDrink = teacherSubFSM.CreateAndPerception<AndPerception>(isInStateDrink, timeOut); //not used
 
         // States
         patrolState = teacherSubFSM.CreateSubStateMachine("Patrol", patrolSubFSM);
@@ -89,7 +92,7 @@ public class Teacher : Authority
         patrolSubFSM.CreateExitTransition("Door unattended", patrolState, push, doorState);
         patrolSubFSM.CreateExitTransition("Thirsty", patrolState, push, drinkState);
 
-        drinkSubFSM.CreateExitTransition("Not thirsty", drinkState, push, patrolState);
+        drinkSubFSM.CreateExitTransition("Not thirsty", drinkState, isInStateDrink, patrolState);
     }
 
     public override void CreateStateMachine()
@@ -102,7 +105,6 @@ public class Teacher : Authority
         Perception reachedPR = teacherFSM.CreatePerception<PushPerception>(); //temporal
         Perception alreadyTecherAtPR = teacherFSM.CreatePerception<PushPerception>(); //temporal
         Perception noTecherAtPR = teacherFSM.CreatePerception<PushPerception>(); //temporal
-
         Perception haveToStayAtPR = teacherFSM.CreateAndPerception<AndPerception>(reachedPR, noTecherAtPR);
         Perception notHaveToStayAtPR = teacherFSM.CreateAndPerception<AndPerception>(reachedPR, alreadyTecherAtPR);
         Perception endChasingState = teacherFSM.CreateOrPerception<OrPerception>(escaped, notHaveToStayAtPR);
@@ -129,25 +131,23 @@ public class Teacher : Authority
         doorSubFSM.Update();
         patrolSubFSM.Update();
         teacherFSM.Update();
+
+        if (!isInStateDrink.Check())
+        {
+            timeOut.Reset();
+        }
     }
 
-    public override bool isInState(string subFSM, string subState)
+    public override bool isInState(string state)
     {
-        Perception isIn;
-        switch (subFSM)
-        {
-            case "Door":
-                isIn = patrolSubFSM.CreatePerception<IsInStatePerception>(doorSubFSM, subState);
-                break;
-            case "Patrol":
-                isIn = patrolSubFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, subState);
-                break;
-            default:
-                isIn = patrolSubFSM.CreatePerception<PushPerception>();
-                break;
+        try {
+            Perception isIn = teacherFSM.CreatePerception<IsInStatePerception>(teacherFSM, state);
+            return isIn.Check();
         }
-
-        return isIn.Check();
+        catch (KeyNotFoundException)
+        {
+            return false;
+        }
     }
 
     protected void Talking()

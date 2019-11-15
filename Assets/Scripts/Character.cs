@@ -9,6 +9,11 @@ public class Character
     //parameters
     protected StateMachineEngine drinkSubFSM;
 
+    protected Perception isInStateDrink;
+    protected Perception timeOut;
+
+    protected float distanceToBar;
+
     protected string name;
     protected Roles role;
     protected Genders gender;
@@ -48,16 +53,17 @@ public class Character
         drinkSubFSM = new StateMachineEngine(true);
 
         // Perceptions
-        Perception push = drinkSubFSM.CreatePerception<PushPerception>(); //temporal
+        Perception gotToBar = drinkSubFSM.CreatePerception<ValuePerception>(() => distanceToBar < 0.3f);
+        Perception startDrinking = drinkSubFSM.CreatePerception<PushPerception>();
 
         // States
-        State walkingToBarState = drinkSubFSM.CreateState("WalkingToBar", WalkingToBar);
+        State walkingToBarState = drinkSubFSM.CreateEntryState("WalkingToBar", WalkingToBar);
         State waitingQueueState = drinkSubFSM.CreateState("WaitingQueue", WaitingQueue);
         State drinkState = drinkSubFSM.CreateState("Drink", Drinking);
 
         // Transitions
-        drinkSubFSM.CreateTransition("Join queue", walkingToBarState, push, waitingQueueState);
-        drinkSubFSM.CreateTransition("Served", waitingQueueState, push, drinkState);
+        drinkSubFSM.CreateTransition("Join queue", walkingToBarState, gotToBar, waitingQueueState);
+        drinkSubFSM.CreateTransition("Served", waitingQueueState, startDrinking, drinkState);
     }
 
     public string getName()
@@ -95,9 +101,9 @@ public class Character
         return servedRecently;
     }
 
-    public void setServed(bool served)
+    public void setServed()
     {
-        servedRecently = served;
+        drinkSubFSM.Fire("Served");
     }
 
     public void Move(Vector3 to)
@@ -139,7 +145,7 @@ public class Character
         this.gameObject.GetComponentInChildren<Canvas>().gameObject.transform.rotation = fixedRotation;
     }
 
-    public virtual bool isInState(string subFSM, string subState)
+    public virtual bool isInState(string state)
     {
         return false;
     }
@@ -171,16 +177,21 @@ public class Character
     protected void WalkingToBar()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Walking to bar");
+        Vector3 barPos = new Vector3(0, 1 - gameState.getBarQueue(this));
+        Move(barPos);
     }
 
     protected void WaitingQueue()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Witing at queue");
+        Debug.Log("[" + name + ", " + getRole() + "] Waiting at queue");
+        servedRecently = false;
     }
 
     protected void Drinking()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Drinking!");
+        gameState.reduceBarQueue(this);
+        servedRecently = true;
     }
 
     protected void createMessage(string text, Color color)

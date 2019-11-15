@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading;
 
 public enum Roles { CalmStudent, MessyStudent, Teacher, OrganizerStudent }
 public enum Genders { Male, Female, Other }
@@ -14,6 +15,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private bool forceDoorAttended = false;
     [SerializeField] private bool doorAttended = false;
+    [SerializeField] private bool forceBarAttended = false;
     [SerializeField] private bool barAttended = false;
 
     [SerializeField] bool paused = false;
@@ -31,12 +33,18 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] List<int> friendsGroups;
     List<Group> groups;
+    List<Character> queue;
+
+    private int queueNum;
 
     private void Awake()
     {
         Agents = new List<GameObject>();
         People = new List<Character>();
         groups = new List<Group>();
+        queue = new List<Character>();
+
+        Interlocked.Add(ref queueNum, -1);
     }
 
     // Start is called before the first frame update
@@ -154,12 +162,12 @@ public class GameManager : MonoBehaviour
                 character.lockCanvasRotation();
                 character.RotationUpdate();
 
-                if (character.isInState("Door", "Waiting for someone"))
+                if (character.isInState("Door"))
                 {
                     changeDoorState = true;
                 }
 
-                if (character.isInState("Bar", "Waiting for client"))
+                if (character.isInState("Serve Drink"))
                 {
                     changeBarState = true;
                 }
@@ -173,7 +181,14 @@ public class GameManager : MonoBehaviour
                 doorAttended = changeDoorState;
             }
 
-            barAttended = changeBarState;
+            if (forceBarAttended)
+            {
+                barAttended = true;
+            }
+            else
+            {
+                barAttended = changeBarState;
+            }
         }
     }
 
@@ -185,6 +200,22 @@ public class GameManager : MonoBehaviour
     public bool getBarAttended()
     {
         return barAttended;
+    }
+
+    public float getBarQueue(Character client)
+    {
+        queue.Add(client);
+        return (float) Interlocked.Increment(ref queueNum);
+    }
+
+    public void reduceBarQueue(Character client)
+    {
+        queue.Remove(client);
+        foreach(Character c in queue)
+        {
+            c.Move(c.GetGameObject().transform.position + new Vector3(0, 1, 0));
+        }
+        Interlocked.Decrement(ref queueNum);
     }
 
     public Character GetCharacter(GameObject obj)
