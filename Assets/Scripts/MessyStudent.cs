@@ -49,7 +49,7 @@ public class MessyStudent : Student
 
         troubleSubFSM.CreateTransition("Didn't get busted", sabotageDrinkState, push, lookingForTroubleState);
         troubleSubFSM.CreateTransition("Busted by organizer", sabotageDrinkState, push, negotiationState);
-        troubleSubFSM.CreateTransition("Busted by teacher", sabotageDrinkState, push, chaseState);
+        troubleSubFSM.CreateTransition("Busted by teacher (drink)", sabotageDrinkState, push, chaseState);
 
         troubleSubFSM.CreateTransition("Convinced organizer", negotiationState, push, lookingForTroubleState);
         troubleSubFSM.CreateTransition("Didn't convince organizer", negotiationState, push, chaseState);
@@ -63,7 +63,7 @@ public class MessyStudent : Student
         troubleSubFSM.CreateTransition("Affinity is negative", checkAffinityState, fightStudent, fightState);
 
         troubleSubFSM.CreateTransition("Fight ends", fightState, push, lookingForTroubleState);
-        troubleSubFSM.CreateTransition("Busted by teacher", fightState, push, arguingState);
+        troubleSubFSM.CreateTransition("Busted by teacher (fight)", fightState, push, arguingState);
     }
 
     private void CreatePunishmentSubStateMachine()
@@ -90,6 +90,8 @@ public class MessyStudent : Student
 
         // Perceptions
         Perception push = messyStudentFSM.CreatePerception<PushPerception>(); //temporal
+        Perception push1 = messyStudentFSM.CreatePerception<PushPerception>(); //temporal
+        Perception push2 = messyStudentFSM.CreatePerception<PushPerception>(); //temporal
 
         // States
         State startState = messyStudentFSM.CreateEntryState("Start");
@@ -100,16 +102,16 @@ public class MessyStudent : Student
 
         // Transitions
         messyStudentFSM.CreateTransition("More thirsty than tired (1)", startState, push, drinkingState);
-        messyStudentFSM.CreateTransition("More tired than thirsty", startState, push, benchState);
-        messyStudentFSM.CreateTransition("Not thirsty, not tired (1)", startState, push, troubleState);
+        messyStudentFSM.CreateTransition("More tired than thirsty", startState, push1, benchState);
+        messyStudentFSM.CreateTransition("Not thirsty, not tired (1)", startState, push2, troubleState);
 
         drinkSubFSM.CreateExitTransition("Not thirsty, tired", drinkingState, push, benchState);
         drinkSubFSM.CreateExitTransition("Not thirsty, not tired (2)", drinkingState, push, troubleState);
 
-        messyStudentFSM.CreateTransition("Not tired, thirsty", benchState, push, drinkingState);
+        messyStudentFSM.CreateTransition("Not tired, thirsty (1)", benchState, push, drinkingState);
         messyStudentFSM.CreateTransition("Not thirsty, not tired (3)", benchState, push, troubleState);
 
-        troubleSubFSM.CreateExitTransition("Not tired, thirsty", troubleState, push, drinkingState);
+        troubleSubFSM.CreateExitTransition("Not tired, thirsty (2)", troubleState, push, drinkingState);
         troubleSubFSM.CreateExitTransition("More thirsty than tired (2)", troubleState, push, benchState);
         troubleSubFSM.CreateExitTransition("Finished arguing", troubleState, push, punishmentState);
 
@@ -122,6 +124,19 @@ public class MessyStudent : Student
         troubleSubFSM.Update();
         punishmentSubFSM.Update();
         messyStudentFSM.Update();
+
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            messyStudentFSM.Fire("Not thirsty, not tired (1)");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            troubleSubFSM.Fire("Sees student");
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            troubleSubFSM.Fire("Affinity is negative");
+        }
     }
 
     public override bool isInState(string subFSM, string subState)
@@ -135,7 +150,7 @@ public class MessyStudent : Student
             case "Trouble":
                 isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(troubleSubFSM, subState);
                 break;
-            case "Punsihment":
+            case "Punishment":
                 isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(punishmentSubFSM, subState);
                 break;
             default:
@@ -147,24 +162,26 @@ public class MessyStudent : Student
     }
 
     public override void LookForTrouble()
-    {
-        Debug.Log("[" + name + ", " + getRole() + "] Looking for some trouble...");
+    {     
+        Vector3 target = new Vector3(Random.Range(0,8), Random.Range(0, 8), 0);
+        Move(target);
+        createMessage("Looking for some trouble...", Color.red);
     }
 
     protected void SabotageDrink()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Drinking should be fun!");
+        this.Move(GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0, 1, 0));
+        createMessage("Drinking should be fun!", Color.red);
     }
 
     protected void BotherTeacher()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Bothering teacher");
-
+        createMessage("Bothering teacher", Color.red);
     }
 
     protected bool CheckAffinity()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Is this one chad or virgin?");
+        createMessage("Is this one chad or virgin?", Color.red);
 
         int affinity = 0;
 
@@ -191,33 +208,34 @@ public class MessyStudent : Student
 
         if (affinity > affinityTolerance)
         {
-            Debug.Log("[" + name + ", " + getRole() + "] This dude is a total chad!");
+            createMessage("This dude is a total chad", Color.red);
             return false;
         }
         else
         {
-            Debug.Log("[" + name + ", " + getRole() + "] What a virgin!");
+            createMessage("What a virgin!", Color.red);
             return true;
         }
     }
 
     protected void Negotiate()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Don't sneak!");
+        createMessage("Don't snitch!", Color.red);
     }
 
     protected void Run()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Run run run!");
+        createMessage("Run run run!", Color.red);
     }
 
     protected void Escape()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Ight imma head out");
+        Move(new Vector3(0, 0, 0));//Needs to move to dancing floor
+        createMessage("Ight imma head out!", Color.red);
     }
 
     protected void Arguing()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Arguing with teacher");
+        createMessage("Arguing with teacher", Color.red);
     }
 }
