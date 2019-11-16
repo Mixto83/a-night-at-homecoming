@@ -18,7 +18,6 @@ public class MessyStudent : Student
 
         CreateTroubleSubStateMachine();
         CreatePunishmentSubStateMachine();
-        CreateStateMachine();
     }
 
     private void CreateTroubleSubStateMachine()
@@ -84,7 +83,7 @@ public class MessyStudent : Student
         punishmentSubFSM.CreateTransition("Teacher busts student", escapeState, push, punishedState);
     }
 
-    private void CreateStateMachine()
+    public override void CreateStateMachine()
     {
         messyStudentFSM = new StateMachineEngine(false);
 
@@ -92,6 +91,12 @@ public class MessyStudent : Student
         Perception push = messyStudentFSM.CreatePerception<PushPerception>(); //temporal
         Perception push1 = messyStudentFSM.CreatePerception<PushPerception>(); //temporal
         Perception push2 = messyStudentFSM.CreatePerception<PushPerception>(); //temporal
+        
+        timeOut = messyStudentFSM.CreatePerception<TimerPerception>(2);
+        isInStateDrink = messyStudentFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, "Drink");
+        Perception exitDrink = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateDrink, timeOut); //not used
+        Perception exitDrinkTired = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateDrink, push);
+        Perception exitDrinkNotTired = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateDrink, push);
 
         // States
         State startState = messyStudentFSM.CreateEntryState("Start");
@@ -105,8 +110,8 @@ public class MessyStudent : Student
         messyStudentFSM.CreateTransition("More tired than thirsty", startState, push1, benchState);
         messyStudentFSM.CreateTransition("Not thirsty, not tired (1)", startState, push2, troubleState);
 
-        drinkSubFSM.CreateExitTransition("Not thirsty, tired", drinkingState, push, benchState);
-        drinkSubFSM.CreateExitTransition("Not thirsty, not tired (2)", drinkingState, push, troubleState);
+        drinkSubFSM.CreateExitTransition("Not thirsty, tired", drinkingState, exitDrinkTired, benchState);
+        drinkSubFSM.CreateExitTransition("Not thirsty, not tired (2)", drinkingState, exitDrinkNotTired, troubleState);
 
         messyStudentFSM.CreateTransition("Not tired, thirsty (1)", benchState, push, drinkingState);
         messyStudentFSM.CreateTransition("Not thirsty, not tired (3)", benchState, push, troubleState);
@@ -136,29 +141,24 @@ public class MessyStudent : Student
         if (Input.GetKeyDown(KeyCode.Alpha6))
         {
             troubleSubFSM.Fire("Affinity is negative");
+            
+        if (!isInStateDrink.Check())
+        {
+            timeOut.Reset();
         }
     }
 
-    public override bool isInState(string subFSM, string subState)
+    public override bool isInState(string state)
     {
-        Perception isIn;
-        switch (subFSM)
+        try
         {
-            case "Drink":
-                isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, subState);
-                break;
-            case "Trouble":
-                isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(troubleSubFSM, subState);
-                break;
-            case "Punishment":
-                isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(punishmentSubFSM, subState);
-                break;
-            default:
-                isIn = messyStudentFSM.CreatePerception<PushPerception>();
-                break;
+            Perception isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(messyStudentFSM, state);
+            return isIn.Check();
         }
-
-        return isIn.Check();
+        catch (KeyNotFoundException)
+        {
+            return false;
+        }
     }
 
     public override void LookForTrouble()

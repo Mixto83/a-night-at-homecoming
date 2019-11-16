@@ -10,10 +10,12 @@ public class CalmStudent : Student
 
     #region Stats
 
-    protected Vector2 meetPos;
+    protected Group group;
+    private int friendNumber;
     protected const int affinityThreshold = 6;
     protected const int DanceAffinityThreshold = 8;
     protected Student targetStudent;
+    private float distanceToMeetPos;
 
     #endregion
 
@@ -23,7 +25,6 @@ public class CalmStudent : Student
         this.role = Roles.CalmStudent;
 
         CreateFlirtSubStateMachine();
-        CreateStateMachine();
     }
 
     private void CreateFlirtSubStateMachine()
@@ -32,32 +33,45 @@ public class CalmStudent : Student
 
         // Perceptions
         Perception push = flirtSubFSM.CreatePerception<PushPerception>(); //temporal
-        Perception timer = flirtSubFSM.CreatePerception<TimerPerception>(2);
-        Perception affinityCheck = flirtSubFSM.CreatePerception<ValuePerception>(() => CheckAffinity(targetStudent) > affinityThreshold);
-        Perception danceAffinityCheck = flirtSubFSM.CreatePerception<ValuePerception>(() => CheckAffinity(targetStudent) > DanceAffinityThreshold);
-        Perception danceWithStudent = flirtSubFSM.CreateOrPerception<OrPerception>(timer, affinityCheck);
-        Perception goBathroomWithStudent = flirtSubFSM.CreateOrPerception<OrPerception>(timer, danceAffinityCheck);
+        Perception timer = flirtSubFSM.CreatePerception<TimerPerception>(1);
+        Perception affinityCheck = flirtSubFSM.CreatePerception<ValuePerception>(() => CheckAffinity(targetStudent) >= affinityThreshold);
+        Perception lowAffinityCheck = flirtSubFSM.CreatePerception<ValuePerception>(() => CheckAffinity(targetStudent) < affinityThreshold);
+        Perception danceAffinityCheck = flirtSubFSM.CreatePerception<ValuePerception>(() => CheckAffinity(targetStudent) >= DanceAffinityThreshold);
+        Perception lowDanceAffinityCheck = flirtSubFSM.CreatePerception<ValuePerception>(() => CheckAffinity(targetStudent) < DanceAffinityThreshold);
+        Perception danceWithStudent = flirtSubFSM.CreateAndPerception<AndPerception>(timer, affinityCheck);
+        
 
         // States
         State checkAffinityState = flirtSubFSM.CreateEntryState("CheckingAffinity", CheckingAffinity);
         State dancingState = flirtSubFSM.CreateState("Dancing", Dancing);
         State bathroomState = flirtSubFSM.CreateState("Bathroom", Kissing);
+        State outState = flirtSubFSM.CreateState("Out Flirt State");
 
         // Transitions
         flirtSubFSM.CreateTransition("High affinity", checkAffinityState, danceWithStudent, dancingState);
-        flirtSubFSM.CreateTransition("High affinity dancing", dancingState, goBathroomWithStudent, bathroomState);
+        flirtSubFSM.CreateTransition("High affinity dancing", dancingState, danceAffinityCheck, bathroomState);
+        flirtSubFSM.CreateTransition("Low affinity", checkAffinityState, lowAffinityCheck, outState);
+        flirtSubFSM.CreateTransition("Low affinity dancing", dancingState, lowDanceAffinityCheck, outState);
+        flirtSubFSM.CreateTransition("Finish Kissing", dancingState, timer, outState);
+
     }
 
-    private void CreateStateMachine()
+    public override void CreateStateMachine()
     {
         calmStudentFSM = new StateMachineEngine(false);
 
         // Perceptions
         Perception push = calmStudentFSM.CreatePerception<PushPerception>(); //temporal
+        Perception pushThirsty = calmStudentFSM.CreatePerception<PushPerception>(); //temporal
         Perception timer = calmStudentFSM.CreatePerception<TimerPerception>(2);
+        Perception isInState = calmStudentFSM.CreatePerception<IsInStatePerception>(flirtSubFSM, "Out Flirt State");
+        Perception enterParty = calmStudentFSM.CreatePerception<ValuePerception>(() => distanceToMeetPos < 1);
+        timeOut = calmStudentFSM.CreatePerception<TimerPerception>(2);
+        isInStateDrink = calmStudentFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, "Drink");
+        Perception exitDrink = calmStudentFSM.CreateAndPerception<AndPerception>(isInStateDrink, timeOut); //not used
 
         // States
-        State startState = calmStudentFSM.CreateEntryState("Start");
+        State startState = calmStudentFSM.CreateEntryState("Start", Start);
         State enjoyState = calmStudentFSM.CreateState("Enjoying", Enjoying);
         State benchState = calmStudentFSM.CreateState("Bench", InBench);
         State drinkingState = calmStudentFSM.CreateSubStateMachine("Drink", drinkSubFSM);
@@ -67,57 +81,59 @@ public class CalmStudent : Student
         State flirtState = calmStudentFSM.CreateSubStateMachine("Flirting", flirtSubFSM);
 
         // Transitions
-        calmStudentFSM.CreateTransition("Look for friends", startState, push, enjoyState);
+        calmStudentFSM.CreateTransition("Look for friends", startState, enterParty, enjoyState);
 
         calmStudentFSM.CreateTransition("Like Person", enjoyState, push, flirtState);
         calmStudentFSM.CreateTransition("Provoked by messy student", enjoyState, push, fightingState);
         calmStudentFSM.CreateTransition("Looking for fresh air", enjoyState, push, outsideState);
-        calmStudentFSM.CreateTransition("Thirsty", enjoyState, push, drinkingState);
+        calmStudentFSM.CreateTransition("Thirsty", enjoyState, pushThirsty, drinkingState);
         calmStudentFSM.CreateTransition("Dislike music", enjoyState, push, benchState);
 
-        flirtSubFSM.CreateExitTransition("Low affinity or finish kissing", flirtState, push, enjoyState);
+        flirtSubFSM.CreateExitTransition("Low affinity or finish kissing", flirtState, isInState, startState);
 
-        calmStudentFSM.CreateTransition("Finish fighting", fightingState, timer, enjoyState);
+        calmStudentFSM.CreateTransition("Finish fighting", fightingState, timer, startState);
         calmStudentFSM.CreateTransition("Caught fighting", fightingState, push, punishedState);
 
-        calmStudentFSM.CreateTransition("Finish punishment", punishedState, timer, enjoyState);
+        calmStudentFSM.CreateTransition("Finish punishment", punishedState, timer, startState);
 
-        calmStudentFSM.CreateTransition("Already taken enough fresh air", outsideState, timer, enjoyState);
+        calmStudentFSM.CreateTransition("Already taken enough fresh air", outsideState, timer, startState);
 
-        drinkSubFSM.CreateExitTransition("Not thirsty any more", drinkingState, push, enjoyState);
+        drinkSubFSM.CreateExitTransition("Not thirsty any more", drinkingState, isInStateDrink, startState);
 
-        calmStudentFSM.CreateTransition("Like music", benchState, push, enjoyState);
+        calmStudentFSM.CreateTransition("Like music", benchState, push, startState);
     }
 
     public override void Update()
     {
+        distanceToMeetPos = Vector3.Distance(this.gameObject.transform.position, group.getMeetPos());
+        distanceToBar = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0, -0.75f, 0));
+
+        if(Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            calmStudentFSM.Fire("Thirsty");
+        }
+
+        if(!isInStateDrink.Check())
+        {
+            timeOut.Reset();
+        }
+
         drinkSubFSM.Update();
         flirtSubFSM.Update();
         calmStudentFSM.Update();
-
-        if(Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            calmStudentFSM.Fire("Look for friends");
-        }
     }
 
-    public override bool isInState(string subFSM, string subState)
+    public override bool isInState(string state)
     {
-        Perception isIn;
-        switch (subFSM)
+        try
         {
-            case "Drink":
-                isIn = calmStudentFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, subState);
-                break;
-            case "Flirt":
-                isIn = calmStudentFSM.CreatePerception<IsInStatePerception>(flirtSubFSM, subState);
-                break;
-            default:
-                isIn = calmStudentFSM.CreatePerception<PushPerception>();
-                break;
+            Perception isIn = calmStudentFSM.CreatePerception<IsInStatePerception>(calmStudentFSM, state);
+            return isIn.Check();
         }
-
-        return isIn.Check();
+        catch (KeyNotFoundException)
+        {
+            return false;
+        }
     }
 
     protected int CheckAffinity(Student targetStudent)
@@ -155,6 +171,30 @@ public class CalmStudent : Student
         }
 
         return affinity;
+    }
+
+    public override void setGroup(Group group)
+    {
+        this.group = group;
+    }
+
+    public void setFriendNumber(int number)
+    {
+        friendNumber = number;
+    }
+
+    //Behaviours
+    private void Start()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Start");
+        Vector3 destination = group.getMyPos(this.friendNumber);
+        Debug.Log(this.friendNumber + " -> " + destination);
+        Move(destination);
+    }
+
+    private void Enjoying()
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] I'm having fun!");
     }
 
     protected void Dancing()

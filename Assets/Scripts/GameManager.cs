@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading;
 
 public enum Roles { CalmStudent, MessyStudent, Teacher, OrganizerStudent }
 public enum Genders { Male, Female, Other }
@@ -14,6 +15,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private bool forceDoorAttended = false;
     [SerializeField] private bool doorAttended = false;
+    [SerializeField] private bool forceBarAttended = false;
     [SerializeField] private bool barAttended = false;
 
     [SerializeField] bool paused = false;
@@ -29,15 +31,29 @@ public class GameManager : MonoBehaviour
     string[] Animals = new string[] { "Dog", "Cat", "Bird", "Bee", "Sheep", "Whale", "Possum", "Crocodile", "Bat", "Spider", "Lizard", "Turtle" };
     string[] Foods = new string[] { "Hamburgers", "Pizza", "Pasta", "Sandwich", "Fish", "Eggs", "Salad", "Chocolate", "Children", "Apple" };
 
+    [SerializeField] List<int> friendsGroups;
+    List<Group> groups;
+    List<Character> queue;
+
+    private int queueNum;
+
     private void Awake()
     {
         Agents = new List<GameObject>();
         People = new List<Character>();
+        groups = new List<Group>();
+        queue = new List<Character>();
+
+        Interlocked.Add(ref queueNum, -1);
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        foreach (int i in friendsGroups)
+        {
+            groups.Add(new Group(i));
+        }
         foreach (Transform child in transform)
         {
             Agents.Add(child.gameObject);
@@ -65,7 +81,7 @@ public class GameManager : MonoBehaviour
             switch (child.tag)
             {
                 case "CalmStudent":
-                    CalmStudent newStudent = new CalmStudent(name, gender, child, this);             
+                    CalmStudent newStudent = new CalmStudent(name, gender, child, this);
                     for (int i = 0; i < 3; i++)
                     {
                         string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];                   
@@ -77,7 +93,24 @@ public class GameManager : MonoBehaviour
                         newStudent.FavAnimals.Add(newAnimal);
                         newStudent.FavFoods.Add(newFood);
                     }
+                    
+                    var j = 0;
+                    foreach (Group g in groups)
+                    {
+                        j++;
+                        if (g.pushFriend(newStudent))
+                        {
+                            newStudent.setGroup(g);
+                            break;
+                        }
+
+                        if(j >= groups.Count)
+                        {
+                            Debug.Log("[Error] All groups are full");
+                        }
+                    }
                     People.Add(newStudent);
+
                     break;
                 case "MessyStudent":
                     MessyStudent newStudent2 = new MessyStudent(name, gender, child, this);
@@ -104,6 +137,15 @@ public class GameManager : MonoBehaviour
                     break;
             }
         }
+        foreach (Group g in groups) {
+            Debug.Log(g.toString());
+        }
+        foreach (Character c in People)
+        {
+            c.CreateStateMachine();
+            if(c.getRole() == Roles.CalmStudent )
+                Debug.Log(c.getName());
+        }
     }
 
     // Update is called once per frame
@@ -118,14 +160,14 @@ public class GameManager : MonoBehaviour
             {
                 character.Update();
                 character.lockCanvasRotation();
-                character.RotateIfNeeded();
+                character.RotationUpdate();
 
-                if (character.isInState("Door", "Waiting for someone"))
+                if (character.isInState("Door"))
                 {
                     changeDoorState = true;
                 }
 
-                if (character.isInState("Bar", "Waiting for client"))
+                if (character.isInState("Serve Drink"))
                 {
                     changeBarState = true;
                 }
@@ -139,7 +181,14 @@ public class GameManager : MonoBehaviour
                 doorAttended = changeDoorState;
             }
 
-            barAttended = changeBarState;
+            if (forceBarAttended)
+            {
+                barAttended = true;
+            }
+            else
+            {
+                barAttended = changeBarState;
+            }
         }
     }
 
@@ -151,5 +200,26 @@ public class GameManager : MonoBehaviour
     public bool getBarAttended()
     {
         return barAttended;
+    }
+
+    public float getBarQueue(Character client)
+    {
+        queue.Add(client);
+        return (float) Interlocked.Increment(ref queueNum);
+    }
+
+    public void reduceBarQueue(Character client)
+    {
+        queue.Remove(client);
+        foreach(Character c in queue)
+        {
+            c.Move(c.GetGameObject().transform.position + new Vector3(0, 1, 0));
+        }
+        Interlocked.Decrement(ref queueNum);
+    }
+
+    public Character GetCharacter(GameObject obj)
+    {
+        return People[Agents.IndexOf(obj)];
     }
 }
