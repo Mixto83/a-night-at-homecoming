@@ -28,6 +28,7 @@ public class OrganizerStudent : Authority
 
         CreateServingSubStateMachine();
         CreatePatrolSubStateMachine();
+        CreateStateMachine();
 
         this.negotiateRandom = Random.value;
     }
