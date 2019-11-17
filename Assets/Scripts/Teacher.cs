@@ -22,6 +22,12 @@ public class Teacher : Authority
         this.strictness = 1;
 
         this.distractionRandom = Random.Range(2, 5);
+
+        CreatePatrolSubStateMachine();
+        CreateChaseSubStateMachine();
+        CreatePunishmentSubStateMachine();
+        CreateSubStateMachine();
+        CreateStateMachine();
     }
 
     private void CreatePatrolSubStateMachine()
@@ -113,15 +119,15 @@ public class Teacher : Authority
         State startState = teacherFSM.CreateEntryState("Start");
         State subFSMState = teacherFSM.CreateSubStateMachine("SubState", teacherSubFSM, patrolState);
         State chaseState = teacherFSM.CreateSubStateMachine("Chase", chaseSubFSM);
-        State punihsmentRoomState = teacherFSM.CreateSubStateMachine("Punishment room", punishmentRoomSubFSM);
+        State punishmentRoomState = teacherFSM.CreateSubStateMachine("Punishment room", punishmentRoomSubFSM);
 
         // Transitions
         teacherFSM.CreateTransition("Start", startState, push, subFSMState);
         teacherSubFSM.CreateExitTransition("Sees trouble / Finishes talking to organizer", subFSMState, push, chaseState);
 
         chaseSubFSM.CreateExitTransition("Student escaped or reached punishment room. There's already a teacher", chaseState, endChasingState, subFSMState);
-        chaseSubFSM.CreateExitTransition("Reached punishment room. There's no techer", chaseState, haveToStayAtPR, punihsmentRoomState);
-        punishmentRoomSubFSM.CreateExitTransition("No more students at punishment room", punihsmentRoomState, push, subFSMState);
+        chaseSubFSM.CreateExitTransition("Reached punishment room. There's no techer", chaseState, haveToStayAtPR, punishmentRoomState);
+        punishmentRoomSubFSM.CreateExitTransition("No more students at punishment room", punishmentRoomState, push, subFSMState);
 
         teacherFSM.Fire("Start");
     }

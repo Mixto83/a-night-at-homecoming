@@ -23,6 +23,7 @@ public class MessyStudent : Student
 
         CreateTroubleSubStateMachine();
         CreatePunishmentSubStateMachine();
+        CreateStateMachine();
     }
 
     private void CreateTroubleSubStateMachine()
