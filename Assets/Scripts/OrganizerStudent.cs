@@ -206,7 +206,7 @@ public class OrganizerStudent : Authority
         createMessage("Sir, get that kid!", Color.blue);
     }
 
-    private bool CheckConvinced()
+    public bool CheckConvinced()
     {
         return negotiateRandom > 0.5f;
     }
