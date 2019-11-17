@@ -12,7 +12,11 @@ public class MessyStudent : Student
     private Student targetStudent;
     private OrganizerStudent negotiatorStudent;
     private Teacher targetTeacher;
-    private WatchingPerception watching;//Necesito wp
+
+    private WatchingPerception watchingCalmStudent;
+    private WatchingPerception watchingTeacher;
+    private WatchingPerception watchingBar;
+    private WatchingPerception watchingOrganizerStudent;//??
 
     //methods
     public MessyStudent(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
@@ -35,7 +39,7 @@ public class MessyStudent : Student
 
         //Perception seesStudent = troubleSubFSM.CreatePerception<PushPerception>(); //temporal
         //Perception affinityCheck = troubleSubFSM.CreatePerception<ValuePerception>(() => CheckAffinity());
-        WatchingPerception seesStudent = troubleSubFSM.CreatePerception<WatchingPerception>(watching);
+        WatchingPerception seesStudent = troubleSubFSM.CreatePerception<WatchingPerception>(watchingCalmStudent);
         Perception fightPositive = troubleSubFSM.CreatePerception<ValuePerception>(() => CheckAffinity());
         Perception fightNegative = troubleSubFSM.CreatePerception<ValuePerception>(() => !CheckAffinity());
         Perception fightStudent = troubleSubFSM.CreateAndPerception<AndPerception>(timer, fightPositive);
@@ -44,6 +48,9 @@ public class MessyStudent : Student
         Perception fightInterrupted = troubleSubFSM.CreatePerception<ValuePerception>();//Metodo
 
         Perception barUnattended = troubleSubFSM.CreatePerception<ValuePerception>(() => !this.gameState.getBarAttended());
+        Perception barAttended = troubleSubFSM.CreatePerception<ValuePerception>(() => this.gameState.getBarAttended());
+        Perception seesBar = troubleSubFSM.CreatePerception<WatchingPerception>(watchingBar);
+        Perception goesToBar = troubleSubFSM.CreateAndPerception<AndPerception>(seesBar, barUnattended);
         Perception bustedAtBar = troubleSubFSM.CreatePerception<ValuePerception>();//Metodo
         Perception bustedAtBarByTeacher = troubleSubFSM.CreatePerception<ValuePerception>();//Metodo
         Perception notBustedAtBar = troubleSubFSM.CreatePerception<ValuePerception>();//Metodo
@@ -51,7 +58,7 @@ public class MessyStudent : Student
         Perception failedNegotiation = troubleSubFSM.CreatePerception<PushPerception>(() => !this.negotiatorStudent.CheckConvinced());
         Perception successfulNegotiation = troubleSubFSM.CreatePerception<PushPerception>(() => this.negotiatorStudent.CheckConvinced());
 
-        WatchingPerception seesTeacher = troubleSubFSM.CreatePerception<WatchingPerception>(watching);//Should change somehow
+        WatchingPerception seesTeacher = troubleSubFSM.CreatePerception<WatchingPerception>(watchingTeacher);//Should change somehow
         Perception endMocking = troubleSubFSM.CreatePerception<PushPerception>();
         Perception escapedFromTeacher = troubleSubFSM.CreatePerception<TimerPerception>(2);
         Perception caughtByTeacher = troubleSubFSM.CreatePerception<ValuePerception>();//Fill
@@ -168,11 +175,7 @@ public class MessyStudent : Student
         messyStudentFSM.Update();
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            setWatching();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha7))
-        {
-            messyStudentFSM.Fire("Not thirsty, not tired (1)");
+            SabotageDrink();
         }
         if (Input.GetKeyDown(KeyCode.Alpha5))
         {
@@ -217,6 +220,7 @@ public class MessyStudent : Student
 
     protected void BotherTeacher()
     {
+        
         createMessage("Bothering teacher", Color.red);
     }
 
@@ -278,10 +282,5 @@ public class MessyStudent : Student
     protected void Arguing()
     {
         createMessage("Arguing with teacher", Color.red);
-    }
-
-    protected void setWatching()
-    {
-        Debug.Log(watching.getTargetCharacter().getRole());
     }
 }
