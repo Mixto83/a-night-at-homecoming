@@ -316,7 +316,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62818ba75f4fd5343a0bbb24cac3da38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paused: 0
+  paused: 1
   forceDoorAttended: 0
   doorAttended: 0
   forceBarAttended: 0
