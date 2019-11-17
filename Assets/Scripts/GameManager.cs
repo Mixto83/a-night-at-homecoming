@@ -13,12 +13,12 @@ public class GameManager : MonoBehaviour
     protected readonly int ANIMALS_NUM = 12;
     protected readonly int HOBBIES_NUM = 12;
 
+    [SerializeField] bool paused = false;
+
     [SerializeField] private bool forceDoorAttended = false;
     [SerializeField] private bool doorAttended = false;
     [SerializeField] private bool forceBarAttended = false;
     [SerializeField] private bool barAttended = false;
-
-    [SerializeField] bool paused = false;
 
     [SerializeField] List<GameObject> Agents;
     List<Character> People;
@@ -202,6 +202,11 @@ public class GameManager : MonoBehaviour
         return barAttended;
     }
 
+    public float getQueueNum()
+    {
+        return (float) queueNum;
+    }
+
     public float getBarQueue(Character client)
     {
         queue.Add(client);
@@ -210,16 +215,23 @@ public class GameManager : MonoBehaviour
 
     public void reduceBarQueue(Character client)
     {
-        queue.Remove(client);
+        var i = queue.Count;
         foreach(Character c in queue)
         {
-            c.Move(c.GetGameObject().transform.position + new Vector3(0, 1, 0));
+            c.Move(new Vector3(0, 1 - queueNum + i));
+            i--;
         }
         Interlocked.Decrement(ref queueNum);
+        queue.Remove(client);
     }
 
     public Character GetCharacter(GameObject obj)
     {
         return People[Agents.IndexOf(obj)];
+    }
+
+    public List<Character> GetPeople()
+    {
+        return People;
     }
 }

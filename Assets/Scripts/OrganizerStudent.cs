@@ -10,8 +10,10 @@ public class OrganizerStudent : Authority
     private StateMachineEngine patrolSubFSM;
 
     private WatchingPerception watching;
-    private Perception repathPatrol;
+    private Perception timer;
+    private Perception isInStatePatrol;
 
+    float tired = 0;
     float negotiateRandom;
     protected float distanceToBarOrg;
 
@@ -21,7 +23,8 @@ public class OrganizerStudent : Authority
         this.role = Roles.OrganizerStudent;
         this.strictness = 0.5f;
 
-        this.watching = new WatchingPerception(this.gameObject, "CalmStudent", this.gameObject.GetComponentInChildren<MeshCollider>(), "Bar");
+        this.watching = new WatchingPerception(this.gameObject, () => watching.getTargetCharacter().getCanBeServed(),
+            () => watching.getTargetCharacter().getRole() != Roles.OrganizerStudent);
 
         CreateServingSubStateMachine();
         CreatePatrolSubStateMachine();
@@ -58,6 +61,8 @@ public class OrganizerStudent : Authority
 
         // Perceptions
         Perception push = patrolSubFSM.CreatePerception<PushPerception>(); //temporal
+        Perception seeMessyStudentInTroubleState = patrolSubFSM.CreatePerception<PushPerception>(); //temporal
+        Perception lostSightOfStudent = patrolSubFSM.CreatePerception<PushPerception>(); //temporal
         Perception convinced = patrolSubFSM.CreatePerception<ValuePerception>(() => CheckConvinced());
         Perception notConvinced = patrolSubFSM.CreatePerception<ValuePerception>(() => !CheckConvinced());
         Perception negotiationEnd = patrolSubFSM.CreatePerception<TimerPerception>(2);
@@ -71,14 +76,13 @@ public class OrganizerStudent : Authority
         State negotiateState = patrolSubFSM.CreateState("Negotiate", Negotiate);
         State callTeacherState = patrolSubFSM.CreateState("Call Teacher", CallTeacher);
 
-        Perception timer = patrolSubFSM.CreatePerception<TimerPerception>(5);
-        Perception isInStatePatrol = patrolSubFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Patroling");
-        repathPatrol = patrolSubFSM.CreateAndPerception<AndPerception>(timer, isInStatePatrol);
+        timer = patrolSubFSM.CreatePerception<TimerPerception>(5);
+        isInStatePatrol = patrolSubFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Patroling");
 
         // Transitions
-        patrolSubFSM.CreateTransition("Sees trouble", patrollingState, push, chaseState);
+        patrolSubFSM.CreateTransition("See trouble", patrollingState, seeMessyStudentInTroubleState, chaseState);
 
-        patrolSubFSM.CreateTransition("Student lost", chaseState, push, patrollingState);
+        patrolSubFSM.CreateTransition("Student lost", chaseState, lostSightOfStudent, patrollingState);
         patrolSubFSM.CreateTransition("Messy Student Caught", chaseState, push, negotiateState);
 
         patrolSubFSM.CreateTransition("Convinced", negotiateState, negotiationEndConvinced, patrollingState);
@@ -92,8 +96,8 @@ public class OrganizerStudent : Authority
         organizerStudentFSM = new StateMachineEngine(false);
 
         // Perceptions
-        Perception timer = organizerStudentFSM.CreatePerception<TimerPerception>(10);
-        Perception tiredDoor = organizerStudentFSM.CreatePerception<TimerPerception>(30);
+        Perception tired = organizerStudentFSM.CreatePerception<ValuePerception>(() => this.tired >= 20);
+        Perception notTired = organizerStudentFSM.CreatePerception<ValuePerception>(() => this.tired <= 0.1f);
         Perception doorAttended = organizerStudentFSM.CreatePerception<ValuePerception>(() => this.gameState.getDoorAttended());
         Perception doorUnattended = organizerStudentFSM.CreatePerception<ValuePerception>(() => !this.gameState.getDoorAttended());
         Perception barAttended = organizerStudentFSM.CreatePerception<ValuePerception>(() => this.gameState.getBarAttended());
@@ -103,10 +107,10 @@ public class OrganizerStudent : Authority
         Perception outOfDoor = organizerStudentFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Out Door State");
         Perception outOfBar = organizerStudentFSM.CreatePerception<IsInStatePerception>(servingSubFSM, "Out Bar State");
         Perception isWaiting = organizerStudentFSM.CreatePerception<IsInStatePerception>(servingSubFSM, "Waiting for client");
-        Perception goToDoor = organizerStudentFSM.CreateAndPerception<AndPerception>(doorUnattended, timer);
-        Perception goToDoorNow = organizerStudentFSM.CreateAndPerception<AndPerception>(goToDoor, isWaiting);
-        Perception goToBar = organizerStudentFSM.CreateAndPerception<AndPerception>(doorNBar, timer);
-        Perception goBackFromDoor = organizerStudentFSM.CreateOrPerception<OrPerception>(outOfDoor, tiredDoor);
+        Perception goToDoor = organizerStudentFSM.CreateAndPerception<AndPerception>(doorUnattended, notTired);
+        Perception goToDoorNow = organizerStudentFSM.CreateAndPerception<AndPerception>(doorUnattended, isWaiting);
+        Perception goToBar = organizerStudentFSM.CreateAndPerception<AndPerception>(doorNBar, notTired);
+        Perception goBackFromDoor = organizerStudentFSM.CreateOrPerception<OrPerception>(outOfDoor, tired);
 
         // States
         State startState = organizerStudentFSM.CreateEntryState("Start", () => Move(initPos));
@@ -131,10 +135,30 @@ public class OrganizerStudent : Authority
         patrolSubFSM.Update();
         organizerStudentFSM.Update();
 
-        if(repathPatrol.Check())
+        if(isInStatePatrol.Check())
         {
-            repathPatrol.Reset();
-            Move(new Vector3(Random.Range(-5, 5), Random.Range(-5, 5)));
+            if (timer.Check())
+            {
+                timer.Reset();
+                Move(new Vector3(Random.Range(-5, 5), Random.Range(-5, 5)));
+            }
+        }
+
+        if(isInState("Door")) {
+            if (tired <= 20) tired += 0.03f;
+        } else
+        {
+            if (tired >= 0.1f) tired -= 0.03f;
+        }
+
+        if(Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            patrolSubFSM.Fire("See trouble");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            patrolSubFSM.Fire("Student lost");
         }
 
         distanceToDoor = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Door").transform.position + new Vector3(-0.75f, 0, 0));
@@ -172,12 +196,14 @@ public class OrganizerStudent : Authority
     protected void Negotiate()
     {
         Debug.Log("[" + name + ", " + getRole() + "] I shouldn't let you go, but...");
+        createMessage("I shouldn't let you go, but...", Color.blue);
         negotiateRandom = Random.value;
     }
 
     protected void CallTeacher()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Sir, get that kid!");
+        createMessage("Sir, get that kid!", Color.blue);
     }
 
     private bool CheckConvinced()
