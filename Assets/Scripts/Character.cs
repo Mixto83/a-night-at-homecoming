@@ -23,7 +23,7 @@ public class Character
     protected NavMeshAgent agent;
 
     protected bool greetedAtDoor = false;
-    private bool servedRecently = false;
+    private bool canBeServed = false;
 
     private Quaternion fixedRotation;
     Vector3 lookAt;
@@ -96,13 +96,14 @@ public class Character
         greetedAtDoor = greeted;
     }
 
-    public bool getServed()
+    public bool getCanBeServed()
     {
-        return servedRecently;
+        return canBeServed;
     }
 
     public void setServed()
     {
+        canBeServed = false;
         drinkSubFSM.Fire("Served");
     }
 
@@ -184,18 +185,19 @@ public class Character
     protected void WaitingQueue()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Waiting at queue");
-        servedRecently = false;
+        canBeServed = true;
     }
 
     protected void Drinking()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Drinking!");
         gameState.reduceBarQueue(this);
-        servedRecently = true;
     }
 
     protected void createMessage(string text, Color color)
     {
+        clearTexts(this);
+
         if (color == null)
         {
             color = Color.green;
@@ -221,5 +223,13 @@ public class Character
         newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 100);
         newText.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
         newText.transform.localPosition = new Vector3(0, 1, 0);
+    }
+
+    protected void clearTexts(Character c)
+    {
+        foreach (Text txt in c.gameObject.GetComponentsInChildren<Text>())
+        {
+            GameObject.Destroy(txt.gameObject);
+        }
     }
 }

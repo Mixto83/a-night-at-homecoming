@@ -19,7 +19,8 @@ public class Authority : Character
     //methods
     public Authority(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
     {
-        this.watching = new WatchingPerception(this.gameObject, "CalmStudent", this.gameObject.GetComponentInChildren<MeshCollider>(), "Door");
+        this.watching = new WatchingPerception(this.gameObject, () => !watching.getTargetCharacter().getGreeted(),
+            () => watching.getTargetCharacter().getRole() == Roles.CalmStudent || watching.getTargetCharacter().getRole() == Roles.MessyStudent);
         CreateDoorSubStateMachine();
     }
 
@@ -53,13 +54,7 @@ public class Authority : Character
 
         this.LookAt(GameObject.FindGameObjectWithTag(tag).transform);
 
-        foreach (Text txt in GameObject.FindObjectsOfType<Text>())
-        {
-            if(txt.text == "Welcome to the party!" || txt.text == "Have a drink!")
-            {
-                GameObject.Destroy(txt.gameObject);
-            }
-        }
+        clearTexts(this);
     }
 
     protected void Walking(string tag, Vector3 offset)
@@ -67,6 +62,8 @@ public class Authority : Character
         Debug.Log("[" + name + ", " + getRole() + "] Walking to " + tag);
 
         this.Move(GameObject.FindGameObjectWithTag(tag).transform.position + offset);
+
+        clearTexts(this);
     }
 
     protected void Welcome()
@@ -79,10 +76,12 @@ public class Authority : Character
     protected void Patrol()
     {
         Debug.Log("[" + name + ", " + getRole() + "] I'm watching you!");
+        createMessage("I'm watching you!", Color.blue);
     }
 
     protected void ChaseStudent()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Come back here, you little...");
+        createMessage("Come back here, you little...", Color.blue);
     }
 }

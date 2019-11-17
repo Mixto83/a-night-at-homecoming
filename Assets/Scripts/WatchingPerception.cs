@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class WatchingPerception : Perception
 {
@@ -8,44 +10,40 @@ public class WatchingPerception : Perception
     #region variables
 
     private GameObject watcher;
-    private string target;
     private MeshCollider colliderVision;
-    private string place;
+    private Func<bool>[] conditions;
+    private GameManager gameState;
 
     private Character targetCharacter;
 
     #endregion variables
 
-    public WatchingPerception(GameObject watcher, string target, MeshCollider colliderVision, string place)
+    public WatchingPerception(GameObject watcher, params Func<bool>[] conditions)
     {
         this.watcher = watcher;
-        this.target = target;
-        this.colliderVision = colliderVision;
-        this.place = place;
+        this.colliderVision = watcher.gameObject.GetComponentInChildren<MeshCollider>();
+        this.conditions = conditions;
+        this.gameState = GameObject.FindObjectOfType<GameManager>();
     }
 
     public override bool Check()
     {
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag(target))
+        foreach (Character character in gameState.GetPeople())
         {
-            if (colliderVision.bounds.Contains(obj.transform.position))
+            if (colliderVision.bounds.Contains(character.GetGameObject().transform.position))
             {
-                bool condition;
+                targetCharacter = character;
 
-                targetCharacter = GameObject.FindObjectOfType<GameManager>().GetCharacter(obj);
-                if (place == "Door") {
-                    condition = !targetCharacter.getGreeted();
-                } else if(place == "Bar")
+                foreach (Func<bool> result in conditions)
                 {
-                    condition = !targetCharacter.getServed();
-                } else
-                {
-                    condition = false;
+                    if (!result())
+                        goto foo;
                 }
-                if (condition)
-                {
-                    return true;
-                }
+
+                return true;
+
+                foo:
+                continue;
             }
         }
 
