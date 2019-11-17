@@ -25,7 +25,6 @@ public class CalmStudent : Student
         this.role = Roles.CalmStudent;
 
         CreateFlirtSubStateMachine();
-        CreateStateMachine();
     }
 
     private void CreateFlirtSubStateMachine()

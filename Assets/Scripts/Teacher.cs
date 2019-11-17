@@ -27,7 +27,6 @@ public class Teacher : Authority
         CreateChaseSubStateMachine();
         CreatePunishmentSubStateMachine();
         CreateSubStateMachine();
-        CreateStateMachine();
     }
 
     private void CreatePatrolSubStateMachine()

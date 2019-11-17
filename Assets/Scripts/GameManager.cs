@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour
                     CalmStudent newStudent = new CalmStudent(name, gender, child, this);
                     for (int i = 0; i < 3; i++)
                     {
-                        string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];                   
+                        string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];
                         string newAnimal = Animals[Random.Range(0, ANIMALS_NUM)];
                         string newFood = Foods[Random.Range(0, FOODS_NUM)];
 
@@ -143,7 +143,7 @@ public class GameManager : MonoBehaviour
         foreach (Character c in People)
         {
             c.CreateStateMachine();
-            if(c.getRole() == Roles.CalmStudent )
+            if(c.getRole() == Roles.CalmStudent)
                 Debug.Log(c.getName());
         }
     }
