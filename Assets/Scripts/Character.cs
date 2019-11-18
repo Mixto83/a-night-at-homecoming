@@ -21,6 +21,9 @@ public class Character
     protected GameObject gameObject;
     protected Vector3 initPos;
     protected NavMeshAgent agent;
+    protected float thirst;
+
+    protected const int thirstThreshold = 5;
 
     protected bool greetedAtDoor = false;
     private bool canBeServed = false;
