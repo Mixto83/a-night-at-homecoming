@@ -26,6 +26,7 @@ public class Teacher : Authority
         CreatePatrolSubStateMachine();
         CreateChaseSubStateMachine();
         CreatePunishmentSubStateMachine();
+        CreateSubStateMachine();
     }
 
     private void CreatePatrolSubStateMachine()
@@ -81,6 +82,29 @@ public class Teacher : Authority
         // Transitions
         punishmentRoomSubFSM.CreateTransition("TimerRandom1", watchingState, randomTimer, distractedState);
         punishmentRoomSubFSM.CreateTransition("TimerRandom2", distractedState, randomTimer, watchingState);
+    }
+
+
+    private void CreateSubStateMachine()
+    {
+        teacherSubFSM = new StateMachineEngine(true);
+
+        // Perceptions
+        Perception push = teacherSubFSM.CreatePerception<PushPerception>(); //temporal
+        timeOut = teacherSubFSM.CreatePerception<TimerPerception>(2);
+        isInStateDrink = teacherSubFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, "Drink");
+        Perception exitDrink = teacherSubFSM.CreateAndPerception<AndPerception>(isInStateDrink, timeOut); //not used
+
+        // States
+        patrolState = teacherSubFSM.CreateSubStateMachine("Patrol", patrolSubFSM);
+        State doorState = teacherSubFSM.CreateSubStateMachine("Door", doorSubFSM);
+        State drinkState = teacherSubFSM.CreateSubStateMachine("Drink", drinkSubFSM);
+
+        // Transitions
+        patrolSubFSM.CreateExitTransition("Door unattended", patrolState, push, doorState);
+        patrolSubFSM.CreateExitTransition("Thirsty", patrolState, push, drinkState);
+
+        drinkSubFSM.CreateExitTransition("Not thirsty", drinkState, isInStateDrink, patrolState);
     }
 
     public override void CreateStateMachine()
