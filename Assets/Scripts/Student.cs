@@ -6,7 +6,6 @@ public class Student : Character
 {
     //parameters
     #region const
-    protected const int thirstThreshold = 5;
     protected const int fatigueThreshold = 5;
     protected const int amusementThreshold = 5;
     #endregion
@@ -20,7 +19,6 @@ public class Student : Character
     #region Stats
     protected float fatigue;
     protected float amusement;
-    protected float thirst;
     protected int affinityTolerance = 5;
     #endregion
 
