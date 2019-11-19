@@ -26,6 +26,17 @@ public class CameraController : MonoBehaviour
 
         transform.Translate(movement * this.GetComponent<Camera>().orthographicSize * 0.1f);
 
-        this.GetComponent<Camera>().orthographicSize -= scroll;
+        if (this.GetComponent<Camera>().orthographicSize < 5f)
+        {
+            this.GetComponent<Camera>().orthographicSize = 5f;
+        } else if (this.GetComponent<Camera>().orthographicSize > 30f)
+        {
+            this.GetComponent<Camera>().orthographicSize = 30f;
+        }
+        else
+        {
+            this.GetComponent<Camera>().orthographicSize -= scroll;
+        }
+
     }
 }

@@ -22,6 +22,7 @@ public class Character
     protected Vector3 initPos;
     protected NavMeshAgent agent;
     protected float thirst;
+    protected List<float> currentOcuppiedPos;
 
     protected const int thirstThreshold = 5;
 
@@ -37,7 +38,11 @@ public class Character
     //methods
     protected Character(string name, Genders gender, Transform obj, GameManager gameState)
     {
-        this.initPos = new Vector3(Random.Range(-5, 5), Random.Range(-5, 5));
+        this.gameState = gameState;
+        var index = Random.Range(0, this.gameState.limitedPossiblePosGym.Count / 2 - 1) * 2;
+        var randomCoordinates = this.gameState.limitedPossiblePosGym.GetRange(index, 2);
+        this.gameState.limitedPossiblePosGym.RemoveRange(index, 2);
+        this.initPos = new Vector3(randomCoordinates[0], randomCoordinates[1]);
         this.fixedRotation = obj.rotation;
 
         this.name = name;
@@ -46,7 +51,6 @@ public class Character
         this.gameObject = obj.gameObject;
         this.agent = this.gameObject.GetComponent<NavMeshAgent>();
         this.agent.updateRotation = false;
-        this.gameState = gameState;
 
         CreateDrinkSubStateMachine();
     }

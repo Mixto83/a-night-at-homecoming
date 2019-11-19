@@ -105,7 +105,7 @@ public class CalmStudent : Student
 
     public override void Update()
     {
-        distanceToMeetPos = Vector3.Distance(this.gameObject.transform.position, group.getMeetPos());
+        distanceToMeetPos = Vector3.Distance(this.gameObject.transform.position, group.getMyPos(this.friendNumber));
         distanceToBar = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(-0.75f, 0, 0));
 
         if(Input.GetKeyDown(KeyCode.Alpha1))

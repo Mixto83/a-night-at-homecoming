@@ -48,6 +48,7 @@ public class Student : Character
 
     protected void CheckingAffinity()
     {
+        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
         Debug.Log("[" + name + ", " + getRole() + "] Checking Affinity");
     }
 }

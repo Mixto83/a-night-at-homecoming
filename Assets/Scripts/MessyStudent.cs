@@ -193,21 +193,24 @@ public class MessyStudent : Student
     }
 
     public override void LookForTrouble()
-    {     
-        Vector3 target = new Vector3(Random.Range(0,8), Random.Range(0, 8), 0);
-        Move(target);
+    {
+        var index = Random.Range(0, this.gameState.limitedPossiblePosGym.Count / 2 - 1) * 2;
+        currentOcuppiedPos = this.gameState.limitedPossiblePosGym.GetRange(index, 2);
+        this.gameState.limitedPossiblePosGym.RemoveRange(index, 2);
+        Move(new Vector3(currentOcuppiedPos[0], currentOcuppiedPos[1]));
         createMessage("Looking for some trouble...", Color.red);
     }
 
     protected void SabotageDrink()
     {
-        this.Move(GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0, 1, 0));
+        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+        this.Move(GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(1, 0, 0));
         createMessage("Drinking should be fun!", Color.red);
     }
 
     protected void BotherTeacher()
     {
-        
+        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
         createMessage("Bothering teacher", Color.red);
     }
 

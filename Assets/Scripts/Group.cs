@@ -9,10 +9,10 @@ public class Group
     private List<CalmStudent> friends;
     private int consistentID = 0;
 
-    public Group(int groupSize)
+    public Group(int groupSize, List<float> randomCoordinates)
     {
         this.groupSize = groupSize;
-        this.meetPos = new Vector3(Random.Range(-4, 4), Random.Range(-4, 4));
+        this.meetPos = new Vector3(randomCoordinates[0], randomCoordinates[1]);
         this.friends = new List<CalmStudent>();
     }
 
