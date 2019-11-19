@@ -10,6 +10,7 @@ TagManager:
   - MessyStudent
   - Door
   - Bar
+  - Desk
   layers:
   - Default
   - TransparentFX

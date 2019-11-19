@@ -218,7 +218,7 @@ public class GameManager : MonoBehaviour
         var i = queue.Count;
         foreach(Character c in queue)
         {
-            c.Move(new Vector3(0, 1 - queueNum + i));
+            c.Move(new Vector3(GameObject.FindGameObjectWithTag("Bar").transform.position.x - 0.75f - queueNum + i, GameObject.FindGameObjectWithTag("Bar").transform.position.y));
             i--;
         }
         Interlocked.Decrement(ref queueNum);

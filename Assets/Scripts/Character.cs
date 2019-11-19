@@ -181,7 +181,7 @@ public class Character
     protected void WalkingToBar()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Walking to bar");
-        Vector3 barPos = new Vector3(0, 1 - gameState.getBarQueue(this));
+        Vector3 barPos = new Vector3(GameObject.FindGameObjectWithTag("Bar").transform.position.x - 0.75f - gameState.getBarQueue(this), GameObject.FindGameObjectWithTag("Bar").transform.position.y);
         Move(barPos);
     }
 

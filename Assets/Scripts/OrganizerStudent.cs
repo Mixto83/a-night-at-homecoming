@@ -14,6 +14,7 @@ public class OrganizerStudent : Authority
     private Perception isInStatePatrol;
 
     float tired = 0;
+    float tiredTime = 50;
     float negotiateRandom;
     protected float distanceToBarOrg;
 
@@ -43,7 +44,7 @@ public class OrganizerStudent : Authority
         Perception barAttended = servingSubFSM.CreatePerception<ValuePerception>(() => this.gameState.getBarAttended());
 
         // States
-        State walkingState = servingSubFSM.CreateEntryState("Walking to bar", () => Walking("Bar", new Vector3(0, 0.75f, 0)));
+        State walkingState = servingSubFSM.CreateEntryState("Walking to bar", () => Walking("Bar", new Vector3(0.75f, 0, 0)));
         State waitingState = servingSubFSM.CreateState("Waiting for client", () => WaitingAt("Bar"));
         State serveState = servingSubFSM.CreateState("Serve", ServeDrink);
         State outState = servingSubFSM.CreateState("Out Bar State");
@@ -96,7 +97,7 @@ public class OrganizerStudent : Authority
         organizerStudentFSM = new StateMachineEngine(false);
 
         // Perceptions
-        Perception tired = organizerStudentFSM.CreatePerception<ValuePerception>(() => this.tired >= 20);
+        Perception tired = organizerStudentFSM.CreatePerception<ValuePerception>(() => this.tired >= tiredTime);
         Perception notTired = organizerStudentFSM.CreatePerception<ValuePerception>(() => this.tired <= 0.1f);
         Perception doorAttended = organizerStudentFSM.CreatePerception<ValuePerception>(() => this.gameState.getDoorAttended());
         Perception doorUnattended = organizerStudentFSM.CreatePerception<ValuePerception>(() => !this.gameState.getDoorAttended());
@@ -145,7 +146,7 @@ public class OrganizerStudent : Authority
         }
 
         if(isInState("Door")) {
-            if (tired <= 20) tired += 0.03f;
+            if (tired <= tiredTime) tired += 0.03f;
         } else
         {
             if (tired >= 0.1f) tired -= 0.03f;
@@ -162,7 +163,7 @@ public class OrganizerStudent : Authority
         }
 
         distanceToDoor = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Door").transform.position + new Vector3(-0.75f, 0, 0));
-        distanceToBarOrg = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0, 0.75f, 0));
+        distanceToBarOrg = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0.75f, 0, 0));
     }
 
     public override bool isInState(string state)
