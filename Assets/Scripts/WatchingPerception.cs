@@ -15,7 +15,6 @@ public class WatchingPerception : Perception
     private GameManager gameState;
 
     private Character targetCharacter;
-
     #endregion variables
 
     public WatchingPerception(GameObject watcher, params Func<bool>[] conditions)
@@ -28,6 +27,7 @@ public class WatchingPerception : Perception
 
     public override bool Check()
     {
+
         foreach (Character character in gameState.GetPeople())
         {
             if (colliderVision.bounds.Contains(character.GetGameObject().transform.position))

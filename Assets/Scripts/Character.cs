@@ -201,7 +201,7 @@ public class Character
         gameState.reduceBarQueue(this);
     }
 
-    protected void createMessage(string text, Color color)
+    public void createMessage(string text, Color color)
     {
         clearTexts(this);
 

@@ -915,6 +915,11 @@ Transform:
   - {fileID: 1186412246}
   - {fileID: 282272838}
   - {fileID: 908136213}
+  - {fileID: 1233237164}
+  - {fileID: 1234507008}
+  - {fileID: 881511484}
+  - {fileID: 1151263814}
+  - {fileID: 1591523582}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1843,6 +1848,213 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 29bf510984f3cfa47bbcd2f4792e95f7, type: 3}
+--- !u!1001 &596111958
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 212705369}
+    m_Modifications:
+    - target: {fileID: 5757898790454728071, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_Name
+      value: Alumno Gamberro (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -14.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -16.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8646e62f0ab298643b09f70fb95accef, type: 3}
+--- !u!1001 &597105388
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 212705369}
+    m_Modifications:
+    - target: {fileID: 5757898790454728071, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_Name
+      value: Alumno Gamberro (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -14.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -16.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 19
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8646e62f0ab298643b09f70fb95accef, type: 3}
+--- !u!1001 &603179308
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 212705369}
+    m_Modifications:
+    - target: {fileID: 5757898790454728071, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_Name
+      value: Alumno Gamberro
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -14.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -16.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8646e62f0ab298643b09f70fb95accef, type: 3}
 --- !u!1 &659100056
 GameObject:
   m_ObjectHideFlags: 0
@@ -2333,6 +2545,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 778984398}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &881511484 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+    type: 3}
+  m_PrefabInstance: {fileID: 1185405432}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &908136212
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2748,6 +2966,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -180.00002}
+--- !u!4 &1151263814 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+    type: 3}
+  m_PrefabInstance: {fileID: 597105388}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1153525578
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2823,6 +3047,75 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1153525578}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1185405432
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 212705369}
+    m_Modifications:
+    - target: {fileID: 5757898790454728071, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_Name
+      value: Alumno Gamberro (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -14.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -16.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8646e62f0ab298643b09f70fb95accef, type: 3}
 --- !u!1001 &1186412245
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2897,6 +3190,18 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2049020526946959062, guid: 13ed1f7b405bc764b922e471d3dcce35,
     type: 3}
   m_PrefabInstance: {fileID: 1186412245}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1233237164 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+    type: 3}
+  m_PrefabInstance: {fileID: 603179308}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1234507008 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+    type: 3}
+  m_PrefabInstance: {fileID: 1501076339}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1280278176
 GameObject:
@@ -3219,6 +3524,75 @@ MonoBehaviour:
   m_Center: {x: -0.020622194, y: 1, z: 3.9436066}
   m_Area: 1
   m_AffectedAgents: f2652fae
+--- !u!1001 &1501076339
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 212705369}
+    m_Modifications:
+    - target: {fileID: 5757898790454728071, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_Name
+      value: Alumno Gamberro (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -14.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -16.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8646e62f0ab298643b09f70fb95accef, type: 3}
 --- !u!1 &1514591058
 GameObject:
   m_ObjectHideFlags: 0
@@ -3426,6 +3800,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!4 &1591523582 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6472138937646083135, guid: 8646e62f0ab298643b09f70fb95accef,
+    type: 3}
+  m_PrefabInstance: {fileID: 596111958}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1609389016
 PrefabInstance:
   m_ObjectHideFlags: 0
