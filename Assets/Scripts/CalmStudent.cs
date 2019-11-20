@@ -19,7 +19,10 @@ public class CalmStudent : Student
     public List<string> musicLikes; 
 
     #endregion
+    #region OtherVariables
+    private volatile bool availableForMess = true;
 
+    #endregion
     //methods
     public CalmStudent(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
     {
@@ -218,5 +221,15 @@ public class CalmStudent : Student
     protected void Outside()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Chilling outside");
+    }
+
+    public bool GetMessyFlag()
+    {
+        return availableForMess;
+    }
+
+    public void SetMessyFlag(bool targeted)
+    {
+        availableForMess = targeted;
     }
 }
