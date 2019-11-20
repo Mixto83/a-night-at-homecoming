@@ -31,11 +31,14 @@ public class MessyStudent : Student
     {
         this.role = Roles.MessyStudent;
 
-        this.watchingCalmStudent = new WatchingPerception(this.gameObject, () => watchingCalmStudent.getTargetCharacter().getRole() == Roles.CalmStudent, () => !chadStudents.Contains((CalmStudent)watchingCalmStudent.getTargetCharacter()));//
+        this.watchingCalmStudent = new WatchingPerception(this.gameObject, () => watchingCalmStudent.getTargetCharacter().getRole() == Roles.CalmStudent, () => !chadStudents.Contains((CalmStudent)watchingCalmStudent.getTargetCharacter()),
+            () => ((CalmStudent)watchingCalmStudent.getTargetCharacter()).GetMessyFlag());//
         this.watchingTeacher = new WatchingPerception(this.gameObject, () => watchingTeacher.getTargetCharacter().getRole() == Roles.Teacher);
         this.watchingOrganizerStudent = new WatchingPerception(this.gameObject, () => watchingOrganizerStudent.getTargetCharacter().getRole() == Roles.OrganizerStudent);
 
         this.chadStudents = new List<CalmStudent>();
+        this.thirst = 0.0f;
+        this.fatigue = 0.0f;
 
         CreateTroubleSubStateMachine();
         CreatePunishmentSubStateMachine();
@@ -85,7 +88,7 @@ public class MessyStudent : Student
         State fightState = troubleSubFSM.CreateState("Fighting", Fight);
 
         // Transitions
-        troubleSubFSM.CreateTransition("Anything found", lookingForTroubleState, searchTimer, lookingForTroubleState);
+        troubleSubFSM.CreateTransition("Nothing found", lookingForTroubleState, searchTimer, lookingForTroubleState);
         troubleSubFSM.CreateTransition("Sees bar unattended", lookingForTroubleState, barUnattended, sabotageDrinkState);
         troubleSubFSM.CreateTransition("Sees teacher", lookingForTroubleState, seesTeacher, botherTeacherState);
         troubleSubFSM.CreateTransition("Sees student", lookingForTroubleState, seesStudent, checkAffinityState);
@@ -210,7 +213,6 @@ public class MessyStudent : Student
         distanceToStartingPos = Vector3.Distance(this.gameObject.transform.position, initPos);
         distanceToSafePos = Vector3.Distance(this.gameObject.transform.position, runVector);
         distanceToPunishmentRoom = Vector3.Distance(this.gameObject.transform.position, punishVector);
-
         drinkSubFSM.Update();
         troubleSubFSM.Update();
         punishmentSubFSM.Update();
@@ -245,6 +247,7 @@ public class MessyStudent : Student
 
     public override void LookForTrouble()
     {
+        if (targetStudent != null) { targetStudent.SetMessyFlag(true); }
         MoveToRandomGymPos();
         createMessage("Looking for some trouble...", Color.red);
     }
@@ -265,10 +268,13 @@ public class MessyStudent : Student
     protected bool CheckAffinity()
     {
         createMessage("Is this one chad or virgin?", Color.red);
-        targetStudent = (CalmStudent) watchingCalmStudent.getTargetCharacter();
-        targetStudent.createMessage("Is this guy watching me?", Color.green);
-        int affinity = 0;
+        targetStudent = (CalmStudent) watchingCalmStudent.getTargetCharacter();   
+        createMessage(targetStudent.getName(), Color.red);
+        targetStudent.SetMessyFlag(false);
+        targetStudent.createMessage("Is " + name  + " watching me?", Color.green);
 
+        int affinity = 0;
+        
         if (Hobbies[0] == targetStudent.Hobbies[0] || Hobbies[0] == targetStudent.Hobbies[1] || Hobbies[0] == targetStudent.Hobbies[2])
             affinity++;
         if (Hobbies[1] == targetStudent.Hobbies[0] || Hobbies[1] == targetStudent.Hobbies[1] || Hobbies[1] == targetStudent.Hobbies[2])
@@ -290,6 +296,7 @@ public class MessyStudent : Student
         if (FavFoods[2] == targetStudent.FavFoods[0] || FavFoods[2] == targetStudent.FavFoods[1] || FavFoods[2] == targetStudent.FavFoods[2])
             affinity++;
 
+        //targetStudent.SetMessyFlag(false);
         if (affinity > affinityTolerance)
         {
             createMessage("This dude is a total chad", Color.red);
@@ -322,7 +329,7 @@ public class MessyStudent : Student
     {
         createMessage("Ight imma head out!", Color.red);
         MoveToRandomGymPos();
-        messyStudentFSM.Fire("End of punishment");//No funciona (?)
+        messyStudentFSM.Fire("End of punishment");
     }
 
 
@@ -333,8 +340,7 @@ public class MessyStudent : Student
 
     private void MoveToRandomGymPos()
     {
-        //No se si es necesario
-        //if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
         var index = Random.Range(0, this.gameState.limitedPossiblePosGym.Count / 2 - 1) * 2;
         currentOcuppiedPos = this.gameState.limitedPossiblePosGym.GetRange(index, 2);
         this.gameState.limitedPossiblePosGym.RemoveRange(index, 2);
@@ -344,35 +350,15 @@ public class MessyStudent : Student
 
     protected void DebugInputs()
     {
+        //Testeo de sabotear bebida
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            messyStudentFSM.Fire("Out of trouble thirsty");
+            troubleSubFSM.Fire("Busted by organizer");
         }
+
         if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            messyStudentFSM.Fire("Out of trouble tired");
-
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha6))
-        {
-            troubleSubFSM.Fire("Finished arguing");
-            /*if (!isInStateDrink.Check())
-            {
-                timeOut.Reset();
-            }*/
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha7))
-        {
-            messyStudentFSM.Fire("More tired than thirsty");
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha8))
-        {
-            messyStudentFSM.Fire("More tired than thirsty");
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha9))
-        {
-            messyStudentFSM.Fire("More tired than thirsty");
+            troubleSubFSM.Fire("Busted by teacher");
         }
     }
 }

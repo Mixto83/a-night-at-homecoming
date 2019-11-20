@@ -198,6 +198,7 @@ public class Character
     protected void Drinking()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Drinking!");
+        this.thirst = 0.0f;
         gameState.reduceBarQueue(this);
     }
 
@@ -239,4 +240,6 @@ public class Character
             GameObject.Destroy(txt.gameObject);
         }
     }
+
+
 }

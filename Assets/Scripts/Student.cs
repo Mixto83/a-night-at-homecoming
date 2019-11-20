@@ -51,4 +51,6 @@ public class Student : Character
         if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
         Debug.Log("[" + name + ", " + getRole() + "] Checking Affinity");
     }
+
+
 }
