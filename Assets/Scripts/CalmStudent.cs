@@ -16,7 +16,6 @@ public class CalmStudent : Student
     protected const int DanceAffinityThreshold = 8;
     protected Student targetStudent;
     private float distanceToMeetPos;
-    public List<string> musicLikes; 
 
     #endregion
 
@@ -24,7 +23,6 @@ public class CalmStudent : Student
     public CalmStudent(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
     {
         this.role = Roles.CalmStudent;
-        this.musicLikes = new List<string>();
 
         CreateFlirtSubStateMachine();
     }
@@ -71,7 +69,6 @@ public class CalmStudent : Student
         timeOut = calmStudentFSM.CreatePerception<TimerPerception>(2);
         isInStateDrink = calmStudentFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, "Drink");
         Perception exitDrink = calmStudentFSM.CreateAndPerception<AndPerception>(isInStateDrink, timeOut); //not used
-        Perception dislikeMusic = calmStudentFSM.CreatePerception<ValuePerception>(() => musicLikes.IndexOf(gameState.soundingMusic) == -1);
 
         // States
         State startState = calmStudentFSM.CreateEntryState("Start", Start);
@@ -90,7 +87,7 @@ public class CalmStudent : Student
         calmStudentFSM.CreateTransition("Provoked by messy student", enjoyState, push, fightingState);
         calmStudentFSM.CreateTransition("Looking for fresh air", enjoyState, push, outsideState);
         calmStudentFSM.CreateTransition("Thirsty", enjoyState, pushThirsty, drinkingState);
-        calmStudentFSM.CreateTransition("Dislike music", enjoyState, dislikeMusic, benchState);
+        calmStudentFSM.CreateTransition("Dislike music", enjoyState, push, benchState);
 
         flirtSubFSM.CreateExitTransition("Low affinity or finish kissing", flirtState, isInState, startState);
 

@@ -12,7 +12,6 @@ public class GameManager : MonoBehaviour
     protected readonly int FOODS_NUM = 10;
     protected readonly int ANIMALS_NUM = 12;
     protected readonly int HOBBIES_NUM = 12;
-    protected readonly int MUSICS_NUM = 9;
 
     [SerializeField] bool paused = false;
 
@@ -20,8 +19,6 @@ public class GameManager : MonoBehaviour
     private bool doorAttended = false;
     private bool forceBarAttended = false;
     private bool barAttended = false;
-    public string soundingMusic;
-    private SimpleTimer musicTimer;
 
     [SerializeField] List<GameObject> Agents;
     List<Character> People;
@@ -33,7 +30,6 @@ public class GameManager : MonoBehaviour
     string[] Hobbies = new string[] { "Comic books", "Videogames", "Movies", "Books", "Cooking", "Board games", "Trading card games", "Sports", "School shooting", "Music", "Dancing", "Gym" };
     string[] Animals = new string[] { "Dog", "Cat", "Bird", "Bee", "Sheep", "Whale", "Possum", "Crocodile", "Bat", "Spider", "Lizard", "Turtle" };
     string[] Foods = new string[] { "Hamburgers", "Pizza", "Pasta", "Sandwich", "Fish", "Eggs", "Salad", "Chocolate", "Children", "Apple" };
-    string[] Music = new string[] { "Rock", "Rap", "Classical", "Punk", "Techno", "Disco", "Romantic", "Pop", "Rumba" }; 
 
     [SerializeField] List<int> friendsGroups;
     List<Group> groups;
@@ -88,7 +84,6 @@ public class GameManager : MonoBehaviour
                                             -9f,-5f, -8f,-5f, -7f,-5f, -6f,-5f, -5f,-5f,                  /*Puerta*/                 1f,-5f, 2f,-5f, 3f,-5f, 4f,-5f, 5f,-5f, 6f,-5f, 7f,-5f, 8f,-5f, 9f,-5f, 10f,-5f, 11f,-5f, 12f,-5f, 13f,-5f, 14f,-5f, 15f,-5f,          /*Barra*/
         };
 
-
         foreach (int i in friendsGroups)
         {
             var index = Random.Range(0, limitedPossiblePosGym.Count / 2 - 1) * 2;
@@ -135,11 +130,6 @@ public class GameManager : MonoBehaviour
                         newStudent.Hobbies.Add(newHobbie);
                         newStudent.FavAnimals.Add(newAnimal);
                         newStudent.FavFoods.Add(newFood);
-                    }
-                    for(int i = 0; i < Music.Length - 1; i++)
-                    {
-                        string newMusic = Music[Random.Range(0, MUSICS_NUM)];
-                        newStudent.musicLikes.Add(newMusic);
                     }
                     
                     var j = 0;
@@ -194,10 +184,6 @@ public class GameManager : MonoBehaviour
             if(c.getRole() == Roles.CalmStudent)
                 Debug.Log(c.getName());
         }
-
-        changeMusic();
-        musicTimer = new SimpleTimer(10);
-        musicTimer.start();
     }
 
     // Update is called once per frame
@@ -242,13 +228,6 @@ public class GameManager : MonoBehaviour
                 barAttended = changeBarState;
             }
         }
-
-        musicTimer.Update();
-        if (musicTimer.isFinished())
-        {
-            changeMusic();
-            musicTimer.reset();
-        }
     }
 
     public bool getDoorAttended()
@@ -282,12 +261,6 @@ public class GameManager : MonoBehaviour
         }
         Interlocked.Decrement(ref queueNum);
         queue.Remove(client);
-    }
-
-    public void changeMusic()
-    {
-        soundingMusic = Music[Random.Range(0, MUSICS_NUM)];
-        Debug.Log(soundingMusic);
     }
 
     public Character GetCharacter(GameObject obj)
