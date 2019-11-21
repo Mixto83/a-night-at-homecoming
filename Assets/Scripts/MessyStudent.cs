@@ -428,6 +428,7 @@ public class MessyStudent : Student
     protected void MoveToTeacher()
     {
         createMessage("Hey oh teach'!", Color.red);
+        targetTeacher = (Teacher)watchingTeacher.getTargetCharacter();
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         targetTeacherPosition = targetTeacher.GetGameObject().transform.position + new Vector3(0.75f, 0, 0);
         Move(targetTeacherPosition);
