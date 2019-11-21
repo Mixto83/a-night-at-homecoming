@@ -22,6 +22,8 @@ public class MessyStudent : Student
     private float distanceToPunishmentRoom = 1.5f;
     private float distanceToSafePos = 1.5f;
 
+    private bool causingTrouble = false;
+
     private Vector3 runVector = new Vector3(-4.5f, 6.0f, 0.0f);
     private Vector3 punishVector = new Vector3(17.5f, 31.0f, 0.0f);
 
@@ -346,6 +348,11 @@ public class MessyStudent : Student
         this.gameState.limitedPossiblePosGym.RemoveRange(index, 2);
 
         Move(new Vector3(currentOcuppiedPos[0], currentOcuppiedPos[1]));
+    }
+
+    public bool isCausingTrouble()
+    {
+        return causingTrouble;
     }
 
     protected void DebugInputs()
