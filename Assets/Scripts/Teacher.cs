@@ -195,4 +195,10 @@ public class Teacher : Authority
         //boolean isdistracted
     }
 
+    public override string Description()
+    {
+        var desc = "NAME: " + getName() + "ROLE: " + getRole() + ", STATE: " + teacherFSM.GetCurrentState().Name;
+
+        return desc + "\n";
+    }
 }

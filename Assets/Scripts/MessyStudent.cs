@@ -476,4 +476,11 @@ public class MessyStudent : Student
             troubleSubFSM.Fire("Didn't convince organizer");
         }
     }
+
+    public override string Description()
+    {
+        var desc = "NAME: " + getName() + "ROLE: " + getRole() + ", STATE: " + messyStudentFSM.GetCurrentState().Name;
+
+        return desc + "\n";
+    }
 }

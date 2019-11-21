@@ -259,7 +259,7 @@ public class GameManager : MonoBehaviour
                 musicTimer.reset();
             }
 
-            gameStateDesc += soundingMusic;
+            gameStateDesc += "MUSIC: " + soundingMusic;
 
             createMessageOnGUI(gameStateDesc, Color.blue);
         }
