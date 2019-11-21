@@ -21,8 +21,11 @@ public class GameManager : MonoBehaviour
     private bool doorAttended = false;
     private bool forceBarAttended = false;
     private bool barAttended = false;
+    private volatile bool barBeingSabotaged = false;
     public string soundingMusic;
     private SimpleTimer musicTimer;
+    public SimpleTimer sabotageAvailable;
+
 
     [SerializeField] List<GameObject> Agents;
     List<Character> People;
@@ -204,6 +207,7 @@ public class GameManager : MonoBehaviour
 
         changeMusic();
         musicTimer = new SimpleTimer(10);
+        sabotageAvailable = new SimpleTimer(10);//No empieza de primeras
         musicTimer.start();
     }
 
@@ -259,6 +263,11 @@ public class GameManager : MonoBehaviour
                 musicTimer.reset();
             }
 
+            sabotageAvailable.Update();
+            if (sabotageAvailable.isFinished()){
+                barBeingSabotaged = false;
+            }
+
             gameStateDesc += soundingMusic;
 
             createMessageOnGUI(gameStateDesc, Color.blue);
@@ -273,6 +282,16 @@ public class GameManager : MonoBehaviour
     public bool getBarAttended()
     {
         return barAttended;
+    }
+
+    public bool getBarSabotaged()
+    {
+        return barBeingSabotaged;
+    }
+
+    public void setBarSabotaged(bool bar)
+    {
+        barBeingSabotaged = bar;
     }
 
     public float getQueueNum()
