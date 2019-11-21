@@ -30,7 +30,7 @@ public class WatchingPerception : Perception
 
         foreach (Character character in gameState.GetPeople())
         {
-            if (colliderVision.bounds.Contains(character.GetGameObject().transform.position))
+            if (colliderVision.bounds.Contains(character.GetGameObject().transform.position) && !GameObject.ReferenceEquals(watcher, character.GetGameObject()))
             {
                 targetCharacter = character;
 

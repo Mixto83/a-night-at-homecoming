@@ -23,6 +23,7 @@ public class Character
     protected NavMeshAgent agent;
     protected float thirst;
     protected List<float> currentOcuppiedPos;
+    public int beauty;
 
     protected const int thirstThreshold = 5;
 
@@ -86,6 +87,11 @@ public class Character
     public Roles getRole()
     {
         return this.role;
+    }
+
+    public Genders getGender()
+    {
+        return gender;
     }
 
     public GameObject GetGameObject()
@@ -153,7 +159,7 @@ public class Character
         this.gameObject.GetComponentInChildren<Canvas>().gameObject.transform.rotation = fixedRotation;
     }
 
-    public virtual bool isInState(string state)
+    public virtual bool isInState(params string[] states)
     {
         return false;
     }
@@ -182,6 +188,15 @@ public class Character
         Debug.Log("[" + name + ", " + getRole() + "] Behaviour not defined");
     }
 
+    protected void Walking(string tag, Vector3 offset)
+    {
+        Debug.Log("[" + name + ", " + getRole() + "] Walking to " + tag);
+
+        this.Move(GameObject.FindGameObjectWithTag(tag).transform.position + offset);
+
+        clearTexts();
+    }
+
     protected void WalkingToBar()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Walking to bar");
@@ -202,9 +217,9 @@ public class Character
         gameState.reduceBarQueue(this);
     }
 
-    public void createMessage(string text, Color color)
+    protected void createMessage(string text, Color color)
     {
-        clearTexts(this);
+        clearTexts();
 
         if (color == null)
         {
@@ -217,7 +232,7 @@ public class Character
 
         GameObject newText = new GameObject(text.Replace(" ", "-"), typeof(RectTransform));
         var newTextComp = newText.AddComponent<Text>();
-        newText.AddComponent<CanvasRenderer>();
+        if (newText.GetComponent<CanvasRenderer>() == null) newText.AddComponent<CanvasRenderer>();
 
         newTextComp.text = text;
         newTextComp.color = color;
@@ -233,13 +248,21 @@ public class Character
         newText.transform.localPosition = new Vector3(0, 1, 0);
     }
 
-    protected void clearTexts(Character c)
+    protected void clearTexts()
     {
-        foreach (Text txt in c.gameObject.GetComponentsInChildren<Text>())
+        foreach (Text txt in this.gameObject.GetComponentsInChildren<Text>())
         {
             GameObject.Destroy(txt.gameObject);
         }
     }
 
+    public virtual void FireFlirt(CalmStudent me)
+    {
 
+    }
+
+    public virtual string Description()
+    {
+        return "\n";
+    }
 }

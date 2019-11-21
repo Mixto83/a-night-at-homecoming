@@ -33,24 +33,13 @@ public class Student : Character
 
     protected void InBench()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Sat in the bench");
-    }
-
-    protected void Fight()
-    {
-        Debug.Log("[" + name + ", " + getRole() + "] Take this Billy!");
+        createMessage("Boring music...", Color.blue);
+        Move(new Vector3(-13.5f, 1f, 0));
     }
 
     protected void Punished()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Punished :(");
+        createMessage("Waiting", Color.red);
+        //Move to available seat
     }
-
-    protected void CheckingAffinity()
-    {
-        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
-        Debug.Log("[" + name + ", " + getRole() + "] Checking Affinity");
-    }
-
-
 }

@@ -54,16 +54,7 @@ public class Authority : Character
 
         this.LookAt(GameObject.FindGameObjectWithTag(tag).transform);
 
-        clearTexts(this);
-    }
-
-    protected void Walking(string tag, Vector3 offset)
-    {
-        Debug.Log("[" + name + ", " + getRole() + "] Walking to " + tag);
-
-        this.Move(GameObject.FindGameObjectWithTag(tag).transform.position + offset);
-
-        clearTexts(this);
+        clearTexts();
     }
 
     protected void Welcome()

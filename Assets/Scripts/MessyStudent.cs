@@ -105,7 +105,7 @@ public class MessyStudent : Student
         State botherTeacherState = troubleSubFSM.CreateState("Bothering teacher", BotherTeacher);
         State arguingState = troubleSubFSM.CreateState("Arguing", Arguing);
         State checkAffinityState = troubleSubFSM.CreateState("CheckingAffinity", CheckingAffinity);
-        State fightState = troubleSubFSM.CreateState("Fighting", Fight);
+        State fightState = troubleSubFSM.CreateState("Fighting", FightAsMessy);
         State movingToStudentState = troubleSubFSM.CreateState("MovingToStudent", MoveToStudent);
         State movingToTeacherState = troubleSubFSM.CreateState("MovingToTeacher", MoveToTeacher);
         State movingToBarState = troubleSubFSM.CreateState("MovingToBar", MoveToBar);
@@ -260,12 +260,6 @@ public class MessyStudent : Student
     #endregion
 
     #region Behaviour Methods
-    protected void Punished()
-    {
-        createMessage("Waiting", Color.red);
-        //Move to available seat
-    }
-
     public override void LookForTrouble()
     {
         if (targetStudent != null) { targetStudent.SetMessyFlag(true); }
@@ -283,6 +277,14 @@ public class MessyStudent : Student
     {
         if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
         createMessage("Bothering teacher", Color.red);
+    }
+
+    private void CheckingAffinity()
+    {
+        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+        createMessage("So, how are you doing?", Color.blue);
+        Move(gameObject.transform.position);
+        LookAt(targetStudent.GetGameObject().transform);
     }
 
     protected bool CheckAffinity()
@@ -324,7 +326,7 @@ public class MessyStudent : Student
         }
     }
 
-    protected void Fight()
+    protected void FightAsMessy()
     {
         fatigue++;
         createMessage("What a virgin! Fatigue: " + fatigue, Color.red);
@@ -400,7 +402,7 @@ public class MessyStudent : Student
         targetStudent = (CalmStudent)watchingCalmStudent.getTargetCharacter();
         createMessage(targetStudent.getName(), Color.red);
         targetStudent.SetMessyFlag(false);
-        targetStudent.createMessage("Is " + name + " watching me? Flag: " + targetStudent.GetMessyFlag(), Color.green);
+        targetStudent.pushFight.Fire();
         if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
         targetStudentPosition = targetStudent.GetGameObject().transform.position + new Vector3(0.75f, 0, 0);
         Move(targetStudentPosition);
@@ -423,12 +425,18 @@ public class MessyStudent : Student
     #endregion
 
 
-    public override bool isInState(string state)
+    public override bool isInState(params string[] states)
     {
         try
         {
-            Perception isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(messyStudentFSM, state);
-            return isIn.Check();
+            foreach (string state in states)
+            {
+                Perception isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(messyStudentFSM, state);
+                if (isIn.Check())
+                    return true;
+            }
+
+            return false;
         }
         catch (KeyNotFoundException)
         {

@@ -149,11 +149,17 @@ public class Teacher : Authority
         }
     }
 
-    public override bool isInState(string state)
+    public override bool isInState(params string[] states)
     {
         try {
-            Perception isIn = teacherFSM.CreatePerception<IsInStatePerception>(teacherFSM, state);
-            return isIn.Check();
+            foreach (string state in states)
+            {
+                Perception isIn = teacherFSM.CreatePerception<IsInStatePerception>(teacherFSM, state);
+                if (isIn.Check())
+                    return true;
+            }
+
+            return false;
         }
         catch (KeyNotFoundException)
         {

@@ -173,20 +173,26 @@ public class OrganizerStudent : Authority
         distanceToBarOrg = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0.75f, 0, 0));
     }
 
-    public override bool isInState(string state)
+    public override bool isInState(params string[] states)
     {
         try
         {
-            Perception isIn = organizerStudentFSM.CreatePerception<IsInStatePerception>(organizerStudentFSM, state);
-            Perception exclusion1 = organizerStudentFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Walking to door");
-            Perception exclusion2 = organizerStudentFSM.CreatePerception<IsInStatePerception>(servingSubFSM, "Walking to bar");
-
-            if (exclusion1.Check() || exclusion2.Check())
+            foreach (string state in states)
             {
-                return false;
+                Perception isIn = organizerStudentFSM.CreatePerception<IsInStatePerception>(organizerStudentFSM, state);
+                Perception exclusion1 = organizerStudentFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Walking to door");
+                Perception exclusion2 = organizerStudentFSM.CreatePerception<IsInStatePerception>(servingSubFSM, "Walking to bar");
+
+                if (state == "Door" && (exclusion1.Check() || exclusion2.Check()))
+                {
+                    break;
+                }
+
+                if (isIn.Check())
+                    return true;
             }
 
-            return isIn.Check();
+            return false;
         }
         catch (KeyNotFoundException) {
             return false;
