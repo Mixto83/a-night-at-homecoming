@@ -147,11 +147,11 @@ public class OrganizerStudent : Authority
             {
                 timerPatrol.Reset();
 
-                if(currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+                if(currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
 
-                var index = Random.Range(0, this.gameState.limitedPossiblePosGym.Count / 2 - 1) * 2;
-                currentOcuppiedPos = this.gameState.limitedPossiblePosGym.GetRange(index, 2);
-                this.gameState.limitedPossiblePosGym.RemoveRange(index, 2);
+                var index = Random.Range(0, this.gameState.possiblePosGym.Count / 2 - 1) * 2;
+                currentOcuppiedPos = this.gameState.possiblePosGym.GetRange(index, 2);
+                this.gameState.possiblePosGym.RemoveRange(index, 2);
 
                 Move(new Vector3(currentOcuppiedPos[0], currentOcuppiedPos[1]));
             }

@@ -34,7 +34,13 @@ public class Student : Character
     protected void InBench()
     {
         createMessage("Boring music...", Color.blue);
-        Move(new Vector3(-13.5f, 1f, 0));
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
+
+        var index = Random.Range(0, this.gameState.possiblePosBench.Count / 2 - 1) * 2;
+        currentOcuppiedBench = this.gameState.possiblePosBench.GetRange(index, 2);
+        this.gameState.possiblePosBench.RemoveRange(index, 2);
+
+        Move(new Vector3(currentOcuppiedBench[0], currentOcuppiedBench[1]));
     }
 
     protected void Punished()

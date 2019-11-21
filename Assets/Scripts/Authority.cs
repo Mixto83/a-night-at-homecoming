@@ -78,6 +78,7 @@ public class Authority : Character
 
     protected void ChaseStudent()
     {
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         targetStudent = watchingDoor.getTargetCharacter();
         Debug.Log("[" + name + ", " + getRole() + "] Come back here, you little...");
         createMessage("Come back here, you little...", Color.blue);

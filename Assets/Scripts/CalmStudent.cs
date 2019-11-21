@@ -117,7 +117,7 @@ public class CalmStudent : Student
         calmStudentFSM.CreateTransition("Look for friends", startState, enterParty, enjoyState);
 
         calmStudentFSM.CreateTransition("Random time", enjoyState, timerForLooking, lookingForCouple);
-        calmStudentFSM.CreateTransition("Random time 2", lookingForCouple, timerForLooking, enjoyState);
+        calmStudentFSM.CreateTransition("Random time 2", lookingForCouple, timerForLooking, startState);
         calmStudentFSM.CreateTransition("Like Person from walk", lookingForCouple, beautyCheck, flirtState);
         calmStudentFSM.CreateTransition("Like Person from enjoy", enjoyState, beautyCheck, flirtState);
         calmStudentFSM.CreateTransition("Provoked by messy student", enjoyState, pushFight, fightingState);
@@ -167,11 +167,11 @@ public class CalmStudent : Student
             {
                 timerPatrol.Reset();
 
-                if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+                if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
 
-                var index = Random.Range(0, this.gameState.limitedPossiblePosGym.Count / 2 - 1) * 2;
-                currentOcuppiedPos = this.gameState.limitedPossiblePosGym.GetRange(index, 2);
-                this.gameState.limitedPossiblePosGym.RemoveRange(index, 2);
+                var index = Random.Range(0, this.gameState.possiblePosGym.Count / 2 - 1) * 2;
+                currentOcuppiedPos = this.gameState.possiblePosGym.GetRange(index, 2);
+                this.gameState.possiblePosGym.RemoveRange(index, 2);
 
                 Move(new Vector3(currentOcuppiedPos[0], currentOcuppiedPos[1]));
             }
@@ -252,6 +252,8 @@ public class CalmStudent : Student
     {
         clearTexts();
         targetStudent = null;
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
+        if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
         Debug.Log("[" + name + ", " + getRole() + "] Start");
         Vector3 destination = group.getMyPos(this.friendNumber);
         Debug.Log(this.friendNumber + " -> " + destination);
@@ -261,8 +263,10 @@ public class CalmStudent : Student
     private void GettingCloser()
     {
         clearTexts();
-        if(targetStudent == null) targetStudent = (CalmStudent) watching.getTargetCharacter();
         blackList.Add(targetStudent);
+        if (targetStudent == null) targetStudent = (CalmStudent) watching.getTargetCharacter();
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
+        if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
         Debug.Log("[" + name + ", " + getRole() + "] Heey " + targetStudent.getName());
         Vector3 offset = GetGameObject().transform.position - targetStudent.GetGameObject().transform.position;
         Move(targetStudent.GetGameObject().transform.position - offset.normalized);
@@ -286,7 +290,7 @@ public class CalmStudent : Student
 
     private void CheckingAffinity()
     {
-        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         createMessage("So, how are you doing?", Color.blue);
         Move(gameObject.transform.position);
         LookAt(targetStudent.GetGameObject().transform);
