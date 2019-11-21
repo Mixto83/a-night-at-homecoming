@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
+using UnityEngine.UI;
 
 public enum Roles { CalmStudent, MessyStudent, Teacher, OrganizerStudent }
-public enum Genders { Male, Female, Other }
+public enum Genders { Male, Female }
 
 public class GameManager : MonoBehaviour
 {
@@ -101,7 +102,7 @@ public class GameManager : MonoBehaviour
         {
             Agents.Add(child.gameObject);
 
-            Genders gender = (Genders) Random.Range(0, 3);
+            Genders gender = (Genders) Random.Range(0, 2);
 
             string name;
             switch (gender)
@@ -125,6 +126,12 @@ public class GameManager : MonoBehaviour
             {
                 case "CalmStudent":
                     CalmStudent newStudent = new CalmStudent(name, gender, child, this);
+                    newStudent.sexuality = (Genders)Random.Range(0, 2);
+                    newStudent.beauty = Random.Range(1, 11);
+                    newStudent.beautyThreshold = Random.Range(1, 11);
+                    newStudent.affinityThreshold = Random.Range(1, 11);
+                    newStudent.DanceAffinityThreshold = Random.Range(1, 11);
+
                     for (int i = 0; i < 3; i++)
                     {
                         string newHobbie = Hobbies[Random.Range(0, HOBBIES_NUM)];
@@ -207,6 +214,7 @@ public class GameManager : MonoBehaviour
         {
             var changeDoorState = false;
             var changeBarState = false;
+            var gameStateDesc = "";
 
             foreach (Character character in People)
             {
@@ -223,6 +231,8 @@ public class GameManager : MonoBehaviour
                 {
                     changeBarState = true;
                 }
+
+                gameStateDesc += character.Description();
             }
 
             if (forceDoorAttended)
@@ -241,13 +251,17 @@ public class GameManager : MonoBehaviour
             {
                 barAttended = changeBarState;
             }
-        }
 
-        musicTimer.Update();
-        if (musicTimer.isFinished())
-        {
-            changeMusic();
-            musicTimer.reset();
+            musicTimer.Update();
+            if (musicTimer.isFinished())
+            {
+                changeMusic();
+                musicTimer.reset();
+            }
+
+            gameStateDesc += "MUSIC: " + soundingMusic;
+
+            createMessageOnGUI(gameStateDesc, Color.blue);
         }
     }
 
@@ -287,7 +301,7 @@ public class GameManager : MonoBehaviour
     public void changeMusic()
     {
         soundingMusic = Music[Random.Range(0, MUSICS_NUM)];
-        Debug.Log(soundingMusic);
+        //createMessageOnGUI(soundingMusic, Color.blue);
     }
 
     public Character GetCharacter(GameObject obj)
@@ -298,5 +312,43 @@ public class GameManager : MonoBehaviour
     public List<Character> GetPeople()
     {
         return People;
+    }
+
+    private void createMessageOnGUI(string text, Color color)
+    {
+        clearTexts();
+
+        if (color == null)
+        {
+            color = Color.green;
+        }
+        if (text == null)
+        {
+            text = "";
+        }
+
+        GameObject newText = new GameObject(text.Replace(" ", "-"), typeof(RectTransform));
+        var newTextComp = newText.AddComponent<Text>();
+        if(newText.GetComponent<CanvasRenderer>() == null) newText.AddComponent<CanvasRenderer>();
+
+        newTextComp.text = text;
+        newTextComp.color = color;
+        newTextComp.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        newTextComp.alignment = TextAnchor.UpperRight;
+        newTextComp.fontSize = 10;
+
+        newText.transform.SetParent(GameObject.FindGameObjectWithTag("CanvasPrincipal").transform);
+
+        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 700);
+        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 350);
+        newText.transform.localPosition = new Vector3(0, 0, 0);
+    }
+
+    private void clearTexts()
+    {
+        foreach (Text txt in GameObject.FindGameObjectWithTag("CanvasPrincipal").GetComponentsInChildren<Text>())
+        {
+            GameObject.Destroy(txt.gameObject);
+        }
     }
 }

@@ -170,11 +170,17 @@ public class Teacher : Authority
         teacherFSM.Update();
     }
 
-    public override bool isInState(string state)
+    public override bool isInState(params string[] states)
     {
         try {
-            Perception isIn = teacherFSM.CreatePerception<IsInStatePerception>(teacherFSM, state);
-            return isIn.Check();
+            foreach (string state in states)
+            {
+                Perception isIn = teacherFSM.CreatePerception<IsInStatePerception>(teacherFSM, state);
+                if (isIn.Check())
+                    return true;
+            }
+
+            return false;
         }
         catch (KeyNotFoundException)
         {
@@ -230,4 +236,10 @@ public class Teacher : Authority
         //boolean isdistracted
     }
 
+    public override string Description()
+    {
+        var desc = "NAME: " + getName() + "ROLE: " + getRole() + ", STATE: " + teacherFSM.GetCurrentState().Name;
+
+        return desc + "\n";
+    }
 }

@@ -11,6 +11,7 @@ TagManager:
   - Door
   - Bar
   - Desk
+  - CanvasPrincipal
   layers:
   - Default
   - TransparentFX
