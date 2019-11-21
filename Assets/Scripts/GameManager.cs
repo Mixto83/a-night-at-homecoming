@@ -268,7 +268,7 @@ public class GameManager : MonoBehaviour
                 barBeingSabotaged = false;
             }
 
-            gameStateDesc += soundingMusic;
+            gameStateDesc += "MUSIC: " + soundingMusic;
 
             createMessageOnGUI(gameStateDesc, Color.blue);
         }

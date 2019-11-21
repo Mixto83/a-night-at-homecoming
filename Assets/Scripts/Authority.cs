@@ -7,7 +7,10 @@ public class Authority : Character
 {
     //parameters
     protected StateMachineEngine doorSubFSM;
-    private WatchingPerception watching;
+    private WatchingPerception watchingDoor;
+    protected WatchingPerception watchingMessy;
+
+    protected Character targetStudent;
     
     protected float distanceToDoor;
 
@@ -19,8 +22,11 @@ public class Authority : Character
     //methods
     public Authority(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
     {
-        this.watching = new WatchingPerception(this.gameObject, () => !watching.getTargetCharacter().getGreeted(),
-            () => watching.getTargetCharacter().getRole() == Roles.CalmStudent || watching.getTargetCharacter().getRole() == Roles.MessyStudent);
+        this.watchingDoor = new WatchingPerception(this.gameObject, () => !watchingDoor.getTargetCharacter().getGreeted(),
+            () => watchingDoor.getTargetCharacter().getRole() == Roles.CalmStudent || watchingDoor.getTargetCharacter().getRole() == Roles.MessyStudent);
+        this.watchingMessy = new WatchingPerception(this.gameObject, () => watchingMessy.getTargetCharacter().getRole() == Roles.MessyStudent,
+            () => watchingMessy.getTargetCharacter().isInState("Trouble"));
+
         CreateDoorSubStateMachine();
     }
 
@@ -30,7 +36,7 @@ public class Authority : Character
 
         // Perceptions
         Perception gotToDoor = doorSubFSM.CreatePerception<ValuePerception>(() => distanceToDoor < 0.3f);
-        WatchingPerception seeSomeone = doorSubFSM.CreatePerception<WatchingPerception>(watching);
+        WatchingPerception seeSomeone = doorSubFSM.CreatePerception<WatchingPerception>(watchingDoor);
         Perception timer = doorSubFSM.CreatePerception<TimerPerception>(2);
         Perception doorAttended = doorSubFSM.CreatePerception<ValuePerception>(() => this.gameState.getDoorAttended());
 
@@ -61,7 +67,7 @@ public class Authority : Character
     {
         Debug.Log("[" + name + ", " + getRole() + "] Welcome to the party!");
         createMessage("Welcome to the party!", Color.blue);
-        watching.getTargetCharacter().setGreeted(true);
+        watchingDoor.getTargetCharacter().setGreeted(true);
     }
 
     protected void Patrol()
@@ -72,6 +78,7 @@ public class Authority : Character
 
     protected void ChaseStudent()
     {
+        targetStudent = watchingDoor.getTargetCharacter();
         Debug.Log("[" + name + ", " + getRole() + "] Come back here, you little...");
         createMessage("Come back here, you little...", Color.blue);
     }

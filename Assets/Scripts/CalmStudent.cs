@@ -329,7 +329,7 @@ public class CalmStudent : Student
 
     public override string Description()
     {
-        var desc = "NAME: " + getName() + ", STATE: " + calmStudentFSM.GetCurrentState().Name + ", GENDER: " + gender + ", SEX: " + sexuality + ", BEAUTY: " + beauty + ", BEAUTYTHRESHOLD: " + beautyThreshold;
+        var desc = "NAME: " + getName() + "ROLE: " + getRole() + ", STATE: " + calmStudentFSM.GetCurrentState().Name;
         
         return desc + "\n";
     }
