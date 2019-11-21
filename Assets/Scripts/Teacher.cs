@@ -24,7 +24,8 @@ public class Teacher : Authority
         this.strictness = 1;
 
         this.distractionRandom = Random.Range(2, 5);
-        this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() != Roles.MessyStudent, () => ((MessyStudent)watchingTrouble.getTargetCharacter()).isCausingTrouble());
+        this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() != Roles.MessyStudent,
+            () => watchingTrouble.getTargetCharacter().isInState("Trouble"));
 
         CreatePatrolSubStateMachine();
         CreatePunishmentSubStateMachine();
@@ -216,10 +217,10 @@ public class Teacher : Authority
 
     protected void MoveToRandomGymPos()
     {
-        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
-        var index = Random.Range(0, this.gameState.limitedPossiblePosGym.Count / 2 - 1) * 2;
-        currentOcuppiedPos = this.gameState.limitedPossiblePosGym.GetRange(index, 2);
-        this.gameState.limitedPossiblePosGym.RemoveRange(index, 2);
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
+        var index = Random.Range(0, this.gameState.possiblePosGym.Count / 2 - 1) * 2;
+        currentOcuppiedPos = this.gameState.possiblePosGym.GetRange(index, 2);
+        this.gameState.possiblePosGym.RemoveRange(index, 2);
 
         Move(new Vector3(currentOcuppiedPos[0], currentOcuppiedPos[1]));
     }

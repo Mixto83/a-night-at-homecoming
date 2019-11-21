@@ -40,8 +40,8 @@ public class GameManager : MonoBehaviour
     List<Group> groups;
     List<Character> queue;
 
-    [HideInInspector] public List<float> possiblePositionsGym;
-    [HideInInspector] public List<float> limitedPossiblePosGym;
+    [HideInInspector] public List<float> possiblePosGym;
+    [HideInInspector] public List<float> possiblePosBench;
 
     private int queueNum;
 
@@ -58,23 +58,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //possiblePositionsGym = new List<float> {-10f,7f,  -9f,7f,  -8f,7f,  -7f,7f,  -6f,7f,  -5f,7f,  -4f,7f,  -3f,7f,  -2f,7f,                                       /*Escenario*/                                      10f,7f,  11f,7f,  12f,7f,  13f,7f,  14f,7f,  15f,7f,  16f,7f,  17f,7f,  18f,7f,
-        //                                    -10f,6f,  -9f,6f,  -8f,6f,  -7f,6f,  -6f,6f,  -5f,6f,  -4f,6f,  -3f,6f,  -2f,6f,                                        /*Escenario*/                                      10f,6f,  11f,6f,  12f,6f,  13f,6f,  14f,6f,  15f,6f,  16f,6f,  17f,6f,  18f,6f,
-        //                                    -10f,5f,  -9f,5f,  -8f,5f,  -7f,5f,  -6f,5f,  -5f,5f,  -4f,5f,  -3f,5f,  -2f,5f,                                        /*Escenario*/                                      10f,5f,  11f,5f,  12f,5f,  13f,5f,  14f,5f,  15f,5f,  16f,5f,  17f,5f,  18f,5f,
-        //                                    -10f,4f,  -9f,4f,  -8f,4f,  -7f,4f,  -6f,4f,  -5f,4f,  -4f,4f,  -3f,4f,  -2f,4f,                                        /*Escenario*/                                      10f,4f,  11f,4f,  12f,4f,  13f,4f,  14f,4f,  15f,4f,  16f,4f,  17f,4f,  18f,4f,
-        //                                    -10f,3f,  -9f,3f,  -8f,3f,  -7f,3f,  -6f,3f,  -5f,3f,  -4f,3f,  -3f,3f,  -2f,3f,                                        /*Escenario*/                                      10f,3f,  11f,3f,  12f,3f,  13f,3f,  14f,3f,  15f,3f,  16f,3f,  17f,3f,  18f,3f,
-        //                                    -10f,2f,  -9f,2f,  -8f,2f,  -7f,2f,  -6f,2f,  -5f,2f,  -4f,2f,  -3f,2f,  -2f,2f,  -1f,2f,  0f,2f,  1f,2f,  2f,2f,  3f,2f,  4f,2f,  5f,2f,  6f,2f,  7f,2f,  8f,2f,  9f,2f,  10f,2f,  11f,2f,  12f,2f,  13f,2f,  14f,2f,  15f,2f,  16f,2f,  17f,2f,  18f,2f,
-        //                                    -10f,1f,  -9f,1f,  -8f,1f,  -7f,1f,  -6f,1f,  -5f,1f,  -4f,1f,  -3f,1f,  -2f,1f,  -1f,1f,  0f,1f,  1f,1f,  2f,1f,  3f,1f,  4f,1f,  5f,1f,  6f,1f,  7f,1f,  8f,1f,  9f,1f,  10f,1f,  11f,1f,  12f,1f,  13f,1f,  14f,1f,  15f,1f,  16f,1f,  17f,1f,  18f,1f,
-        //                                    -10f,0f,  -9f,0f,  -8f,0f,  -7f,0f,  -6f,0f,  -5f,0f,  -4f,0f,  -3f,0f,  -2f,0f,  -1f,0f,  0f,0f,  1f,0f,  2f,0f,  3f,0f,  4f,0f,  5f,0f,  6f,0f,  7f,0f,  8f,0f,  9f,0f,  10f,0f,  11f,0f,  12f,0f,  13f,0f,  14f,0f,  15f,0f,  16f,0f,  17f,0f,  18f,0f,
-        //                                    -10f,-1f, -9f,-1f, -8f,-1f, -7f,-1f, -6f,-1f, -5f,-1f, -4f,-1f, -3f,-1f, -2f,-1f, -1f,-1f, 0f,-1f, 1f,-1f, 2f,-1f, 3f,-1f, 4f,-1f, 5f,-1f, 6f,-1f, 7f,-1f, 8f,-1f, 9f,-1f, 10f,-1f, 11f,-1f, 12f,-1f, 13f,-1f, 14f,-1f, 15f,-1f, 16f,-1f, 17f,-1f, 18f,-1f,
-        //                                    -10f,-2f, -9f,-2f, -8f,-2f, -7f,-2f, -6f,-2f, -5f,-2f, -4f,-2f, -3f,-2f, -2f,-2f, -1f,-2f, 0f,-2f, 1f,-2f, 2f,-2f, 3f,-2f, 4f,-2f, 5f,-2f, 6f,-2f, 7f,-2f, 8f,-2f, 9f,-2f, 10f,-2f, 11f,-2f, 12f,-2f, 13f,-2f, 14f,-2f, 15f,-2f, 16f,-2f,   /*Barra*/
-        //                                    -10f,-3f, -9f,-3f, -8f,-3f, -7f,-3f, -6f,-3f, -5f,-3f, -4f,-3f, -3f,-3f, -2f,-3f, -1f,-3f, 0f,-3f, 1f,-3f, 2f,-3f, 3f,-3f, 4f,-3f, 5f,-3f, 6f,-3f, 7f,-3f, 8f,-3f, 9f,-3f,                          /*Cola barra*/                          /*Barra*/
-        //                                    -10f,-4f, -9f,-4f, -8f,-4f, -7f,-4f, -6f,-4f, -5f,-4f, -4f,-4f, -3f,-4f, -2f,-4f, -1f,-4f, 0f,-4f, 1f,-4f, 2f,-4f, 3f,-4f, 4f,-4f, 5f,-4f, 6f,-4f, 7f,-4f, 8f,-4f, 9f,-4f, 10f,-4f, 11f,-4f, 12f,-4f, 13f,-4f, 14f,-4f, 15f,-4f, 16f,-4f,   /*Barra*/
-        //                                    -10f,-5f, -9f,-5f, -8f,-5f, -7f,-5f, -6f,-5f, -5f,-5f, -4f,-5f, -3f,-5f, -2f,-5f, -1f,-5f, 0f,-5f, 1f,-5f, 2f,-5f, 3f,-5f, 4f,-5f, 5f,-5f, 6f,-5f, 7f,-5f, 8f,-5f, 9f,-5f, 10f,-5f, 11f,-5f, 12f,-5f, 13f,-5f, 14f,-5f, 15f,-5f, 16f,-5f, 17f,-5f, 18f,-5f,
-        //                                    -10f,-6f, -9f,-6f, -8f,-6f, -7f,-6f, -6f,-6f, -5f,-6f, -4f,-6f,         /*Puerta*/         0f,-6f, 1f,-6f, 2f,-6f, 3f,-6f, 4f,-6f, 5f,-6f, 6f,-6f, 7f,-6f, 8f,-6f, 9f,-6f, 10f,-6f, 11f,-6f, 12f,-6f, 13f,-6f, 14f,-6f, 15f,-6f, 16f,-6f, 17f,-6f, 18f,-6f,
-        //};
-
-        limitedPossiblePosGym = new List<float> {
+        possiblePosGym = new List<float> {
                                             -9f,6f,  -8f,6f,  -7f,6f,  -6f,6f,  -5f,6f,  -4f,6f,  -3f,6f,                                                 /*Escenario*/                                               11f,6f,  12f,6f,  13f,6f,  14f,6f,  15f,6f,  16f,6f,  17f,6f,  18f,6f,
                                             -9f,5f,  -8f,5f,  -7f,5f,  -6f,5f,  -5f,5f,  -4f,5f,  -3f,5f,                                                 /*Escenario*/                                               11f,5f,  12f,5f,  13f,5f,  14f,5f,  15f,5f,  16f,5f,  17f,5f,  18f,5f,
                                             -9f,4f,  -8f,4f,  -7f,4f,  -6f,4f,  -5f,4f,  -4f,4f,  -3f,4f,                                                 /*Escenario*/                                               11f,4f,  12f,4f,  13f,4f,  14f,4f,  15f,4f,  16f,4f,  17f,4f,  18f,4f,
@@ -89,12 +73,28 @@ public class GameManager : MonoBehaviour
                                             -9f,-5f, -8f,-5f, -7f,-5f, -6f,-5f, -5f,-5f,                  /*Puerta*/                 1f,-5f, 2f,-5f, 3f,-5f, 4f,-5f, 5f,-5f, 6f,-5f, 7f,-5f, 8f,-5f, 9f,-5f, 10f,-5f, 11f,-5f, 12f,-5f, 13f,-5f, 14f,-5f, 15f,-5f,          /*Barra*/
         };
 
+        possiblePosBench = new List<float> {-16f,7f,  -15f,7f,  -14f,7f,  -13f,7f,  -12f,7f,
+                                            -16f,6f,  -15f,6f,  -14f,6f,  -13f,6f,  -12f,6f,
+                                            -16f,5f,  -15f,5f,  -14f,5f,  -13f,5f,  -12f,5f,
+                                            -16f,4f,  -15f,4f,  -14f,4f,  -13f,4f,  -12f,4f,
+                                            -16f,3f,  -15f,3f,  -14f,3f,  -13f,3f,  -12f,3f,
+                                            -16f,2f,  -15f,2f,  -14f,2f,  -13f,2f,  -12f,2f,
+                                            -16f,1f,  -15f,1f,  -14f,1f,  -13f,1f,  -12f,1f,
+                                            -16f,0f,  -15f,0f,  -14f,0f,  -13f,0f,  -12f,0f,
+                                            -16f,-1f, -15f,-1f, -14f,-1f, -13f,-1f, -12f,-1f,
+                                            -16f,-2f, -15f,-2f, -14f,-2f, -13f,-2f, -12f,-2f,
+                                            -16f,-3f, -15f,-3f, -14f,-3f, -13f,-3f, -12f,-3f,
+                                            -16f,-4f, -15f,-4f, -14f,-4f, -13f,-4f, -12f,-4f,
+                                            -16f,-5f, -15f,-5f, -14f,-5f, -13f,-5f, -12f,-5f,
+                                            -16f,-6f, -15f,-6f, -14f,-6f, -13f,-6f, -12f,-6f,
+        };
+
 
         foreach (int i in friendsGroups)
         {
-            var index = Random.Range(0, limitedPossiblePosGym.Count / 2 - 1) * 2;
-            var randomCoordinates = limitedPossiblePosGym.GetRange(index, 2);
-            limitedPossiblePosGym.RemoveRange(index, 2);
+            var index = Random.Range(0, possiblePosGym.Count / 2 - 1) * 2;
+            var randomCoordinates = possiblePosGym.GetRange(index, 2);
+            possiblePosGym.RemoveRange(index, 2);
             groups.Add(new Group(i, randomCoordinates));
         }
 

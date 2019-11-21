@@ -263,6 +263,7 @@ public class MessyStudent : Student
     #region Behaviour Methods
     public override void LookForTrouble()
     {
+        if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
         if (targetStudent != null) { targetStudent.SetMessyFlag(true); }
         MoveToRandomGymPos();
         createMessage("Trouble! Size: " + whiteFlagStudents.Count + ", Thirst: "  + thirst, Color.red);
@@ -276,13 +277,13 @@ public class MessyStudent : Student
 
     protected void BotherTeacher()
     {
-        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         createMessage("Bothering teacher", Color.red);
     }
 
     private void CheckingAffinity()
     {
-        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         createMessage("So, how are you doing?", Color.blue);
         Move(gameObject.transform.position);
         LookAt(targetStudent.GetGameObject().transform);
@@ -378,10 +379,10 @@ public class MessyStudent : Student
     #region Movement Methods
     private void MoveToRandomGymPos()
     {
-        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
-        var index = Random.Range(0, this.gameState.limitedPossiblePosGym.Count / 2 - 1) * 2;
-        currentOcuppiedPos = this.gameState.limitedPossiblePosGym.GetRange(index, 2);
-        this.gameState.limitedPossiblePosGym.RemoveRange(index, 2);
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
+        var index = Random.Range(0, this.gameState.possiblePosGym.Count / 2 - 1) * 2;
+        currentOcuppiedPos = this.gameState.possiblePosGym.GetRange(index, 2);
+        this.gameState.possiblePosGym.RemoveRange(index, 2);
 
         Move(new Vector3(currentOcuppiedPos[0], currentOcuppiedPos[1]));
     }
@@ -404,15 +405,15 @@ public class MessyStudent : Student
         createMessage(targetStudent.getName(), Color.red);
         targetStudent.SetMessyFlag(false);
         targetStudent.pushFight.Fire();
-        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         targetStudentPosition = targetStudent.GetGameObject().transform.position + new Vector3(0.75f, 0, 0);
         Move(targetStudentPosition);
     }
 
     protected void MoveToTeacher()
     {
-       createMessage("Hey oh teach'!", Color.red);
-        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+        createMessage("Hey oh teach'!", Color.red);
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         targetTeacherPosition = targetTeacher.GetGameObject().transform.position + new Vector3(0.75f, 0, 0);
         Move(targetTeacherPosition);
     }
@@ -420,7 +421,7 @@ public class MessyStudent : Student
     protected void MoveToBar()
     {
         createMessage("Bar is free!", Color.red);
-        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
+        if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         this.Move(GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(1, 0, 0));
     }
     #endregion

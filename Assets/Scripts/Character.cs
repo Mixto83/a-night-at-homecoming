@@ -23,6 +23,7 @@ public class Character
     protected NavMeshAgent agent;
     protected float thirst;
     protected List<float> currentOcuppiedPos;
+    protected List<float> currentOcuppiedBench;
     public int beauty;
 
     protected const int thirstThreshold = 5;
@@ -40,9 +41,9 @@ public class Character
     protected Character(string name, Genders gender, Transform obj, GameManager gameState)
     {
         this.gameState = gameState;
-        var index = Random.Range(0, this.gameState.limitedPossiblePosGym.Count / 2 - 1) * 2;
-        var randomCoordinates = this.gameState.limitedPossiblePosGym.GetRange(index, 2);
-        this.gameState.limitedPossiblePosGym.RemoveRange(index, 2);
+        var index = Random.Range(0, this.gameState.possiblePosGym.Count / 2 - 1) * 2;
+        var randomCoordinates = this.gameState.possiblePosGym.GetRange(index, 2);
+        this.gameState.possiblePosGym.RemoveRange(index, 2);
         this.initPos = new Vector3(randomCoordinates[0], randomCoordinates[1]);
         this.fixedRotation = obj.rotation;
 
@@ -199,6 +200,7 @@ public class Character
 
     protected void WalkingToBar()
     {
+        if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
         Debug.Log("[" + name + ", " + getRole() + "] Walking to bar");
         Vector3 barPos = new Vector3(GameObject.FindGameObjectWithTag("Bar").transform.position.x - 0.75f - gameState.getBarQueue(this), GameObject.FindGameObjectWithTag("Bar").transform.position.y);
         Move(barPos);
