@@ -24,8 +24,7 @@ public class Teacher : Authority
         this.strictness = 1;
 
         this.distractionRandom = Random.Range(2, 5);
-        this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() != Roles.MessyStudent, 
-            () => ((MessyStudent)watchingTrouble.getTargetCharacter()).isCausingTrouble());
+        this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() != Roles.MessyStudent, () => ((MessyStudent)watchingTrouble.getTargetCharacter()).isCausingTrouble());
 
         CreatePatrolSubStateMachine();
         CreatePunishmentSubStateMachine();
@@ -39,8 +38,9 @@ public class Teacher : Authority
 
         // Perceptions
         Perception organizerPush = patrolSubFSM.CreatePerception<PushPerception>();
-        Perception timer = patrolSubFSM.CreatePerception<TimerPerception>(2);
+        Perception talkTimer = patrolSubFSM.CreatePerception<TimerPerception>(2);
         Perception findTrouble = patrolSubFSM.CreatePerception<WatchingPerception>(watchingTrouble);
+        Perception patrolTimer = patrolSubFSM.CreatePerception<TimerPerception>(2);
 
         // States
         State patrolingState = patrolSubFSM.CreateEntryState("Patroling", TeacherPatrol);
@@ -48,8 +48,9 @@ public class Teacher : Authority
         State readyToChaseState = patrolSubFSM.CreateState("Ready to Chase");
 
         // Transitions
+        patrolSubFSM.CreateTransition("Keep patrolling", patrolingState, patrolTimer, patrolingState);
         patrolSubFSM.CreateTransition("Sees organizer call", patrolingState, organizerPush, talkingState);
-        patrolSubFSM.CreateTransition("Stops talking to organizer", talkingState, timer, readyToChaseState);
+        patrolSubFSM.CreateTransition("Stops talking to organizer", talkingState, talkTimer, readyToChaseState);
         patrolSubFSM.CreateTransition("Sees trouble", patrolingState, findTrouble, readyToChaseState);
     }
 
