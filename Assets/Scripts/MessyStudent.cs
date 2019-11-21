@@ -271,10 +271,13 @@ public class MessyStudent : Student
         createMessage("Trouble! Size: " + whiteFlagStudents.Count + ", Thirst: "  + thirst, Color.red);
     }
 
+    //Sabotea la bebida
     protected void SabotageDrink()
     {
-        thirst+=2;
+        thirst += 2;
         createMessage("Drinking should be fun! Thirst: " + thirst, Color.red);
+        gameState.sabotageAvailable.reset();
+        gameState.sabotageAvailable.start();
     }
 
     protected void BotherTeacher()
@@ -329,30 +332,6 @@ public class MessyStudent : Student
         {
             return true;
         }
-    }
-
-    //Se mueve random buscando problemas
-    public override void LookForTrouble()
-    {
-        if (targetStudent != null) { targetStudent.SetMessyFlag(true); }
-        MoveToRandomGymPos();
-        createMessage("Trouble! Size: " + whiteFlagStudents.Count + ", Thirst: " + thirst, Color.red);
-    }
-
-    //Sabotea la bebida
-    protected void SabotageDrink()
-    {
-        thirst += 2;
-        createMessage("Drinking should be fun! Thirst: " + thirst, Color.red);
-        gameState.sabotageAvailable.reset();
-        gameState.sabotageAvailable.start();
-    }
-
-    //Molesta al profesor
-    protected void BotherTeacher()
-    {
-        if (currentOcuppiedPos != null) this.gameState.limitedPossiblePosGym.AddRange(currentOcuppiedPos);
-        createMessage("Bothering teacher", Color.red);
     }
 
     //Pelea cuando checkAffinity devuelve true
