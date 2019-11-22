@@ -5,17 +5,17 @@ using UnityEngine;
 public class Teacher : Authority
 {
     //parameters
-    private StateMachineEngine teacherFSM;
+    public StateMachineEngine teacherFSM;
     private StateMachineEngine teacherSubFSM;
-    private StateMachineEngine patrolSubFSM;
+    public StateMachineEngine patrolSubFSM;
     private StateMachineEngine chaseSubFSM;
     private StateMachineEngine punishmentRoomSubFSM;
 
     private WatchingPerception watchingTrouble;
 
-    State patrolState;
-
     float distractionRandom;
+    float distanceToMessy = 3.0f;
+    MessyStudent targetMessyStudent;
 
     //methods
     public Teacher(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
@@ -30,7 +30,6 @@ public class Teacher : Authority
         CreatePatrolSubStateMachine();
         CreatePunishmentSubStateMachine();
         CreateChaseSubStateMachine();
-        CreateSubStateMachine();
     }
 
     private void CreatePatrolSubStateMachine()
@@ -39,20 +38,28 @@ public class Teacher : Authority
 
         // Perceptions
         Perception organizerPush = patrolSubFSM.CreatePerception<PushPerception>();
+        Perception messyPush = patrolSubFSM.CreatePerception<PushPerception>();
         Perception talkTimer = patrolSubFSM.CreatePerception<TimerPerception>(2);
         Perception findTrouble = patrolSubFSM.CreatePerception<WatchingPerception>(watchingTrouble);
         Perception patrolTimer = patrolSubFSM.CreatePerception<TimerPerception>(2);
-
+        Perception messyTimer = patrolSubFSM.CreatePerception<TimerPerception>(1);
+        Perception messyTimer2 = patrolSubFSM.CreatePerception<TimerPerception>(1);
         // States
         State patrolingState = patrolSubFSM.CreateEntryState("Patroling", TeacherPatrol);
+        State waitingForMessyState = patrolSubFSM.CreateState("Waiting For Messy", WaitForMessy);
+        State warningMessyState = patrolSubFSM.CreateState("Warning Messy", TriggerMessy);
         State talkingState = patrolSubFSM.CreateState("Talking to Organizer", Talking);
         State readyToChaseState = patrolSubFSM.CreateState("Ready to Chase");
+         
 
         // Transitions
         patrolSubFSM.CreateTransition("Keep patrolling", patrolingState, patrolTimer, patrolingState);
         patrolSubFSM.CreateTransition("Sees organizer call", patrolingState, organizerPush, talkingState);
         patrolSubFSM.CreateTransition("Stops talking to organizer", talkingState, talkTimer, readyToChaseState);
         patrolSubFSM.CreateTransition("Sees trouble", patrolingState, findTrouble, readyToChaseState);
+        patrolSubFSM.CreateTransition("Pushed by messy", patrolingState, messyPush, waitingForMessyState);
+        patrolSubFSM.CreateTransition("Warn messy", waitingForMessyState, messyTimer, warningMessyState);
+        patrolSubFSM.CreateTransition("Pursuit messy", warningMessyState, messyTimer2, readyToChaseState);
     }
 
     private void CreateChaseSubStateMachine()
@@ -60,17 +67,18 @@ public class Teacher : Authority
         chaseSubFSM = new StateMachineEngine(true);
 
         // Perceptions
-        Perception distanceToStudent = chaseSubFSM.CreatePerception<ValuePerception>();//Rellenar
+        
+        Perception reachedMessy = chaseSubFSM.CreatePerception<ValuePerception>(() => distanceToMessy <= 1.5f);
         Perception timerArgue = chaseSubFSM.CreatePerception<TimerPerception>(2);
-
+        Perception stillChasing = chaseSubFSM.CreatePerception<TimerPerception>(2);
         // States
-        State chasingStudentState = chaseSubFSM.CreateEntryState("Chasing Student", ChaseStudent);
+        State chasingStudentState = chaseSubFSM.CreateEntryState("Chasing Student", ChaseMessyStudent);
         State arguingState = chaseSubFSM.CreateState("Arguing", Arguing);
         State toPunishmentRoomState = chaseSubFSM.CreateState("Taking student to punishment room", ToPunishmentRoom);
-
         // Transitions
-        chaseSubFSM.CreateTransition("Caught", chasingStudentState, distanceToStudent, arguingState);
-        chaseSubFSM.CreateTransition("Finish arguing", chasingStudentState, timerArgue, toPunishmentRoomState);
+        chaseSubFSM.CreateTransition("Keep chasing", chasingStudentState, stillChasing, chasingStudentState);
+        chaseSubFSM.CreateTransition("Caught", chasingStudentState, reachedMessy, arguingState);
+        chaseSubFSM.CreateTransition("Finish arguing", arguingState, timerArgue, toPunishmentRoomState);
     }
 
     private void CreatePunishmentSubStateMachine()
@@ -90,37 +98,6 @@ public class Teacher : Authority
         punishmentRoomSubFSM.CreateTransition("TimerRandom2", distractedState, randomTimer2, watchingState);
     }
 
-
-    private void CreateSubStateMachine()
-    {
-        teacherSubFSM = new StateMachineEngine(true);
-
-        //Perceptions
-        Perception isInPatrol = teacherSubFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Patroling");
-
-        Perception doorAttended = teacherSubFSM.CreatePerception<ValuePerception>(() => this.gameState.getDoorAttended());
-        Perception doorUnattended = teacherSubFSM.CreatePerception<ValuePerception>(() => !this.gameState.getDoorAttended());
-
-        Perception goToDoor = teacherSubFSM.CreateAndPerception<AndPerception>(isInPatrol, doorUnattended);
-
-        Perception outOfDoor = teacherSubFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Out Door State");
-
-        Perception thirsty = teacherSubFSM.CreatePerception<ValuePerception>(() => thirst > thirstThreshold);
-        Perception goToDrink = teacherSubFSM.CreateAndPerception<AndPerception>(isInPatrol, thirsty);
-
-        Perception isInDrink = teacherSubFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, "Drink");
-
-        // States
-        patrolState = teacherSubFSM.CreateSubStateMachine("Patrol", patrolSubFSM);
-        State doorState = teacherSubFSM.CreateSubStateMachine("Door", doorSubFSM);
-        State drinkState = teacherSubFSM.CreateSubStateMachine("Drink", drinkSubFSM);
-
-        //Transitions
-        patrolSubFSM.CreateExitTransition("Door unattended", patrolState, goToDoor, doorState);
-        doorSubFSM.CreateExitTransition("Back from door", doorState, outOfDoor, patrolState);
-        patrolSubFSM.CreateExitTransition("Need to drink", patrolState, goToDrink, drinkState);
-        drinkSubFSM.CreateExitTransition("Already drank, back to Patrol", drinkState, isInDrink, patrolState);
-    }
 
     public override void CreateStateMachine()
     {
@@ -146,30 +123,53 @@ public class Teacher : Authority
 
         Perception noStudentsAtPR = teacherFSM.CreatePerception<ValuePerception>();//rellenar
 
+        Perception isInPatrol = teacherFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Patroling");
+        Perception doorUnattended = teacherFSM.CreatePerception<ValuePerception>(() => !this.gameState.getDoorAttended());
+        Perception goToDoor = teacherFSM.CreateAndPerception<AndPerception>(isInPatrol, doorUnattended);
+
+        Perception outOfDoor = teacherFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Out Door State");
+
+        Perception thirsty = teacherFSM.CreatePerception<ValuePerception>(() => thirst > thirstThreshold);
+        Perception goToDrink = teacherFSM.CreateAndPerception<AndPerception>(isInPatrol, thirsty);
+
+        Perception isInDrink = teacherFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, "Drink");
+
         // States
         State startState = teacherFSM.CreateEntryState("Start");
-        State subFSMState = teacherFSM.CreateSubStateMachine("SubState", teacherSubFSM, patrolState);
         State chaseState = teacherFSM.CreateSubStateMachine("Chase", chaseSubFSM);
         State punishmentRoomState = teacherFSM.CreateSubStateMachine("Punishment room", punishmentRoomSubFSM);
+        State patrolState = teacherFSM.CreateSubStateMachine("Patrol", patrolSubFSM);
+        State doorState = teacherFSM.CreateSubStateMachine("Door", doorSubFSM);
+        State drinkState = teacherFSM.CreateSubStateMachine("Drink", drinkSubFSM);
         State returnToGym = teacherFSM.CreateState("Return To Gym", ToGym);
 
         //Transitions
-        teacherFSM.CreateTransition("Start", startState, startPush, subFSMState);
-        teacherSubFSM.CreateExitTransition("Sees trouble / Finishes talking to organizer", subFSMState, readyToChase, chaseState);
-        teacherFSM.CreateTransition("Gets to gym from punishment room", returnToGym, atGym, subFSMState);
-        chaseSubFSM.CreateExitTransition("Student escaped", chaseState, loseStudentPush, subFSMState);
+        teacherFSM.CreateTransition("Start", startState, startPush, patrolState);
+        patrolSubFSM.CreateExitTransition("Sees trouble / Finishes talking to organizer", patrolState, readyToChase, chaseState);
+        teacherFSM.CreateTransition("Gets to gym from punishment room", returnToGym, atGym, patrolState);
+        chaseSubFSM.CreateExitTransition("Student escaped", chaseState, loseStudentPush, patrolState);
         chaseSubFSM.CreateExitTransition("Teacher at PR, returns to gym", chaseState, notStayAtPR, returnToGym);
         chaseSubFSM.CreateExitTransition("No other teacher at PR, stays", chaseState, stayAtPR, punishmentRoomState);
         punishmentRoomSubFSM.CreateExitTransition("No students left, returns to gym", punishmentRoomState, noStudentsAtPR, returnToGym);
+
+        //patrolSubFSM.CreateExitTransition("Door unattended", patrolState, goToDoor, doorState);
+        doorSubFSM.CreateExitTransition("Back from door", doorState, outOfDoor, patrolState);
+        patrolSubFSM.CreateExitTransition("Need to drink", patrolState, goToDrink, drinkState);
+        drinkSubFSM.CreateExitTransition("Already drank, back to Patrol", drinkState, isInDrink, patrolState);
 
         teacherFSM.Fire("Start");
     }
 
     public override void Update()
     {
+        if (targetMessyStudent != null) distanceToMessy = Vector3.Distance(this.GetGameObject().transform.position, targetMessyStudent.GetGameObject().transform.position);
         doorSubFSM.Update();
+        drinkSubFSM.Update();
         patrolSubFSM.Update();
+        chaseSubFSM.Update();
         teacherFSM.Update();
+        DebugInputs();
+
     }
 
     public override bool isInState(params string[] states)
@@ -190,6 +190,25 @@ public class Teacher : Authority
         }
     }
 
+    public bool isInSubState(StateMachineEngine subFSM, params string[] states)
+    {
+        try
+        {
+            foreach (string state in states)
+            {
+                Perception isIn = teacherFSM.CreatePerception<IsInStatePerception>(subFSM, state);
+                if (isIn.Check())
+                    return true;
+            }
+
+            return false;
+        }
+        catch (KeyNotFoundException)
+        {
+            return false;
+        }
+    }
+
     protected void Talking()
     {
         Debug.Log("[" + name + ", " + getRole() + "] I'm watching you...");
@@ -197,7 +216,8 @@ public class Teacher : Authority
 
     protected void Arguing()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] You're going to be punished for this!!");
+        if (targetMessyStudent != null) { targetMessyStudent.troubleSubFSM.Fire("Busted by teacher"); }
+        createMessage("You're going to be punished for this!!", Color.blue);
     }
 
     protected void ToPunishmentRoom()
@@ -225,6 +245,35 @@ public class Teacher : Authority
         Move(new Vector3(currentOcuppiedPos[0], currentOcuppiedPos[1]));
     }
 
+    protected void ChaseMessyStudent()
+    {
+        if (targetMessyStudent != null)
+        {
+            createMessage("Come back here you! " + targetMessyStudent.getName(), Color.blue);
+            Move(targetMessyStudent.GetGameObject().transform.position + new Vector3(1.5f, 0.0f, 0.0f));
+        }
+    }
+
+    protected void WaitForMessy()
+    {
+        if (targetMessyStudent != null)  createMessage("WDYW " + targetMessyStudent.getName(), Color.blue);
+    }
+
+    public void SetMessyStudent(MessyStudent ms)
+    {
+        targetMessyStudent = ms;
+    }
+    
+    protected void TriggerMessy()
+    {
+        Debug.Log("No entro al if");
+        if (targetMessyStudent != null)
+        {
+            Debug.Log("Triggereo al messy");
+            targetMessyStudent.troubleSubFSM.Fire("Finished bothering teacher");        
+        }
+    }
+
     //Punishment Room State FSM: Teachers
     protected void Watching()
     {
@@ -243,5 +292,14 @@ public class Teacher : Authority
         var desc = "NAME: " + getName() + "ROLE: " + getRole() + ", STATE: " + teacherFSM.GetCurrentState().Name;
 
         return desc + "\n";
+    }
+
+    protected void DebugInputs()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            chaseSubFSM.Fire("Caught");
+        }
+        
     }
 }
