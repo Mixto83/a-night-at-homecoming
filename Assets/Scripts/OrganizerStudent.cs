@@ -33,6 +33,9 @@ public class OrganizerStudent : Authority
         CreatePatrolSubStateMachine();
 
         this.negotiateRandom = Random.value;
+
+        animationController = this.gameObject.GetComponentInChildren<Animator>();
+        if(gender == Genders.Female) animationController.SetBool("isGirl", true);
     }
 
     private void CreateServingSubStateMachine()
@@ -141,7 +144,7 @@ public class OrganizerStudent : Authority
         patrolSubFSM.Update();
         organizerStudentFSM.Update();
 
-        if(isInStatePatrol.Check())
+        if (isInStatePatrol.Check())
         {
             if (timerPatrol.Check())
             {
@@ -222,21 +225,21 @@ public class OrganizerStudent : Authority
     protected void ServeDrink()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Serving drink");
-        createMessage("Have a drink!", Color.blue);
+        //createMessage("Have a drink!", Color.blue);
         watchingBar.getTargetCharacter().setServed();
     }
 
     protected void Negotiate()
     {
         Debug.Log("[" + name + ", " + getRole() + "] I shouldn't let you go, but...");
-        createMessage("I shouldn't let you go, but...", Color.blue);
+        //createMessage("I shouldn't let you go, but...", Color.blue);
         negotiateRandom = Random.value;
     }
 
     protected void CallTeacher()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Sir, get that kid!");
-        createMessage("Sir, get that kid!", Color.blue);
+        //createMessage("Sir, get that kid!", Color.blue);
     }
 
     public bool CheckConvinced()

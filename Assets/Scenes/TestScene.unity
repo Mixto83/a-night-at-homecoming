@@ -495,10 +495,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   paused: 0
   soundingMusic: 
-  Agents: []
-  debugMode: 0
+  debugMode: 1
   door: {fileID: 424376491}
   bar: {fileID: 241125566}
+  bocadillos:
+  - {fileID: 21300000, guid: 0ba09d25de5917940b4cef11faefcc74, type: 3}
+  - {fileID: 21300000, guid: e520441b522e4b94e9a6afcff905b090, type: 3}
+  - {fileID: 21300000, guid: e1dc149eb90060547b52b578856a76c3, type: 3}
+  - {fileID: 21300000, guid: 40ae1e3cf2ec38d42a273a5fb4abf8e7, type: 3}
+  - {fileID: 21300000, guid: 4d7b6a2e32850974a95ae468047444b9, type: 3}
+  - {fileID: 21300000, guid: 46222bf78ce24f64189abffa86c24212, type: 3}
+  - {fileID: 21300000, guid: ed35bfdf285c3eb43adc80c051e4d3ae, type: 3}
+  - {fileID: 21300000, guid: 29203332979f3d14683789ecc76ab3ef, type: 3}
+  - {fileID: 21300000, guid: 26e1b1523f021bd408ecf587b502793f, type: 3}
+  - {fileID: 21300000, guid: 10a3c51a1b6bd7f4daa44eea25586341, type: 3}
+  - {fileID: 21300000, guid: e839d5e8431b09c41b07cbc7fc1eacb2, type: 3}
+  - {fileID: 21300000, guid: 13101c551ff9fed489ef4704a8e8f3e4, type: 3}
+  - {fileID: 21300000, guid: 6d733c6646cd9e042a62f45ee9d5a79c, type: 3}
   friendsGroups: 0200000003000000
   possiblePosGym: []
   possiblePosBench: []

@@ -37,6 +37,8 @@ public class Character
 
     protected GameManager gameState;
 
+    protected Animator animationController;
+
     //methods
     protected Character(string name, Genders gender, Transform obj, GameManager gameState)
     {
@@ -195,12 +197,13 @@ public class Character
 
         this.Move(GameObject.FindGameObjectWithTag(tag).transform.position + offset);
 
-        clearTexts();
+        clearSprites();
     }
 
     protected void WalkingToBar()
     {
         if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
+        createMessage(6);
         Debug.Log("[" + name + ", " + getRole() + "] Walking to bar");
         Vector3 barPos = new Vector3(GameObject.FindGameObjectWithTag("Bar").transform.position.x - 0.75f - gameState.getBarQueue(this), GameObject.FindGameObjectWithTag("Bar").transform.position.y);
         Move(barPos);
@@ -219,8 +222,9 @@ public class Character
         gameState.reduceBarQueue(this);
     }
 
-    protected void createMessage(string text, Color color)
+    protected void createMessage(int index)
     {
+        /*
         clearTexts();
 
         if (color == null)
@@ -231,7 +235,7 @@ public class Character
         {
             text = "";
         }
-
+        
         GameObject newText = new GameObject(text.Replace(" ", "-"), typeof(RectTransform));
         var newTextComp = newText.AddComponent<Text>();
         if (newText.GetComponent<CanvasRenderer>() == null) newText.AddComponent<CanvasRenderer>();
@@ -247,14 +251,25 @@ public class Character
         newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 200);
         newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 100);
         newText.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-        newText.transform.localPosition = new Vector3(0, 1, 0);
+        newText.transform.localPosition = new Vector3(0, 1, 0);*/
+
+        clearSprites();
+
+        GameObject newSprite = new GameObject(gameState.bocadillos[index].name);
+        var newSpriteComp = newSprite.AddComponent<SpriteRenderer>();
+        if (newSprite.GetComponent<CanvasRenderer>() == null) newSprite.AddComponent<CanvasRenderer>();
+
+        newSpriteComp.sprite = gameState.bocadillos[index];
+
+        newSprite.transform.SetParent(this.gameObject.GetComponentInChildren<Canvas>().transform);
+        newSprite.transform.localPosition = new Vector3(0, 1.5f, 0);
     }
 
-    protected void clearTexts()
+    protected void clearSprites()
     {
-        foreach (Text txt in this.gameObject.GetComponentsInChildren<Text>())
+        foreach (SpriteRenderer spr in this.gameObject.GetComponentInChildren<Canvas>().GetComponentsInChildren<SpriteRenderer>())
         {
-            GameObject.Destroy(txt.gameObject);
+            GameObject.Destroy(spr.gameObject);
         }
     }
 
@@ -266,5 +281,17 @@ public class Character
     public virtual string Description()
     {
         return "\n";
+    }
+
+    public void animationUpdate()
+    {
+        if (agent.velocity.magnitude > 0.1f)
+        {
+            animationController.SetBool("isWalking", true);
+        }
+        else
+        {
+            animationController.SetBool("isWalking", false);
+        }
     }
 }

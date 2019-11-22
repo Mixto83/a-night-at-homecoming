@@ -59,6 +59,9 @@ public class MessyStudent : Student
 
         CreateTroubleSubStateMachine();
         CreatePunishmentSubStateMachine();
+
+        animationController = this.gameObject.GetComponentInChildren<Animator>();
+        if (gender == Genders.Female) animationController.SetBool("isGirl", true);
     }
 
     #region FSMs Methods
@@ -279,7 +282,7 @@ public class MessyStudent : Student
         if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
         if (targetStudent != null) { targetStudent.SetMessyFlag(true); }
         MoveToRandomGymPos();
-        createMessage("Trouble! Size: " + whiteFlagStudents.Count + ", Thirst: "  + thirst, Color.red);
+        //createMessage("Trouble! Size: " + whiteFlagStudents.Count + ", Thirst: "  + thirst, Color.red);
     }
 
     //Sabotea la bebida
@@ -287,7 +290,7 @@ public class MessyStudent : Student
     {
         causingTrouble = true;
         thirst += 2;
-        createMessage("Drinking should be fun! Thirst: " + thirst, Color.red);
+        //createMessage("Drinking should be fun! Thirst: " + thirst, Color.red);
         gameState.sabotageAvailable.reset();
         gameState.sabotageAvailable.start();
     }
@@ -298,13 +301,13 @@ public class MessyStudent : Student
         //if (targetTeacher != null) targetTeacher.teacherSubFSM
         targetTeacher.patrolSubFSM.Fire("Pushed by messy");
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
-        createMessage("Bothering teacher", Color.red);
+        //createMessage("Bothering teacher", Color.red);
     }
 
     private void CheckingAffinity()
     {
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
-        createMessage("So, how are you doing?", Color.blue);
+        //createMessage("So, how are you doing?", Color.blue);
         Move(gameObject.transform.position);
         LookAt(targetStudent.GetGameObject().transform);
     }
@@ -312,7 +315,7 @@ public class MessyStudent : Student
     //Cuando llega a la posicion del personaje, comprueba la afinidad
     protected bool CheckAffinity()
     {
-        createMessage("Is this one chad or virgin?", Color.red);
+        //createMessage("Is this one chad or virgin?", Color.red);
         if (!whiteFlagStudents.Contains(targetStudent)) whiteFlagStudents.Add(targetStudent);
         int affinity = 0;
         
@@ -340,7 +343,7 @@ public class MessyStudent : Student
         //targetStudent.SetMessyFlag(false);
         if (affinity > affinityTolerance)
         {
-            createMessage("This dude is a total chad", Color.red);
+            //createMessage("This dude is a total chad", Color.red);
             return false;
         }
         else
@@ -353,7 +356,7 @@ public class MessyStudent : Student
     protected void FightAsMessy()
     {
         fatigue++;
-        createMessage("What a virgin! Fatigue: " + fatigue, Color.red);
+        createMessage(2);
     }
 
     //Escapar del profesor: Pillado saboteando ponche o tras molestarle
@@ -362,14 +365,14 @@ public class MessyStudent : Student
         thirst++;
         fatigue++;
         //Move(runPosition);//Se va a la entrada
-        createMessage("Run run run! Fatigue: " + fatigue + ", Thirst: " + thirst, Color.red);
+        createMessage(12);
     }
 
     //Castigo
     //Inicio de castigo
     protected void Arguing()
     {
-        createMessage("Arguing with teacher", Color.red);
+        createMessage(8);
 
     }
     //Escape de la sala de castigo
@@ -377,13 +380,13 @@ public class MessyStudent : Student
     {
         thirst--;
         fatigue--;
-        createMessage("Ight imma head out!", Color.red);
+        createMessage(12);
         Move(escapePosition);
     }
     //Fin del estado
     private void ExitPunishment()
     {
-        createMessage("I broke free!", Color.red);
+        //createMessage("I broke free!", Color.red);
         messyStudentFSM.Fire("End of punishment");
     }
 
@@ -391,13 +394,13 @@ public class MessyStudent : Student
     protected void StartNegotation()
     {
         negotiatorStudent = (OrganizerStudent)watchingOrganizerStudent.getTargetCharacter();
-        createMessage("Negotiating with " + negotiatorStudent.getName(), Color.red);
+        createMessage(8);
         Move(this.gameObject.transform.position - new Vector3(0, 2, 0));
     }
 
     protected void Negotiate()
     {
-        createMessage("Don't snitch!", Color.red);
+        createMessage(8);
     }
 
     protected void TriggerTeacher()
@@ -427,16 +430,16 @@ public class MessyStudent : Student
     //Se va hasta la sala de castigo
     private void MoveToPunishment()
     {
-        createMessage("Damn, busted!", Color.red);
+        //createMessage("Damn, busted!", Color.red);
         Move(punishPosition);
     }
 
     //Se va hasta el estudiante calmado objetivo
     protected void MoveToStudent()
     {
-        createMessage("Found someone!", Color.red);
+        //createMessage("Found someone!", Color.red);
         targetStudent = (CalmStudent) watchingCalmStudent.getTargetCharacter();
-        createMessage(targetStudent.getName(), Color.red);
+        //createMessage(targetStudent.getName(), Color.red);
         targetStudent.SetMessyFlag(false);
         targetStudent.pushFight.Fire();//Cambiar
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
@@ -447,7 +450,7 @@ public class MessyStudent : Student
     //Se va hasta el profesor objetivo
     protected void MoveToTeacher()
     {
-        createMessage("Hey oh teach'!", Color.red);
+        //createMessage("Hey oh teach'!", Color.red);
         targetTeacher = (Teacher)watchingTeacher.getTargetCharacter();
         targetTeacher.SetMessyStudent(this);
         targetTeacherPosition = targetTeacher.GetGameObject().transform.position + new Vector3(1.5f, 0, 0);
@@ -459,7 +462,7 @@ public class MessyStudent : Student
     //Se va a la barra
     protected void MoveToBar()
     {
-        createMessage("Bar is free!", Color.red);
+        //createMessage("Bar is free!", Color.red);
         this.gameState.setBarSabotaged(true);
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         this.Move(GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(1, 0, 0));

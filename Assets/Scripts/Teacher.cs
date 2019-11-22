@@ -30,6 +30,9 @@ public class Teacher : Authority
         CreatePatrolSubStateMachine();
         CreatePunishmentSubStateMachine();
         CreateChaseSubStateMachine();
+
+        animationController = this.gameObject.GetComponentInChildren<Animator>();
+        if (gender == Genders.Female) animationController.SetBool("isGirl", true);
     }
 
     private void CreatePatrolSubStateMachine()
@@ -217,7 +220,7 @@ public class Teacher : Authority
     protected void Arguing()
     {
         if (targetMessyStudent != null) { targetMessyStudent.troubleSubFSM.Fire("Busted by teacher"); }
-        createMessage("You're going to be punished for this!!", Color.blue);
+        //createMessage("You're going to be punished for this!!", Color.blue);
     }
 
     protected void ToPunishmentRoom()
@@ -249,14 +252,14 @@ public class Teacher : Authority
     {
         if (targetMessyStudent != null)
         {
-            createMessage("Come back here you! " + targetMessyStudent.getName(), Color.blue);
+            createMessage(11);
             Move(targetMessyStudent.GetGameObject().transform.position + new Vector3(1.5f, 0.0f, 0.0f));
         }
     }
 
     protected void WaitForMessy()
     {
-        if (targetMessyStudent != null)  createMessage("WDYW " + targetMessyStudent.getName(), Color.blue);
+        //if (targetMessyStudent != null)  createMessage("WDYW " + targetMessyStudent.getName(), Color.blue);
     }
 
     public void SetMessyStudent(MessyStudent ms)

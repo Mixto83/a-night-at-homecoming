@@ -22,16 +22,18 @@ public class GameManager : MonoBehaviour
     private bool forceBarAttended = false;
     private bool barAttended = false;
     private volatile bool barBeingSabotaged = false;
-    public string soundingMusic;
+    [HideInInspector] public string soundingMusic;
     private SimpleTimer musicTimer;
     public SimpleTimer sabotageAvailable;
 
 
-    [SerializeField] List<GameObject> Agents;
+    List<GameObject> Agents;
     List<Character> People;
     [SerializeField] bool debugMode;
     [SerializeField] GameObject door;
     [SerializeField] GameObject bar;
+
+    public List<Sprite> bocadillos;
 
     string[] Names = new string[] { "Diego", "Mario", "Juan", "Cesar", "Daniel", "Pedro", "Manuel", "Maria", "Marta", "Carmen", "Raquel", "Lucia", "Ana", "Laura" };
     string[] Hobbies = new string[] { "Comic books", "Videogames", "Movies", "Books", "Cooking", "Board games", "Trading card games", "Sports", "School shooting", "Music", "Dancing", "Gym" };
@@ -237,6 +239,8 @@ public class GameManager : MonoBehaviour
                 }
 
                 gameStateDesc += character.Description();
+
+                character.animationUpdate();
             }
 
             if (forceDoorAttended)
@@ -270,7 +274,13 @@ public class GameManager : MonoBehaviour
 
             gameStateDesc += "MUSIC: " + soundingMusic;
 
-            createMessageOnGUI(gameStateDesc, Color.blue);
+            if (debugMode)
+            {
+                createMessageOnGUI(gameStateDesc, Color.blue);
+            } else
+            {
+                clearTexts();
+            }
         }
     }
 

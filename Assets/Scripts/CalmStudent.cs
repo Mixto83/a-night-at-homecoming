@@ -43,6 +43,9 @@ public class CalmStudent : Student
             () => watching.getTargetCharacter().beauty >= beautyThreshold, () => watching.getTargetCharacter().isInState("Enjoying", "Looking for couple", "Bench", "Outside"), () => !blackList.Contains(watching.getTargetCharacter()));
 
         CreateFlirtSubStateMachine();
+
+        animationController = this.gameObject.GetComponentInChildren<Animator>();
+        if (gender == Genders.Female) animationController.SetBool("isGirl", true);
     }
 
     private void CreateFlirtSubStateMachine()
@@ -228,10 +231,10 @@ public class CalmStudent : Student
 
         if (affinity > affinityThreshold)
         {
-            createMessage("This dude is a total chad!", Color.blue);
+            //createMessage("This dude is a total chad!", Color.blue);
         } else
         {
-            createMessage("What a virgin!", Color.blue);
+            //createMessage("What a virgin!", Color.blue);
         }
 
         return affinity;
@@ -250,7 +253,7 @@ public class CalmStudent : Student
     //Behaviours
     private void Start()
     {
-        clearTexts();
+        clearSprites();
         targetStudent = null;
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
@@ -262,7 +265,7 @@ public class CalmStudent : Student
 
     private void GettingCloser()
     {
-        clearTexts();
+        clearSprites();
         blackList.Add(targetStudent);
         if (targetStudent == null) targetStudent = (CalmStudent) watching.getTargetCharacter();
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
@@ -275,36 +278,36 @@ public class CalmStudent : Student
 
     private void Enjoying()
     {
-        createMessage("I'm having fun!", Color.blue);
+        createMessage(7);
     }
 
     protected void Dancing()
     {
-        createMessage("I'm the dancing queen!", Color.blue);
+        createMessage(4);
     }
 
     protected void Kissing()
     {
-        createMessage("Chuu", Color.blue);
+        createMessage(1);
     }
 
     private void CheckingAffinity()
     {
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
-        createMessage("So, how are you doing?", Color.blue);
+        createMessage(0);
         Move(gameObject.transform.position);
         LookAt(targetStudent.GetGameObject().transform);
     }
 
     protected void Outside()
     {
-        createMessage("I'm so tired...", Color.blue);
+        createMessage(5);
         Move(new Vector3(-24f, -10f, 0));
     }
 
     private void FightAsCalm()
     {
-        createMessage("Is " + name + " watching me?", Color.green);
+        createMessage(2);
     }
 
     public bool GetMessyFlag()

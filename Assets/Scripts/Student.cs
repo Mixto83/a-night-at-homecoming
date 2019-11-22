@@ -33,7 +33,7 @@ public class Student : Character
 
     protected void InBench()
     {
-        createMessage("Boring music...", Color.blue);
+        createMessage(9);
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
 
         var index = Random.Range(0, this.gameState.possiblePosBench.Count / 2 - 1) * 2;
@@ -45,7 +45,7 @@ public class Student : Character
 
     protected void Punished()
     {
-        createMessage("Waiting", Color.red);
+        createMessage(10);
         //Move to available seat
     }
 }

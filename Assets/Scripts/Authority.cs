@@ -60,20 +60,20 @@ public class Authority : Character
 
         this.LookAt(GameObject.FindGameObjectWithTag(tag).transform);
 
-        clearTexts();
+        clearSprites();
     }
 
     protected void Welcome()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Welcome to the party!");
-        createMessage("Welcome to the party!", Color.blue);
+        //createMessage("Welcome to the party!", Color.blue);
         watchingDoor.getTargetCharacter().setGreeted(true);
     }
 
     protected void Patrol()
     {
         Debug.Log("[" + name + ", " + getRole() + "] I'm watching you!");
-        createMessage("I'm watching you!", Color.blue);
+        //createMessage("I'm watching you!", Color.blue);
     }
 
     protected void ChaseStudent()
@@ -81,6 +81,6 @@ public class Authority : Character
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         targetStudent = watchingDoor.getTargetCharacter();
         Debug.Log("[" + name + ", " + getRole() + "] Come back here, you little...");
-        createMessage("Come back here, you little...", Color.blue);
+        //createMessage("Come back here, you little...", Color.blue);
     }
 }
