@@ -34,6 +34,7 @@ public class Student : Character
     protected void InBench()
     {
         createMessage(9);
+        if(fatigue > 0.0f) fatigue--;
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
 
         var index = Random.Range(0, this.gameState.possiblePosBench.Count / 2 - 1) * 2;

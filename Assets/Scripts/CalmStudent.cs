@@ -38,6 +38,7 @@ public class CalmStudent : Student
         this.role = Roles.CalmStudent;
         this.musicLikes = new List<string>();
         this.blackList = new List<Character>();
+        this.fatigue = 0.0f;
 
         this.watching = new WatchingPerception(this.gameObject, () => watching.getTargetCharacter().getGender() == sexuality, () => watching.getTargetCharacter().getRole() == Roles.CalmStudent,
             () => watching.getTargetCharacter().beauty >= beautyThreshold, () => watching.getTargetCharacter().isInState("Enjoying", "Looking for couple", "Bench", "Outside"), () => !blackList.Contains(watching.getTargetCharacter()));
@@ -82,6 +83,7 @@ public class CalmStudent : Student
         Perception pushThirsty = calmStudentFSM.CreatePerception<PushPerception>();
         Perception fatigueCheck = calmStudentFSM.CreatePerception<ValuePerception>(() => fatigue >= fatigueThreshold);
         Perception timer = calmStudentFSM.CreatePerception<TimerPerception>(5);
+        Perception timerTired = calmStudentFSM.CreatePerception<TimerPerception>(20);
         Perception timerFlirt = calmStudentFSM.CreatePerception<TimerPerception>(30);
         Perception timerForLooking = calmStudentFSM.CreatePerception<TimerPerception>(20);
         Perception lowAffinityCheck = calmStudentFSM.CreatePerception<ValuePerception>(() => CheckAffinity(targetStudent) < affinityThreshold);
@@ -138,7 +140,7 @@ public class CalmStudent : Student
 
         calmStudentFSM.CreateTransition("Finish punishment", punishedState, timer, startState);
 
-        calmStudentFSM.CreateTransition("Already taken enough fresh air", outsideState, timer, startState);
+        calmStudentFSM.CreateTransition("Already taken enough fresh air", outsideState, timerTired, startState);
 
         drinkSubFSM.CreateExitTransition("Not thirsty any more", drinkingState, isInStateDrink, startState);
 
@@ -257,6 +259,7 @@ public class CalmStudent : Student
         targetStudent = null;
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
+        if (currentOcuppiedOutside != null) this.gameState.possiblePosOutside.AddRange(currentOcuppiedOutside);
         Debug.Log("[" + name + ", " + getRole() + "] Start");
         Vector3 destination = group.getMyPos(this.friendNumber);
         Debug.Log(this.friendNumber + " -> " + destination);
@@ -266,10 +269,11 @@ public class CalmStudent : Student
     private void GettingCloser()
     {
         clearSprites();
-        blackList.Add(targetStudent);
         if (targetStudent == null) targetStudent = (CalmStudent) watching.getTargetCharacter();
+        blackList.Add(targetStudent);
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
+        if (currentOcuppiedOutside != null) this.gameState.possiblePosOutside.AddRange(currentOcuppiedOutside);
         Debug.Log("[" + name + ", " + getRole() + "] Heey " + targetStudent.getName());
         Vector3 offset = GetGameObject().transform.position - targetStudent.GetGameObject().transform.position;
         Move(targetStudent.GetGameObject().transform.position - offset.normalized);
@@ -279,11 +283,13 @@ public class CalmStudent : Student
     private void Enjoying()
     {
         createMessage(7);
+        fatigue++;
     }
 
     protected void Dancing()
     {
         createMessage(4);
+        fatigue++;
     }
 
     protected void Kissing()
@@ -302,12 +308,18 @@ public class CalmStudent : Student
     protected void Outside()
     {
         createMessage(5);
-        Move(new Vector3(-24f, -10f, 0));
+        fatigue = 0.0f;
+        var index = Random.Range(0, this.gameState.possiblePosOutside.Count / 2 - 1) * 2;
+        currentOcuppiedOutside = this.gameState.possiblePosOutside.GetRange(index, 2);
+        this.gameState.possiblePosOutside.RemoveRange(index, 2);
+
+        Move(new Vector3(currentOcuppiedOutside[0], currentOcuppiedOutside[1]));
     }
 
     private void FightAsCalm()
     {
         createMessage(2);
+        fatigue++;
     }
 
     public bool GetMessyFlag()
