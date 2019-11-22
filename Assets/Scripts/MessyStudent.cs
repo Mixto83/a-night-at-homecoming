@@ -49,7 +49,8 @@ public class MessyStudent : Student
 
         this.watchingCalmStudent = new WatchingPerception(this.gameObject, () => watchingCalmStudent.getTargetCharacter().getRole() == Roles.CalmStudent, () => !whiteFlagStudents.Contains((CalmStudent)watchingCalmStudent.getTargetCharacter()),
             () => ((CalmStudent)watchingCalmStudent.getTargetCharacter()).GetMessyFlag(), () => watchingCalmStudent.getTargetCharacter().isInState("Enjoying"));
-        this.watchingTeacher = new WatchingPerception(this.gameObject, () => watchingTeacher.getTargetCharacter().getRole() == Roles.Teacher, () => watchingTeacher.getTargetCharacter().isInState("SubState"));//Cambiar estado
+        this.watchingTeacher = new WatchingPerception(this.gameObject, () => watchingTeacher.getTargetCharacter().getRole() == Roles.Teacher, () => watchingTeacher.getTargetCharacter().isInState("Patrol"),
+            () => ((Teacher)watchingTeacher.getTargetCharacter()).isInSubState(((Teacher)watchingTeacher.getTargetCharacter()).patrolSubFSM, "Patroling"));//Cambiar estado
         this.watchingOrganizerStudent = new WatchingPerception(this.gameObject, () => watchingOrganizerStudent.getTargetCharacter().getRole() == Roles.OrganizerStudent);
         
         this.whiteFlagStudents = new List<CalmStudent>();
@@ -103,6 +104,7 @@ public class MessyStudent : Student
         Perception escapedFromTeacher = troubleSubFSM.CreatePerception<ValuePerception>(() => distanceToSafePos < 0.5);
         Perception caughtByTeacher = troubleSubFSM.CreatePerception<PushPerception>();
         Perception escapeTimer = troubleSubFSM.CreatePerception<TimerPerception>(2);
+        Perception arguingTimer = troubleSubFSM.CreatePerception<TimerPerception>(4);
 
         // States
         State lookingForTroubleState = troubleSubFSM.CreateEntryState("Looking for trouble", LookForTrouble);
@@ -118,6 +120,7 @@ public class MessyStudent : Student
         State movingToBarState = troubleSubFSM.CreateState("MovingToBar", MoveToBar);
         State startingNegotiationState = troubleSubFSM.CreateState("Starting negotiation", StartNegotation);
         State escapedFromTeacherState = troubleSubFSM.CreateState("Escaped From teacher", TriggerTeacher);
+        State readyToPunishmentState = troubleSubFSM.CreateState("Ready to punishment");
 
         // Transitions
         troubleSubFSM.CreateTransition("Nothing found", lookingForTroubleState, searchTimer, lookingForTroubleState);
@@ -144,10 +147,12 @@ public class MessyStudent : Student
 
         troubleSubFSM.CreateTransition("Fight ends", fightState, fightEnded, lookingForTroubleState);
         troubleSubFSM.CreateTransition("Busted by teacher (fight)", fightState, fightInterrupted, arguingState);
+        troubleSubFSM.CreateTransition("Starting punishment", arguingState, arguingTimer, readyToPunishmentState);
 
         troubleSubFSM.CreateTransition("Student Reached", movingToStudentState, studentReached, checkAffinityState);
         troubleSubFSM.CreateTransition("Bar Reached", movingToBarState, barReached, sabotageDrinkState);
         troubleSubFSM.CreateTransition("Teacher Reached", movingToTeacherState, teacherReached, botherTeacherState);
+
     }
 
     private void CreatePunishmentSubStateMachine()
@@ -198,6 +203,7 @@ public class MessyStudent : Student
         Perception enterParty = messyStudentFSM.CreatePerception<ValuePerception>(() => distanceToStartingPos < 0.5);
         Perception inBench = messyStudentFSM.CreatePerception<ValuePerception>(() => distanceToBench < 0.5);
         Perception isInStateTrouble = messyStudentFSM.CreatePerception<IsInStatePerception>(troubleSubFSM, "Looking for trouble");
+        Perception isInStateReadyToPunish = messyStudentFSM.CreatePerception<IsInStatePerception>(troubleSubFSM, "Ready to punishment");
 
         //Sale de beber: cansado o sin cansarse
         Perception exitDrinkTired = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateDrink, tired);
@@ -212,7 +218,7 @@ public class MessyStudent : Student
         //Sale de trouble: sediendo, cansado (o una mas que la otra) o castigado
         Perception exitTroubleThirsty = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateTrouble, thirsty);
         Perception exitTroubleTired = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateTrouble, tired);
-        Perception exitTroublePunished = messyStudentFSM.CreatePerception<PushPerception>();//WIP
+        Perception exitTroublePunished = messyStudentFSM.CreatePerception<PushPerception>();//Eliminar
 
         //Salida del castigo
         Perception exitPunishment = messyStudentFSM.CreatePerception<PushPerception>();//WIP
@@ -237,7 +243,7 @@ public class MessyStudent : Student
         messyStudentFSM.CreateTransition("Out of bench thirsty", benchState, thirsty, drinkingState);
         messyStudentFSM.CreateTransition("Out of bench troubling", benchState, notThirsty, troubleState);
 
-        troubleSubFSM.CreateExitTransition("Finished arguing", troubleState, exitTroublePunished, punishmentState);
+        troubleSubFSM.CreateExitTransition("Finished arguing", troubleState, isInStateReadyToPunish, punishmentState);
         punishmentSubFSM.CreateExitTransition("End of punishment", punishmentState, exitPunishment, troubleState);
     }
     #endregion
@@ -290,6 +296,7 @@ public class MessyStudent : Student
     {
         //fire persecucion al teacher, probablemente haga falta un estado intermedio
         //if (targetTeacher != null) targetTeacher.teacherSubFSM
+        targetTeacher.patrolSubFSM.Fire("Pushed by messy");
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         createMessage("Bothering teacher", Color.red);
     }
@@ -443,7 +450,6 @@ public class MessyStudent : Student
         createMessage("Hey oh teach'!", Color.red);
         targetTeacher = (Teacher)watchingTeacher.getTargetCharacter();
         targetTeacher.SetMessyStudent(this);
-        targetTeacher.patrolSubFSM.Fire("Pushed by messy");
         targetTeacherPosition = targetTeacher.GetGameObject().transform.position + new Vector3(1.5f, 0, 0);
 
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
