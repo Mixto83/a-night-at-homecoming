@@ -98,7 +98,7 @@ public class Teacher : Authority
         punishmentRoomSubFSM = new StateMachineEngine(true);
 
         // Perceptions
-        Perception atTable = punishmentRoomSubFSM.CreatePerception<ValuePerception>(() => distanceToPunishTable <= 0.5f);
+        Perception atTable = punishmentRoomSubFSM.CreatePerception<ValuePerception>(() => distanceToPunishTable <= 1.0f);
         Perception randomTimer = punishmentRoomSubFSM.CreatePerception<TimerPerception>(distractionRandom); //temporal
         Perception randomTimer2 = punishmentRoomSubFSM.CreatePerception<TimerPerception>(distractionRandom);
 
@@ -108,11 +108,10 @@ public class Teacher : Authority
         State distractedState = punishmentRoomSubFSM.CreateState("Reading newspaper", ReadingNewspaper);
 
         // Transitions
-        punishmentRoomSubFSM.CreateTransition("Start watching", walkToTableState, randomTimer, watchingState);
+        punishmentRoomSubFSM.CreateTransition("Start watching", walkToTableState, atTable, watchingState);
         punishmentRoomSubFSM.CreateTransition("TimerRandom1", watchingState, randomTimer, distractedState);
         punishmentRoomSubFSM.CreateTransition("TimerRandom2", distractedState, randomTimer2, watchingState);
     }
-    //TODO: Move to gym
 
     public override void CreateStateMachine()
     {
@@ -137,6 +136,7 @@ public class Teacher : Authority
         Perception stayAtPR = teacherFSM.CreateAndPerception<AndPerception>(PRReady, noTeacherAtPR);
 
         Perception noStudentsAtPR = teacherFSM.CreatePerception<ValuePerception>();//rellenar
+        Perception exitTimer = teacherFSM.CreatePerception<TimerPerception>(1);
 
         Perception isInPatrol = teacherFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Patroling");
         Perception doorUnattended = teacherFSM.CreatePerception<ValuePerception>(() => !this.gameState.getDoorAttended());
@@ -156,6 +156,7 @@ public class Teacher : Authority
         State patrolState = teacherFSM.CreateSubStateMachine("Patrol", patrolSubFSM);
         State doorState = teacherFSM.CreateSubStateMachine("Door", doorSubFSM);
         State drinkState = teacherFSM.CreateSubStateMachine("Drink", drinkSubFSM);
+        State leavePRState = teacherFSM.CreateState("Leave PR", LeavePR);
         State returnToGym = teacherFSM.CreateState("Return To Gym", ToGym);
 
         //Transitions
@@ -165,7 +166,8 @@ public class Teacher : Authority
         chaseSubFSM.CreateExitTransition("Student escaped", chaseState, loseStudentPush, patrolState);
         chaseSubFSM.CreateExitTransition("Teacher at PR, returns to gym", chaseState, notStayAtPR, returnToGym);
         chaseSubFSM.CreateExitTransition("No other teacher at PR, stays", chaseState, stayAtPR, punishmentRoomState);
-        punishmentRoomSubFSM.CreateExitTransition("No students left, returns to gym", punishmentRoomState, noStudentsAtPR, returnToGym);
+        punishmentRoomSubFSM.CreateExitTransition("No students left, returns to gym", punishmentRoomState, noStudentsAtPR, leavePRState);
+        teacherFSM.CreateTransition("Table left, go back to gym", leavePRState,exitTimer, returnToGym);
 
         //patrolSubFSM.CreateExitTransition("Door unattended", patrolState, goToDoor, doorState);
         doorSubFSM.CreateExitTransition("Back from door", doorState, outOfDoor, patrolState);
@@ -186,6 +188,7 @@ public class Teacher : Authority
         patrolSubFSM.Update();
         chaseSubFSM.Update();
         teacherFSM.Update();
+        punishmentRoomSubFSM.Update();
         DebugInputs();
     }
 
@@ -301,6 +304,7 @@ public class Teacher : Authority
     protected void Watching()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Don't think you're gonna escape...");
+        gameState.setPunishRoomAttended(true);
     }
 
     protected void ReadingNewspaper()
@@ -308,6 +312,11 @@ public class Teacher : Authority
         Debug.Log("[" + name + ", " + getRole() + "] President Tremp did what again?");
         distractionRandom = Random.Range(2, 5);
         //boolean isdistracted
+    }
+
+    protected void LeavePR()
+    {
+        gameState.setPunishRoomAttended(false);
     }
 
     public override string Description()
