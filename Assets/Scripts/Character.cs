@@ -17,7 +17,7 @@ public class Character
     protected string name;
     protected Roles role;
     protected Genders gender;
-    protected Vector3 position;
+    protected Vector3 destination;
     protected GameObject gameObject;
     protected Vector3 initPos;
     protected NavMeshAgent agent;
@@ -25,6 +25,7 @@ public class Character
     protected List<float> currentOcuppiedPos;
     protected List<float> currentOcuppiedBench;
     protected List<float> currentOcuppiedOutside;
+    protected List<float> currentOcuppiedBathroom;
     public int beauty;
 
     protected const int thirstThreshold = 5;
@@ -52,7 +53,7 @@ public class Character
 
         this.name = name;
         this.gender = gender;
-        this.position = obj.position;
+        this.destination = obj.position;
         this.gameObject = obj.gameObject;
         this.agent = this.gameObject.GetComponent<NavMeshAgent>();
         this.agent.updateRotation = false;
@@ -83,9 +84,9 @@ public class Character
         return this.name;
     }
 
-    public Vector3 getPos()
+    public Vector3 getDestination()
     {
-        return this.position;
+        return this.destination;
     }
 
     public Roles getRole()
@@ -126,6 +127,7 @@ public class Character
 
     public void Move(Vector3 to)
     {
+        destination = to;
         agent.SetDestination(to);
     }
 

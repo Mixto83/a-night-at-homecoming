@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public List<float> possiblePosGym;
     [HideInInspector] public List<float> possiblePosBench;
     [HideInInspector] public List<float> possiblePosOutside;
+    [HideInInspector] public List<float> possiblePosBathroom;
+    [HideInInspector] public List<float> possiblePosPunishment;
 
     private int queueNum;
 
@@ -123,6 +125,16 @@ public class GameManager : MonoBehaviour
                                               -30f,-17f, -29f,-17f, -28f,-17f, -27f,-17f, -26f,-17f, -25f,-17f, -24f,-17f, -23f,-17f, -22f,-17f, -21f,-17f, -20f,-17f, -19f,-17f, -18f,-17f, -17f,-17f, -16f,-17f, -15f,-17f, -14f,-17f, -13f,-17f, -12f,-17f, -11f,-17f, -10f,-17f, -9f,-17f, -8f,-17f, -7f,-17f, -6f,-17f, -5f,-17f, -4f,-17f, -3f,-17f, -2f,-17f, -1f,-17f, 0f,-17f, 1f,-17f, 2f,-17f, 3f,-17f, 4f,-17f, 5f,-17f, 6f,-17f, 7f,-17f, 8f,-17f, 9f,-17f, 10f,-17f, 11f,-17f, 12f,-17f, 13f,-17f, 14f,-17f, 15f,-17f, 16f,-17f, 17f,-17f, 18f,-17f,
                                               -30f,-18f, -29f,-18f, -28f,-18f, -27f,-18f, -26f,-18f, -25f,-18f, -24f,-18f, -23f,-18f, -22f,-18f, -21f,-18f, -20f,-18f, -19f,-18f, -18f,-18f, -17f,-18f, -16f,-18f, -15f,-18f, -14f,-18f, -13f,-18f, -12f,-18f, -11f,-18f, -10f,-18f, -9f,-18f, -8f,-18f, -7f,-18f, -6f,-18f, -5f,-18f, -4f,-18f, -3f,-18f, -2f,-18f, -1f,-18f, 0f,-18f, 1f,-18f, 2f,-18f, 3f,-18f, 4f,-18f, 5f,-18f, 6f,-18f, 7f,-18f, 8f,-18f, 9f,-18f, 10f,-18f, 11f,-18f, 12f,-18f, 13f,-18f, 14f,-18f, 15f,-18f, 16f,-18f, 17f,-18f, 18f,-18f,
                                               -30f,-19f, -29f,-19f, -28f,-19f, -27f,-19f, -26f,-19f, -25f,-19f, -24f,-19f, -23f,-19f, -22f,-19f, -21f,-19f, -20f,-19f, -19f,-19f, -18f,-19f, -17f,-19f, -16f,-19f, -15f,-19f, -14f,-19f, -13f,-19f, -12f,-19f, -11f,-19f, -10f,-19f, -9f,-19f, -8f,-19f, -7f,-19f, -6f,-19f, -5f,-19f, -4f,-19f, -3f,-19f, -2f,-19f, -1f,-19f, 0f,-19f, 1f,-19f, 2f,-19f, 3f,-19f, 4f,-19f, 5f,-19f, 6f,-19f, 7f,-19f, 8f,-19f, 9f,-19f, 10f,-19f, 11f,-19f, 12f,-19f, 13f,-19f, 14f,-19f, 15f,-19f, 16f,-19f, 17f,-19f, 18f,-19f,
+        };
+
+        possiblePosBathroom = new List<float> {41f,27f, 46f,27f,
+                                               41f,23f, 46f,23f,
+                                               41f,18f, 46f,18f,
+                                               41f,14f, 46f,14f,
+        };
+
+        possiblePosPunishment = new List<float> {4f,35f, 7f,35f, 10f,35f, 13f,35f,
+                                                 4f,38f, 7f,38f, 10f,38f, 13f,38f,
         };
 
         foreach (int i in friendsGroups)

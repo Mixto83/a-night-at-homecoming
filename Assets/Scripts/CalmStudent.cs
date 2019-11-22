@@ -13,6 +13,8 @@ public class CalmStudent : Student
     public Perception pushFight;
     private Perception timerPatrol;
 
+    public List<float> reservedKissPos;
+
     #region Stats
 
     protected Group group;
@@ -84,13 +86,12 @@ public class CalmStudent : Student
         Perception fatigueCheck = calmStudentFSM.CreatePerception<ValuePerception>(() => fatigue >= fatigueThreshold);
         Perception timer = calmStudentFSM.CreatePerception<TimerPerception>(5);
         Perception timerTired = calmStudentFSM.CreatePerception<TimerPerception>(20);
-        Perception timerFlirt = calmStudentFSM.CreatePerception<TimerPerception>(30);
+        Perception timerFlirt = calmStudentFSM.CreatePerception<TimerPerception>(60);
         Perception timerForLooking = calmStudentFSM.CreatePerception<TimerPerception>(20);
         Perception lowAffinityCheck = calmStudentFSM.CreatePerception<ValuePerception>(() => CheckAffinity(targetStudent) < affinityThreshold);
         Perception lowDanceAffinityCheck = calmStudentFSM.CreatePerception<ValuePerception>(() => CheckAffinity(targetStudent) < DanceAffinityThreshold);
         Perception isInStateCheck = calmStudentFSM.CreatePerception<IsInStatePerception>(flirtSubFSM, "CheckingAffinity");
         Perception isInStateDance = calmStudentFSM.CreatePerception<IsInStatePerception>(flirtSubFSM, "Dancing");
-        Perception isInStateBathroom = calmStudentFSM.CreatePerception<IsInStatePerception>(flirtSubFSM, "Bathroom");
         Perception lowAffinity = calmStudentFSM.CreateAndPerception<AndPerception>(lowAffinityCheck, isInStateCheck);
         Perception lowDanceAffinity = calmStudentFSM.CreateAndPerception<AndPerception>(lowDanceAffinityCheck, isInStateDance);
         Perception affinities = calmStudentFSM.CreateOrPerception<OrPerception>(lowAffinity, lowDanceAffinity);
@@ -152,12 +153,12 @@ public class CalmStudent : Student
         distanceToMeetPos = Vector3.Distance(this.gameObject.transform.position, group.getMyPos(this.friendNumber));
         distanceToBar = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(-0.75f, 0, 0));
 
-        if(Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             calmStudentFSM.Fire("Thirsty");
         }
 
-        if(!isInStateDrink.Check())
+        if (!isInStateDrink.Check())
         {
             timeOut.Reset();
         }
@@ -181,6 +182,13 @@ public class CalmStudent : Student
                 Move(new Vector3(currentOcuppiedPos[0], currentOcuppiedPos[1]));
             }
         }
+
+        if (isInState("Flirting"))
+        {
+            Perception isInStateBathroom = calmStudentFSM.CreatePerception<IsInStatePerception>(flirtSubFSM, "Bathroom");
+            if (isInStateBathroom.Check())
+                LookAt(targetStudent.GetGameObject().transform);
+        }
     }
 
     public override bool isInState(params string[] states)
@@ -203,7 +211,15 @@ public class CalmStudent : Student
 
     protected int CheckAffinity(Student targetStudent)
     {
-        int affinity = 0;
+        var affinity = 0;
+
+        if (sexuality == targetStudent.getGender())
+        {
+            affinity += 6; //affinity base
+        } else
+        {
+            return 0;
+        }
 
         if (Hobbies[0] == targetStudent.Hobbies[0] || Hobbies[0] == targetStudent.Hobbies[1] || Hobbies[0] == targetStudent.Hobbies[2])
             affinity++;
@@ -226,18 +242,15 @@ public class CalmStudent : Student
         if (FavFoods[2] == targetStudent.FavFoods[0] || FavFoods[2] == targetStudent.FavFoods[1] || FavFoods[2] == targetStudent.FavFoods[2])
             affinity++;
 
-        if(sexuality != targetStudent.getGender())
+        /*if (affinity > affinityThreshold)
         {
-            affinity = 0;
-        }
-
-        if (affinity > affinityThreshold)
-        {
-            //createMessage("This dude is a total chad!", Color.blue);
+            createMessage("This dude is a total chad!", Color.blue);
         } else
         {
-            //createMessage("What a virgin!", Color.blue);
-        }
+            createMessage("What a virgin!", Color.blue);
+        }*/
+
+        Debug.Log("Aff: " + affinity + ". Thres: " + affinityThreshold);
 
         return affinity;
     }
@@ -260,6 +273,7 @@ public class CalmStudent : Student
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
         if (currentOcuppiedOutside != null) this.gameState.possiblePosOutside.AddRange(currentOcuppiedOutside);
+        if (currentOcuppiedBathroom != null) this.gameState.possiblePosBathroom.AddRange(currentOcuppiedBathroom);
         Debug.Log("[" + name + ", " + getRole() + "] Start");
         Vector3 destination = group.getMyPos(this.friendNumber);
         Debug.Log(this.friendNumber + " -> " + destination);
@@ -295,6 +309,21 @@ public class CalmStudent : Student
     protected void Kissing()
     {
         createMessage(1);
+        if (((CalmStudent) targetStudent).reservedKissPos == null) {
+            var index = Random.Range(0, this.gameState.possiblePosBathroom.Count / 2 - 1) * 2;
+            currentOcuppiedBathroom = this.gameState.possiblePosBathroom.GetRange(index, 2);
+            this.gameState.possiblePosBathroom.RemoveRange(index, 2);
+
+            this.reservedKissPos = currentOcuppiedBathroom;
+        } else
+        {
+            currentOcuppiedBathroom = ((CalmStudent)targetStudent).reservedKissPos;
+        }
+
+        Vector3 kissingPos = new Vector3(currentOcuppiedBathroom[0], currentOcuppiedBathroom[1]);
+
+        if (targetStudent.getDestination() == kissingPos) kissingPos.x = kissingPos.x + 1;
+        Move(kissingPos);
     }
 
     private void CheckingAffinity()
