@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     private bool doorAttended = false;
     private bool forceBarAttended = false;
     private bool barAttended = false;
+    private bool punishRoomAttended = false;
     private volatile bool barBeingSabotaged = false;
     [HideInInspector] public string soundingMusic;
     private SimpleTimer musicTimer;
@@ -297,6 +298,16 @@ public class GameManager : MonoBehaviour
     public bool getBarSabotaged()
     {
         return barBeingSabotaged;
+    }
+
+    public bool getPunishRoomAttended()
+    {
+        return punishRoomAttended;
+    }
+
+    public void setPunishRoomAttended(bool PRAttend)
+    {
+        punishRoomAttended = PRAttend;
     }
 
     public void setBarSabotaged(bool bar)

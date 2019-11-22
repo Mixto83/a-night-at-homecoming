@@ -14,7 +14,16 @@ public class Teacher : Authority
     private WatchingPerception watchingTrouble;
 
     float distractionRandom;
-    float distanceToMessy = 3.0f;
+
+    float distanceToMessy = 4.0f;
+    float distanceToPunish = 4.0f;
+    float distanceToGym = 4.0f;
+    float distanceToPunishTable = 4.0f;
+
+    private Vector3 punishPosition = new Vector3(17.5f, 31.0f, 0.0f);
+    private Vector3 gymPosition = new Vector3(18.0f, 7.0f, 0.0f);
+    private Vector3 punishTablePosition = new Vector3(17.5f, 36.0f, 0.0f);
+
     MessyStudent targetMessyStudent;
 
     //methods
@@ -71,7 +80,7 @@ public class Teacher : Authority
 
         // Perceptions
         
-        Perception reachedMessy = chaseSubFSM.CreatePerception<ValuePerception>(() => distanceToMessy <= 1.5f);
+        Perception reachedMessy = chaseSubFSM.CreatePerception<ValuePerception>(() => distanceToMessy <= 2.0f);
         Perception timerArgue = chaseSubFSM.CreatePerception<TimerPerception>(2);
         Perception stillChasing = chaseSubFSM.CreatePerception<TimerPerception>(2);
         // States
@@ -89,18 +98,21 @@ public class Teacher : Authority
         punishmentRoomSubFSM = new StateMachineEngine(true);
 
         // Perceptions
+        Perception atTable = punishmentRoomSubFSM.CreatePerception<ValuePerception>(() => distanceToPunishTable <= 0.5f);
         Perception randomTimer = punishmentRoomSubFSM.CreatePerception<TimerPerception>(distractionRandom); //temporal
         Perception randomTimer2 = punishmentRoomSubFSM.CreatePerception<TimerPerception>(distractionRandom);
 
         // States
-        State watchingState = punishmentRoomSubFSM.CreateEntryState("Watching", Watching);
+        State walkToTableState = punishmentRoomSubFSM.CreateEntryState("Walking to table", MoveToPRTable);
+        State watchingState = punishmentRoomSubFSM.CreateState("Watching", Watching);
         State distractedState = punishmentRoomSubFSM.CreateState("Reading newspaper", ReadingNewspaper);
 
         // Transitions
+        punishmentRoomSubFSM.CreateTransition("Start watching", walkToTableState, randomTimer, watchingState);
         punishmentRoomSubFSM.CreateTransition("TimerRandom1", watchingState, randomTimer, distractedState);
         punishmentRoomSubFSM.CreateTransition("TimerRandom2", distractedState, randomTimer2, watchingState);
     }
-
+    //TODO: Move to gym
 
     public override void CreateStateMachine()
     {
@@ -111,18 +123,18 @@ public class Teacher : Authority
 
         Perception readyToChase = teacherFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Ready to Chase");
 
-        Perception atGym = teacherFSM.CreatePerception<ValuePerception>();//rellenar
+        Perception atGym = teacherFSM.CreatePerception<ValuePerception>(() => distanceToGym <= 0.5f);
 
         Perception loseStudentPush = teacherFSM.CreatePerception<PushPerception>();
 
         Perception isGoingToPR = teacherFSM.CreatePerception<IsInStatePerception>(chaseSubFSM, "Taking student to punishment room");
-        Perception atPR = teacherFSM.CreatePerception<ValuePerception>();//rellenar
-        Perception teacherAtPR = teacherFSM.CreatePerception<ValuePerception>();//rellenar
+        Perception atPR = teacherFSM.CreatePerception<ValuePerception>(() => distanceToPunish <= 1.5f);
+        Perception teacherAtPR = teacherFSM.CreatePerception<ValuePerception>(() => gameState.getPunishRoomAttended());
         Perception PRReady = teacherFSM.CreateAndPerception<AndPerception>(isGoingToPR, atPR);
         Perception notStayAtPR = teacherFSM.CreateAndPerception<AndPerception>(PRReady, teacherAtPR);
 
-        Perception teacherNotAtPR = teacherFSM.CreatePerception<ValuePerception>();//rellenar
-        Perception stayAtPR = teacherFSM.CreateAndPerception<AndPerception>(PRReady, teacherNotAtPR);
+        Perception noTeacherAtPR = teacherFSM.CreatePerception<ValuePerception>(() => !gameState.getPunishRoomAttended());
+        Perception stayAtPR = teacherFSM.CreateAndPerception<AndPerception>(PRReady, noTeacherAtPR);
 
         Perception noStudentsAtPR = teacherFSM.CreatePerception<ValuePerception>();//rellenar
 
@@ -166,13 +178,15 @@ public class Teacher : Authority
     public override void Update()
     {
         if (targetMessyStudent != null) distanceToMessy = Vector3.Distance(this.GetGameObject().transform.position, targetMessyStudent.GetGameObject().transform.position);
+        distanceToPunish = Vector3.Distance(this.GetGameObject().transform.position, punishPosition);
+        distanceToGym = Vector3.Distance(this.GetGameObject().transform.position, gymPosition);
+        distanceToPunishTable = Vector3.Distance(this.GetGameObject().transform.position, punishTablePosition);
         doorSubFSM.Update();
         drinkSubFSM.Update();
         patrolSubFSM.Update();
         chaseSubFSM.Update();
         teacherFSM.Update();
         DebugInputs();
-
     }
 
     public override bool isInState(params string[] states)
@@ -220,17 +234,23 @@ public class Teacher : Authority
     protected void Arguing()
     {
         if (targetMessyStudent != null) { targetMessyStudent.troubleSubFSM.Fire("Busted by teacher"); }
-        //createMessage("You're going to be punished for this!!", Color.blue);
+        createMessage(11);
     }
 
     protected void ToPunishmentRoom()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] Taking student to punishment room");
+        Move(punishPosition);
     }
 
     protected void ToGym()
     {
+        clearSprites();
+        Move(gymPosition);
+    }
 
+    protected void MoveToPRTable()
+    {
+        Move(punishTablePosition);
     }
 
     protected void TeacherPatrol()
@@ -303,6 +323,9 @@ public class Teacher : Authority
         {
             chaseSubFSM.Fire("Caught");
         }
-        
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            teacherFSM.Fire("No students left, returns to gym");
+        }
     }
 }
