@@ -292,7 +292,7 @@ public class Teacher : Authority
 
     public override string Description()
     {
-        var desc = "NAME: " + getName() + "ROLE: " + getRole() + ", STATE: " + teacherFSM.GetCurrentState().Name;
+        var desc = "NAME: " + getName() + ", ROLE: " + getRole() + ", STATE: " + teacherFSM.GetCurrentState().Name;
 
         return desc + "\n";
     }

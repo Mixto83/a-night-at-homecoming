@@ -301,13 +301,13 @@ public class MessyStudent : Student
         //if (targetTeacher != null) targetTeacher.teacherSubFSM
         targetTeacher.patrolSubFSM.Fire("Pushed by messy");
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
-        //createMessage("Bothering teacher", Color.red);
+        createMessage(3);
     }
 
     private void CheckingAffinity()
     {
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
-        //createMessage("So, how are you doing?", Color.blue);
+        createMessage(3);
         Move(gameObject.transform.position);
         LookAt(targetStudent.GetGameObject().transform);
     }
@@ -529,7 +529,7 @@ public bool isCausingTrouble()
 
     public override string Description()
     {
-        var desc = "NAME: " + getName() + "ROLE: " + getRole() + ", STATE: " + messyStudentFSM.GetCurrentState().Name;
+        var desc = "NAME: " + getName() + ", ROLE: " + getRole() + ", STATE: " + messyStudentFSM.GetCurrentState().Name;
 
         return desc + "\n";
     }

@@ -249,7 +249,7 @@ public class OrganizerStudent : Authority
 
     public override string Description()
     {
-        var desc = "NAME: " + getName() + "ROLE: " + getRole() + ", STATE: " + organizerStudentFSM.GetCurrentState().Name;
+        var desc = "NAME: " + getName() + ", ROLE: " + getRole() + ", STATE: " + organizerStudentFSM.GetCurrentState().Name;
 
         return desc + "\n";
     }
