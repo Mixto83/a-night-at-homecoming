@@ -88,11 +88,13 @@ public class MessyStudent : Student
         //Ve la barra y decide sabotearla con o sin exito
         Perception barAttended = troubleSubFSM.CreatePerception<ValuePerception>(() => this.gameState.getBarAttended());//Necesario?
         Perception barUnattended = troubleSubFSM.CreatePerception<ValuePerception>(() => !this.gameState.getBarAttended());
-        Perception barNear = troubleSubFSM.CreatePerception<ValuePerception>(() => distanceToBar < 3);
+        Perception barNear = troubleSubFSM.CreatePerception<ValuePerception>(() => distanceToBar < 5);
         Perception barNoticed = troubleSubFSM.CreateAndPerception<AndPerception>(barUnattended, barNear);
+        Perception barSabotaged = troubleSubFSM.CreatePerception<ValuePerception>(() => this.gameState.getBarSabotaged());
         Perception barNotSabotaged = troubleSubFSM.CreatePerception<ValuePerception>(() => !this.gameState.getBarSabotaged());
         Perception barAvailable = troubleSubFSM.CreateAndPerception<AndPerception>(barNoticed, barNotSabotaged);
-        Perception barReached = troubleSubFSM.CreatePerception<ValuePerception>(()=> distanceToBar < 1.5f);
+        Perception barReached = troubleSubFSM.CreatePerception<ValuePerception>(()=> distanceToBar < 0.8f);
+
         Perception bustedAtBar = troubleSubFSM.CreatePerception<PushPerception>();//Push desde organizer
         Perception bustedAtBarByTeacher = troubleSubFSM.CreatePerception<PushPerception>();//Push desde teacher
         Perception drinkSabotaged = troubleSubFSM.CreatePerception<TimerPerception>(3);//Exitoso
@@ -169,7 +171,7 @@ public class MessyStudent : Student
         Perception teacherDistracted = punishmentSubFSM.CreatePerception<ValuePerception>();
         Perception bustedByTeacher = punishmentSubFSM.CreatePerception<PushPerception>();
         Perception reachedEscape = punishmentSubFSM.CreatePerception<ValuePerception>(() => distanceToEscapePos < 0.5);
-        Perception punishTimer = punishmentSubFSM.CreatePerception<TimerPerception>(20);//Cambiar a algo mucho mas grande
+        Perception punishTimer = punishmentSubFSM.CreatePerception<TimerPerception>(35);//Cambiar a algo mucho mas grande
 
         // States
         State toPunishmentRoomState = punishmentSubFSM.CreateEntryState("Being taken to punishment room", MoveToPunishment);
@@ -178,7 +180,6 @@ public class MessyStudent : Student
         State escapeState = punishmentSubFSM.CreateState("Escape", Escape);
         State exitState = punishmentSubFSM.CreateState("Exit Punishment", ExitPunishment);
 
-        
 
         // Transitions
         punishmentSubFSM.CreateTransition("Reached punishment room", toPunishmentRoomState, roomReached, chosingSeatState);
@@ -298,7 +299,6 @@ public class MessyStudent : Student
     {
         causingTrouble = true;
         thirst += 2;
-        //createMessage("Drinking should be fun! Thirst: " + thirst, Color.red);
         gameState.sabotageAvailable.reset();
         gameState.sabotageAvailable.start();
     }
@@ -477,7 +477,7 @@ public class MessyStudent : Student
         //createMessage("Bar is free!", Color.red);
         this.gameState.setBarSabotaged(true);
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
-        this.Move(GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0, -0.75f, 0));
+        this.Move(GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0, -1.5f, 0));
     }
 
     

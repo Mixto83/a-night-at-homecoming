@@ -51,6 +51,7 @@ public class Student : Character
     {
         LookAt(GameObject.FindGameObjectWithTag("Desk").transform);
     }
+    
 
     //Se mueve a un asiento disponible del aula de castigo
     protected void MoveToRandomPunishmentRoomPos()

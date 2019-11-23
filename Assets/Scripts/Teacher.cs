@@ -57,8 +57,8 @@ public class Teacher : Authority
         Perception talkTimer = patrolSubFSM.CreatePerception<TimerPerception>(2);
         Perception findTrouble = patrolSubFSM.CreatePerception<WatchingPerception>(watchingTrouble);
         Perception patrolTimer = patrolSubFSM.CreatePerception<TimerPerception>(2);
-        Perception messyTimer = patrolSubFSM.CreatePerception<TimerPerception>(1);
-        Perception messyTimer2 = patrolSubFSM.CreatePerception<TimerPerception>(1);
+        Perception warningPush = patrolSubFSM.CreatePerception<PushPerception>();
+        Perception pursuitPush = patrolSubFSM.CreatePerception<PushPerception>();
         // States
         State patrolingState = patrolSubFSM.CreateEntryState("Patroling", TeacherPatrol);
         State waitingForMessyState = patrolSubFSM.CreateState("Waiting For Messy", WaitForMessy);
@@ -73,8 +73,8 @@ public class Teacher : Authority
         patrolSubFSM.CreateTransition("Stops talking to organizer", talkingState, talkTimer, readyToChaseState);
         patrolSubFSM.CreateTransition("Sees trouble", patrolingState, findTrouble, readyToChaseState);
         patrolSubFSM.CreateTransition("Pushed by messy", patrolingState, messyPush, waitingForMessyState);
-        patrolSubFSM.CreateTransition("Warn messy", waitingForMessyState, messyTimer, warningMessyState);
-        patrolSubFSM.CreateTransition("Pursuit messy", warningMessyState, messyTimer2, readyToChaseState);
+        patrolSubFSM.CreateTransition("Warn messy", waitingForMessyState, warningPush, warningMessyState);
+        patrolSubFSM.CreateTransition("Pursuit messy", warningMessyState, pursuitPush, readyToChaseState);
     }
 
     private void CreateChaseSubStateMachine()
@@ -83,7 +83,7 @@ public class Teacher : Authority
 
         // Perceptions
         
-        Perception reachedMessy = chaseSubFSM.CreatePerception<ValuePerception>(() => distanceToMessy <= 2.0f);
+        Perception reachedMessy = chaseSubFSM.CreatePerception<ValuePerception>(() => distanceToMessy <= 1.8f);
         Perception arguingTimer = chaseSubFSM.CreatePerception<TimerPerception>(4);
         Perception stillChasing = chaseSubFSM.CreatePerception<TimerPerception>(2);
         // States
@@ -287,7 +287,8 @@ public class Teacher : Authority
 
     protected void WaitForMessy()
     {
-        //if (targetMessyStudent != null)  createMessage("WDYW " + targetMessyStudent.getName(), Color.blue);
+        Move(this.GetGameObject().transform.position);
+        patrolSubFSM.Fire("Warn messy");
     }
 
     public void SetMessyStudent(MessyStudent ms)
@@ -297,11 +298,10 @@ public class Teacher : Authority
     
     protected void TriggerMessy()
     {
-        Debug.Log("No entro al if");
         if (targetMessyStudent != null)
         {
-            Debug.Log("Triggereo al messy");
-            targetMessyStudent.troubleSubFSM.Fire("Finished bothering teacher");        
+            targetMessyStudent.troubleSubFSM.Fire("Finished bothering teacher");
+            patrolSubFSM.Fire("Pursuit messy");
         }
     }
 
