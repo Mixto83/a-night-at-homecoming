@@ -36,6 +36,8 @@ public class Teacher : Authority
         this.strictness = 1;
 
         this.distractionRandom = Random.Range(2, 10);
+        this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() == Roles.MessyStudent,
+            /*() => watchingTrouble.getTargetCharacter().isInState("Trouble"),*/ () => ((MessyStudent)watchingTrouble.getTargetCharacter()).isCausingTrouble());
         
         CreatePatrolSubStateMachine();
         CreatePunishmentSubStateMachine();
@@ -57,11 +59,14 @@ public class Teacher : Authority
         Perception patrolTimer = patrolSubFSM.CreatePerception<TimerPerception>(2);
         Perception warningPush = patrolSubFSM.CreatePerception<PushPerception>();
         Perception pursuitPush = patrolSubFSM.CreatePerception<PushPerception>();
+        Perception identifiedPush = patrolSubFSM.CreatePerception<PushPerception>();
+
         // States
         State patrolingState = patrolSubFSM.CreateEntryState("Patroling", TeacherPatrol);
         State waitingForMessyState = patrolSubFSM.CreateState("Waiting For Messy", WaitForMessy);
         State warningMessyState = patrolSubFSM.CreateState("Warning Messy", TriggerMessy);
         State talkingState = patrolSubFSM.CreateState("Talking to Organizer", Talking);
+        State identifyStudentState = patrolSubFSM.CreateState("Identifying Student", IdentifyStudent);
         State readyToChaseState = patrolSubFSM.CreateState("Ready to Chase");
          
 
@@ -69,7 +74,8 @@ public class Teacher : Authority
         patrolSubFSM.CreateTransition("Keep patrolling", patrolingState, patrolTimer, patrolingState);
         patrolSubFSM.CreateTransition("Sees organizer call", patrolingState, organizerPush, talkingState);
         patrolSubFSM.CreateTransition("Stops talking to organizer", talkingState, talkTimer, readyToChaseState);
-        patrolSubFSM.CreateTransition("Sees trouble", patrolingState, findTrouble, readyToChaseState);
+        patrolSubFSM.CreateTransition("Sees trouble", patrolingState, findTrouble, identifyStudentState);
+        patrolSubFSM.CreateTransition("Ends identifying", identifyStudentState, identifiedPush, readyToChaseState);
         patrolSubFSM.CreateTransition("Pushed by messy", patrolingState, messyPush, waitingForMessyState);
         patrolSubFSM.CreateTransition("Warn messy", waitingForMessyState, warningPush, warningMessyState);
         patrolSubFSM.CreateTransition("Pursuit messy", warningMessyState, pursuitPush, readyToChaseState);
@@ -117,7 +123,7 @@ public class Teacher : Authority
         punishmentRoomSubFSM.CreateTransition("TimerRandom1", watchingState, randomTimer, distractedState);
         punishmentRoomSubFSM.CreateTransition("TimerRandom2", distractedState, randomTimer2, watchingState);
     }
-
+    
     public override void CreateStateMachine()
     {
         teacherFSM = new StateMachineEngine(false);
@@ -143,7 +149,7 @@ public class Teacher : Authority
         Perception noTeacherAtPR = teacherFSM.CreatePerception<ValuePerception>(() => !gameState.getPunishRoomAttended());
         Perception stayAtPR = teacherFSM.CreateAndPerception<AndPerception>(PRReady, noTeacherAtPR);
 
-        Perception noStudentsAtPR = teacherFSM.CreatePerception<ValuePerception>(() => this.gameState.GetPeoplePunished() <= 0);//rellenar
+        Perception noStudentsAtPR = teacherFSM.CreatePerception<ValuePerception>(() => this.gameState.GetPeoplePunished() <= 0);
         Perception exitTimer = teacherFSM.CreatePerception<TimerPerception>(1);
 
         Perception isInPatrol = teacherFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Patroling");
@@ -338,6 +344,22 @@ public class Teacher : Authority
     {
         this.gameState.SetTeacherDistracted(false);
         gameState.setPunishRoomAttended(false);
+    }
+
+    protected void IdentifyStudent()
+    {
+        targetMessyStudent = (MessyStudent)watchingTrouble.getTargetCharacter();
+        
+        if (targetMessyStudent.isInSubState(targetMessyStudent.troubleSubFSM, "Sabotage drink"))
+        {
+            targetMessyStudent.troubleSubFSM.Fire("Busted by teacher (bar)");
+        }
+        else if (targetMessyStudent.isInSubState(targetMessyStudent.troubleSubFSM, "Fighting"))
+        {
+            targetMessyStudent.troubleSubFSM.Fire("Busted by teacher (fight)");
+        }
+
+        patrolSubFSM.Fire("Ends identifying");
     }
 
     public bool GetMessyFlag()

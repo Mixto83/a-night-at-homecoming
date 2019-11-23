@@ -363,6 +363,7 @@ public class MessyStudent : Student
     //Pelea cuando checkAffinity devuelve true
     protected void FightAsMessy()
     {
+        causingTrouble = true;
         fatigue++;
         createMessage(2);
     }
@@ -370,6 +371,7 @@ public class MessyStudent : Student
     //Escapar del profesor: Pillado saboteando ponche o tras molestarle
     protected void Run()
     {
+        causingTrouble = false;
         thirst++;
         fatigue++;
         Move(runPosition);//Se va a la entrada
@@ -380,6 +382,7 @@ public class MessyStudent : Student
     //Inicio de castigo
     protected void Arguing()
     {
+        causingTrouble = false;
         createMessage(8);
     }
     //Escape de la sala de castigo
@@ -408,6 +411,7 @@ public class MessyStudent : Student
 
     protected void Negotiate()
     {
+        causingTrouble = false;
         createMessage(8);
     }
 
@@ -496,6 +500,25 @@ public bool isCausingTrouble()
             foreach (string state in states)
             {
                 Perception isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(messyStudentFSM, state);
+                if (isIn.Check())
+                    return true;
+            }
+
+            return false;
+        }
+        catch (KeyNotFoundException)
+        {
+            return false;
+        }
+    }
+
+    public bool isInSubState(StateMachineEngine subFSM, params string[] states)
+    {
+        try
+        {
+            foreach (string state in states)
+            {
+                Perception isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(subFSM, state);
                 if (isIn.Check())
                     return true;
             }
