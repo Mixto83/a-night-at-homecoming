@@ -26,6 +26,7 @@ public class Character
     protected List<float> currentOcuppiedBench;
     protected List<float> currentOcuppiedOutside;
     protected List<float> currentOcuppiedBathroom;
+    protected List<float> currentOcuppiedPunishment;
     public int beauty;
 
     protected const int thirstThreshold = 5;

@@ -30,7 +30,7 @@ public class MessyStudent : Student
     private float distanceToTargetTeacher = 1.5f;
     private float distanceToTargetStudent = 1.5f;
 
-    private Vector3 runPosition = new Vector3(-4.5f, 6.0f, 0.0f);
+    private Vector3 runPosition = new Vector3(-2.0f, -8.0f, 0.0f);
     private Vector3 punishPosition = new Vector3(17.5f, 31.0f, 0.0f);
     private Vector3 escapePosition = new Vector3(17.5f, 7.5f, 0.0f);
     private Vector3 targetStudentPosition = Vector3.zero;
@@ -50,7 +50,8 @@ public class MessyStudent : Student
         this.watchingCalmStudent = new WatchingPerception(this.gameObject, () => watchingCalmStudent.getTargetCharacter().getRole() == Roles.CalmStudent, () => !whiteFlagStudents.Contains((CalmStudent)watchingCalmStudent.getTargetCharacter()),
             () => ((CalmStudent)watchingCalmStudent.getTargetCharacter()).GetMessyFlag(), () => watchingCalmStudent.getTargetCharacter().isInState("Enjoying"));
         this.watchingTeacher = new WatchingPerception(this.gameObject, () => watchingTeacher.getTargetCharacter().getRole() == Roles.Teacher, () => watchingTeacher.getTargetCharacter().isInState("Patrol"),
-            () => ((Teacher)watchingTeacher.getTargetCharacter()).isInSubState(((Teacher)watchingTeacher.getTargetCharacter()).patrolSubFSM, "Patroling"));//Cambiar estado
+            () => ((Teacher)watchingTeacher.getTargetCharacter()).isInSubState(((Teacher)watchingTeacher.getTargetCharacter()).patrolSubFSM, "Patroling"),
+            () => ((Teacher)watchingTeacher.getTargetCharacter()).GetMessyFlag());//Cambiar estado
         this.watchingOrganizerStudent = new WatchingPerception(this.gameObject, () => watchingOrganizerStudent.getTargetCharacter().getRole() == Roles.OrganizerStudent);
         
         this.whiteFlagStudents = new List<CalmStudent>();
@@ -102,7 +103,6 @@ public class MessyStudent : Student
         //Ve profesor y le molesta
         Perception seesTeacher = troubleSubFSM.CreatePerception<WatchingPerception>(watchingTeacher);
         Perception teacherReached = troubleSubFSM.CreatePerception<ValuePerception>(() => distanceToTargetTeacher < 0.5f);
-        //Perception endMocking = troubleSubFSM.CreatePerception<TimerPerception>(5);
         Perception endMocking = troubleSubFSM.CreatePerception<PushPerception>();
         Perception escapedFromTeacher = troubleSubFSM.CreatePerception<ValuePerception>(() => distanceToSafePos < 0.5);
         Perception caughtByTeacher = troubleSubFSM.CreatePerception<PushPerception>();
@@ -168,6 +168,7 @@ public class MessyStudent : Student
         Perception teacherDistracted = punishmentSubFSM.CreatePerception<ValuePerception>();
         Perception bustedByTeacher = punishmentSubFSM.CreatePerception<PushPerception>();
         Perception reachedEscape = punishmentSubFSM.CreatePerception<ValuePerception>(() => distanceToEscapePos < 0.5);
+        Perception punishTimer = punishmentSubFSM.CreatePerception<TimerPerception>(5);//Cambiar a algo mucho mas grande
 
         // States
         State toPunishmentRoom = punishmentSubFSM.CreateEntryState("Being taken to punishment room", MoveToPunishment);
@@ -179,6 +180,7 @@ public class MessyStudent : Student
         punishmentSubFSM.CreateTransition("Reached punishment room", toPunishmentRoom, roomReached, punishedState);
         punishmentSubFSM.CreateTransition("Teacher distracted", punishedState, teacherDistracted, escapeState);
         punishmentSubFSM.CreateTransition("Teacher busts student", escapeState, bustedByTeacher, toPunishmentRoom);
+        punishmentSubFSM.CreateTransition("Time out", punishedState, punishTimer, exitState);
         punishmentSubFSM.CreateTransition("Reached escape position", escapeState, reachedEscape, exitState);
     }
 
@@ -364,7 +366,7 @@ public class MessyStudent : Student
     {
         thirst++;
         fatigue++;
-        //Move(runPosition);//Se va a la entrada
+        Move(runPosition);//Se va a la entrada
         createMessage(12);
     }
 
@@ -405,7 +407,13 @@ public class MessyStudent : Student
 
     protected void TriggerTeacher()
     {
-        if (targetTeacher != null) targetTeacher.teacherFSM.Fire("Student escaped");
+        clearSprites();
+        if (targetTeacher != null)
+        {
+            targetTeacher.SetMessyFlag(true);
+            targetTeacher.teacherFSM.Fire("Student escaped");
+        }
+        
     }
     #endregion
 
@@ -453,6 +461,7 @@ public class MessyStudent : Student
         //createMessage("Hey oh teach'!", Color.red);
         targetTeacher = (Teacher)watchingTeacher.getTargetCharacter();
         targetTeacher.SetMessyStudent(this);
+        targetTeacher.SetMessyFlag(false);
         targetTeacherPosition = targetTeacher.GetGameObject().transform.position + new Vector3(1.5f, 0, 0);
 
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
@@ -467,6 +476,8 @@ public class MessyStudent : Student
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
         this.Move(GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(1, 0, 0));
     }
+
+    
     #endregion
 
 

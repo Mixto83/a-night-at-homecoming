@@ -26,6 +26,8 @@ public class Teacher : Authority
 
     MessyStudent targetMessyStudent;
 
+    private volatile bool availableForMess = true;
+
     //methods
     public Teacher(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
     {
@@ -81,7 +83,7 @@ public class Teacher : Authority
         // Perceptions
         
         Perception reachedMessy = chaseSubFSM.CreatePerception<ValuePerception>(() => distanceToMessy <= 2.0f);
-        Perception timerArgue = chaseSubFSM.CreatePerception<TimerPerception>(2);
+        Perception arguingTimer = chaseSubFSM.CreatePerception<TimerPerception>(4);
         Perception stillChasing = chaseSubFSM.CreatePerception<TimerPerception>(2);
         // States
         State chasingStudentState = chaseSubFSM.CreateEntryState("Chasing Student", ChaseMessyStudent);
@@ -90,7 +92,7 @@ public class Teacher : Authority
         // Transitions
         chaseSubFSM.CreateTransition("Keep chasing", chasingStudentState, stillChasing, chasingStudentState);
         chaseSubFSM.CreateTransition("Caught", chasingStudentState, reachedMessy, arguingState);
-        chaseSubFSM.CreateTransition("Finish arguing", arguingState, timerArgue, toPunishmentRoomState);
+        chaseSubFSM.CreateTransition("Finish arguing", arguingState, arguingTimer, toPunishmentRoomState);
     }
 
     private void CreatePunishmentSubStateMachine()
@@ -248,11 +250,13 @@ public class Teacher : Authority
     protected void ToGym()
     {
         clearSprites();
+        availableForMess = true;
         Move(gymPosition);
     }
 
     protected void MoveToPRTable()
     {
+        gameState.setPunishRoomAttended(true);
         Move(punishTablePosition);
     }
 
@@ -304,7 +308,7 @@ public class Teacher : Authority
     protected void Watching()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Don't think you're gonna escape...");
-        gameState.setPunishRoomAttended(true);
+        
     }
 
     protected void ReadingNewspaper()
@@ -317,6 +321,16 @@ public class Teacher : Authority
     protected void LeavePR()
     {
         gameState.setPunishRoomAttended(false);
+    }
+
+    public bool GetMessyFlag()
+    {
+        return availableForMess;
+    }
+
+    public void SetMessyFlag(bool targeted)
+    {
+        availableForMess = targeted;
     }
 
     public override string Description()

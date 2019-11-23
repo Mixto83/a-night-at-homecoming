@@ -44,9 +44,15 @@ public class Student : Character
         Move(new Vector3(currentOcuppiedBench[0], currentOcuppiedBench[1]));
     }
 
+    //Se va a un sitio del aula de castigo
     protected void Punished()
     {
-        createMessage(10);
-        //Move to available seat
+        if (currentOcuppiedPunishment != null) this.gameState.possiblePosPunishment.AddRange(currentOcuppiedPunishment);
+        var index = Random.Range(0, this.gameState.possiblePosPunishment.Count / 2 - 1) * 2;
+        currentOcuppiedPunishment = this.gameState.possiblePosPunishment.GetRange(index, 2);
+        this.gameState.possiblePosPunishment.RemoveRange(index, 2);
+
+        Move(new Vector3(currentOcuppiedPunishment[0], currentOcuppiedPunishment[1]));
+        LookAt(GameObject.FindGameObjectWithTag("Desk").transform);
     }
 }
