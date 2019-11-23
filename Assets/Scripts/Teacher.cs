@@ -27,6 +27,7 @@ public class Teacher : Authority
     MessyStudent targetMessyStudent;
 
     private volatile bool availableForMess = true;
+    private bool distracted = false;
 
     //methods
     public Teacher(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
@@ -34,7 +35,7 @@ public class Teacher : Authority
         this.role = Roles.Teacher;
         this.strictness = 1;
 
-        this.distractionRandom = Random.Range(2, 5);
+        this.distractionRandom = Random.Range(2, 10);
         this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() != Roles.MessyStudent,
             () => watchingTrouble.getTargetCharacter().isInState("Trouble"));
 
@@ -137,7 +138,7 @@ public class Teacher : Authority
         Perception noTeacherAtPR = teacherFSM.CreatePerception<ValuePerception>(() => !gameState.getPunishRoomAttended());
         Perception stayAtPR = teacherFSM.CreateAndPerception<AndPerception>(PRReady, noTeacherAtPR);
 
-        Perception noStudentsAtPR = teacherFSM.CreatePerception<ValuePerception>();//rellenar
+        Perception noStudentsAtPR = teacherFSM.CreatePerception<ValuePerception>(() => this.gameState.GetPeoplePunished() <= 0);//rellenar
         Perception exitTimer = teacherFSM.CreatePerception<TimerPerception>(1);
 
         Perception isInPatrol = teacherFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Patroling");
@@ -307,6 +308,7 @@ public class Teacher : Authority
     //Punishment Room State FSM: Teachers
     protected void Watching()
     {
+        distracted = false;
         Debug.Log("[" + name + ", " + getRole() + "] Don't think you're gonna escape...");
         
     }
@@ -314,12 +316,13 @@ public class Teacher : Authority
     protected void ReadingNewspaper()
     {
         Debug.Log("[" + name + ", " + getRole() + "] President Tremp did what again?");
-        distractionRandom = Random.Range(2, 5);
-        //boolean isdistracted
+        distractionRandom = Random.Range(2, 10);
+        distracted = true;
     }
 
     protected void LeavePR()
     {
+        distracted = false;
         gameState.setPunishRoomAttended(false);
     }
 
@@ -331,6 +334,11 @@ public class Teacher : Authority
     public void SetMessyFlag(bool targeted)
     {
         availableForMess = targeted;
+    }
+
+    public bool GetDistracted()
+    {
+        return distracted;
     }
 
     public override string Description()

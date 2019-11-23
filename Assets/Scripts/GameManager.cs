@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     private bool barAttended = false;
     private bool punishRoomAttended = false;
     private volatile bool barBeingSabotaged = false;
+    private volatile int peopleOnPunishmentRoom = 0;
     [HideInInspector] public string soundingMusic;
     private SimpleTimer musicTimer;
     public SimpleTimer sabotageAvailable;
@@ -393,6 +394,18 @@ public class GameManager : MonoBehaviour
     public List<Character> GetPeople()
     {
         return People;
+    }
+
+    public int GetPeoplePunished()
+    {
+        return peopleOnPunishmentRoom;
+    }
+
+    public void ChangePeoplePunished(bool positive)
+    {
+        if (positive) peopleOnPunishmentRoom++;
+        else peopleOnPunishmentRoom--;
+        Debug.Log("People: " + peopleOnPunishmentRoom);
     }
 
     private void createMessageOnGUI(string text, Color color)

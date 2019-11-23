@@ -165,21 +165,26 @@ public class MessyStudent : Student
         // Perceptions
         Perception push = punishmentSubFSM.CreatePerception<PushPerception>(); //temporal
         Perception roomReached = punishmentSubFSM.CreatePerception<ValuePerception>(() => distanceToPunishmentRoom < 0.5);
+        Perception seatReached = punishmentSubFSM.CreatePerception<ValuePerception>(() => distanceToPunishPos < 0.5);
         Perception teacherDistracted = punishmentSubFSM.CreatePerception<ValuePerception>();
         Perception bustedByTeacher = punishmentSubFSM.CreatePerception<PushPerception>();
         Perception reachedEscape = punishmentSubFSM.CreatePerception<ValuePerception>(() => distanceToEscapePos < 0.5);
-        Perception punishTimer = punishmentSubFSM.CreatePerception<TimerPerception>(5);//Cambiar a algo mucho mas grande
+        Perception punishTimer = punishmentSubFSM.CreatePerception<TimerPerception>(20);//Cambiar a algo mucho mas grande
 
         // States
-        State toPunishmentRoom = punishmentSubFSM.CreateEntryState("Being taken to punishment room", MoveToPunishment);
+        State toPunishmentRoomState = punishmentSubFSM.CreateEntryState("Being taken to punishment room", MoveToPunishment);
+        State chosingSeatState = punishmentSubFSM.CreateState("Walking to Seat", MoveToRandomPunishmentRoomPos);
         State punishedState = punishmentSubFSM.CreateState("Punished", Punished);
         State escapeState = punishmentSubFSM.CreateState("Escape", Escape);
         State exitState = punishmentSubFSM.CreateState("Exit Punishment", ExitPunishment);
 
+        
+
         // Transitions
-        punishmentSubFSM.CreateTransition("Reached punishment room", toPunishmentRoom, roomReached, punishedState);
+        punishmentSubFSM.CreateTransition("Reached punishment room", toPunishmentRoomState, roomReached, chosingSeatState);
+        punishmentSubFSM.CreateTransition("Reached seat", chosingSeatState, seatReached, punishedState);
         punishmentSubFSM.CreateTransition("Teacher distracted", punishedState, teacherDistracted, escapeState);
-        punishmentSubFSM.CreateTransition("Teacher busts student", escapeState, bustedByTeacher, toPunishmentRoom);
+        punishmentSubFSM.CreateTransition("Teacher busts student", escapeState, bustedByTeacher, toPunishmentRoomState);
         punishmentSubFSM.CreateTransition("Time out", punishedState, punishTimer, exitState);
         punishmentSubFSM.CreateTransition("Reached escape position", escapeState, reachedEscape, exitState);
     }
@@ -266,7 +271,8 @@ public class MessyStudent : Student
         distanceToSafePos = Vector3.Distance(this.gameObject.transform.position, runPosition);
         distanceToEscapePos = Vector3.Distance(this.gameObject.transform.position, escapePosition);
         distanceToPunishmentRoom = Vector3.Distance(this.gameObject.transform.position, punishPosition);
-        distanceToBar = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Bar").transform.position);
+        distanceToPunishPos = Vector3.Distance(this.gameObject.transform.position, randomPunishSeat);
+        distanceToBar = Vector3.Distance(this.gameObject.transform.position, GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0, -0.75f, 0));
         if (targetStudent != null) distanceToTargetStudent = Vector3.Distance(this.gameObject.transform.position, targetStudentPosition);
         if (targetTeacher != null) distanceToTargetTeacher = Vector3.Distance(this.gameObject.transform.position, targetTeacherPosition);
         drinkSubFSM.Update();
@@ -389,6 +395,7 @@ public class MessyStudent : Student
     private void ExitPunishment()
     {
         //createMessage("I broke free!", Color.red);
+        this.gameState.ChangePeoplePunished(false);
         messyStudentFSM.Fire("End of punishment");
     }
 
@@ -429,16 +436,12 @@ public class MessyStudent : Student
         Move(new Vector3(currentOcuppiedPos[0], currentOcuppiedPos[1]));
     }
 
-    //Se mueve a un asiento disponible del aula de castigo
-    private void MoveToRandomPunishmentRoomPos()
-    {
-        Debug.Log("Not implemented");
-    }
 
     //Se va hasta la sala de castigo
     private void MoveToPunishment()
     {
         //createMessage("Damn, busted!", Color.red);
+        this.gameState.ChangePeoplePunished(true);
         Move(punishPosition);
     }
 
@@ -474,7 +477,7 @@ public class MessyStudent : Student
         //createMessage("Bar is free!", Color.red);
         this.gameState.setBarSabotaged(true);
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
-        this.Move(GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(1, 0, 0));
+        this.Move(GameObject.FindGameObjectWithTag("Bar").transform.position + new Vector3(0, -0.75f, 0));
     }
 
     
