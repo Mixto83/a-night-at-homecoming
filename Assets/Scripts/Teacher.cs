@@ -37,7 +37,7 @@ public class Teacher : Authority
 
         this.distractionRandom = Random.Range(2, 10);
         this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() == Roles.MessyStudent,
-            /*() => watchingTrouble.getTargetCharacter().isInState("Trouble"),*/ () => ((MessyStudent)watchingTrouble.getTargetCharacter()).isCausingTrouble());
+            () => ((MessyStudent)watchingTrouble.getTargetCharacter()).isCausingTrouble());
         
         CreatePatrolSubStateMachine();
         CreatePunishmentSubStateMachine();
@@ -87,7 +87,7 @@ public class Teacher : Authority
 
         // Perceptions
         
-        Perception reachedMessy = chaseSubFSM.CreatePerception<ValuePerception>(() => targetStudent != null ? Vector3.Distance(targetStudent.GetGameObject().transform.position, GetGameObject().transform.position) < 1 : false);
+        Perception reachedMessy = chaseSubFSM.CreatePerception<ValuePerception>(() => targetStudent != null ? Vector3.Distance(targetStudent.GetGameObject().transform.position, GetGameObject().transform.position) < 1.5 : false);
         Perception arguingTimer = chaseSubFSM.CreatePerception<TimerPerception>(4);
         //Perception stillChasing = chaseSubFSM.CreatePerception<TimerPerception>(2);
         // States
@@ -95,7 +95,7 @@ public class Teacher : Authority
         State arguingState = chaseSubFSM.CreateState("Arguing", Arguing);
         State toPunishmentRoomState = chaseSubFSM.CreateState("Taking student to punishment room", ToPunishmentRoom);
 
-        timerChasing = chaseSubFSM.CreatePerception<TimerPerception>(1);
+        timerChasing = chaseSubFSM.CreatePerception<TimerPerception>(2);
         isInStateChasing = chaseSubFSM.CreatePerception<IsInStatePerception>(chaseSubFSM, "Chasing Student");
 
         // Transitions
@@ -153,10 +153,10 @@ public class Teacher : Authority
         Perception exitTimer = teacherFSM.CreatePerception<TimerPerception>(1);
 
         Perception isInPatrol = teacherFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Patroling");
-        Perception doorUnattended = teacherFSM.CreatePerception<ValuePerception>(() => !this.gameState.getDoorAttended());
+        /*Perception doorUnattended = teacherFSM.CreatePerception<ValuePerception>(() => !this.gameState.getDoorAttended());
         Perception goToDoor = teacherFSM.CreateAndPerception<AndPerception>(isInPatrol, doorUnattended);
 
-        Perception outOfDoor = teacherFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Out Door State");
+        Perception outOfDoor = teacherFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Out Door State");*/
 
         Perception thirsty = teacherFSM.CreatePerception<ValuePerception>(() => thirst > thirstThreshold);
         Perception goToDrink = teacherFSM.CreateAndPerception<AndPerception>(isInPatrol, thirsty);
@@ -168,7 +168,7 @@ public class Teacher : Authority
         State chaseState = teacherFSM.CreateSubStateMachine("Chase", chaseSubFSM);
         State punishmentRoomState = teacherFSM.CreateSubStateMachine("Punishment room", punishmentRoomSubFSM);
         State patrolState = teacherFSM.CreateSubStateMachine("Patrol", patrolSubFSM);
-        State doorState = teacherFSM.CreateSubStateMachine("Door", doorSubFSM);
+        //State doorState = teacherFSM.CreateSubStateMachine("Door", doorSubFSM);
         State drinkState = teacherFSM.CreateSubStateMachine("Drink", drinkSubFSM);
         State leavePRState = teacherFSM.CreateState("Leave PR", LeavePR);
         State returnToGym = teacherFSM.CreateState("Return To Gym", ToGym);
@@ -183,8 +183,8 @@ public class Teacher : Authority
         punishmentRoomSubFSM.CreateExitTransition("No students left, returns to gym", punishmentRoomState, noStudentsAtPR, leavePRState);
         teacherFSM.CreateTransition("Table left, go back to gym", leavePRState,exitTimer, returnToGym);
 
-        //patrolSubFSM.CreateExitTransition("Door unattended", patrolState, goToDoor, doorState);
-        doorSubFSM.CreateExitTransition("Back from door", doorState, outOfDoor, patrolState);
+        /*patrolSubFSM.CreateExitTransition("Door unattended", patrolState, goToDoor, doorState);
+        doorSubFSM.CreateExitTransition("Back from door", doorState, outOfDoor, patrolState);*/
         patrolSubFSM.CreateExitTransition("Need to drink", patrolState, goToDrink, drinkState);
         drinkSubFSM.CreateExitTransition("Already drank, back to Patrol", drinkState, isInDrink, patrolState);
 
@@ -196,7 +196,7 @@ public class Teacher : Authority
         distanceToPunish = Vector3.Distance(this.GetGameObject().transform.position, punishPosition);
         distanceToGym = Vector3.Distance(this.GetGameObject().transform.position, gymPosition);
         distanceToPunishTable = Vector3.Distance(this.GetGameObject().transform.position, punishTablePosition);
-        doorSubFSM.Update();
+        //doorSubFSM.Update();
         drinkSubFSM.Update();
         patrolSubFSM.Update();
         chaseSubFSM.Update();
@@ -211,9 +211,10 @@ public class Teacher : Authority
                 if (targetStudent != null)
                 {
                     timerChasing.Reset();
-
+                    /*
                     Vector3 offset = GetGameObject().transform.position - targetStudent.GetGameObject().transform.position;
-                    Move(targetStudent.GetGameObject().transform.position - offset.normalized);
+                    Move(targetStudent.GetGameObject().transform.position - offset.normalized);*/
+                    Move(targetStudent.GetGameObject().transform.position + new Vector3(1.5f, 0.0f, 0.0f));
                 }
             }
         }
@@ -267,13 +268,13 @@ public class Teacher : Authority
         {
              if (!targetStudent.Fire("Busted by teacher")) Debug.Log("Transición no existe");
         }
-
         createMessage(11);
     }
 
     protected void ToPunishmentRoom()
     {
         Move(punishPosition);
+        targetStudent = null;
     }
 
     protected void ToGym()
@@ -291,6 +292,7 @@ public class Teacher : Authority
 
     protected void TeacherPatrol()
     {
+        clearSprites();
         MoveToRandomGymPos();
     }
 

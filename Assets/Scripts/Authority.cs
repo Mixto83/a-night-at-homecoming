@@ -18,7 +18,6 @@ public class Authority : Character
 
     #region Stats
     protected float strictness;
-    protected float thirst;
     #endregion
 
     //methods
@@ -27,7 +26,7 @@ public class Authority : Character
         this.watchingDoor = new WatchingPerception(this.gameObject, () => !watchingDoor.getTargetCharacter().getGreeted(),
             () => watchingDoor.getTargetCharacter().getRole() == Roles.CalmStudent || watchingDoor.getTargetCharacter().getRole() == Roles.MessyStudent);
         this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() == Roles.MessyStudent,
-            () => watchingTrouble.getTargetCharacter().isInState("Trouble"));
+            () => ((MessyStudent)watchingTrouble.getTargetCharacter()).isCausingTrouble());
 
         CreateDoorSubStateMachine();
     }
@@ -82,7 +81,7 @@ public class Authority : Character
     {
         createMessage(11);
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
-        targetStudent = watchingTrouble.getTargetCharacter();
+        if(targetStudent == null) targetStudent = watchingTrouble.getTargetCharacter();
         Debug.Log("[" + name + ", " + getRole() + "] Come back here, you little...");
     }
 }
