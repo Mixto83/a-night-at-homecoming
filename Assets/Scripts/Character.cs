@@ -171,6 +171,11 @@ public class Character
         return false;
     }
 
+    public virtual bool isInSubState(params string[] states)
+    {
+        return false;
+    }
+
     public virtual void setGroup(Group group)
     {
 

@@ -348,15 +348,15 @@ public class Teacher : Authority
 
     protected void IdentifyStudent()
     {
-        targetMessyStudent = (MessyStudent)watchingTrouble.getTargetCharacter();
+        targetStudent = (MessyStudent)watchingTrouble.getTargetCharacter();
         
-        if (targetMessyStudent.isInSubState(targetMessyStudent.troubleSubFSM, "Sabotage drink"))
+        if (targetStudent.isInSubState("Sabotage drink"))
         {
-            targetMessyStudent.troubleSubFSM.Fire("Busted by teacher (bar)");
+            targetStudent.Fire("Busted by teacher (bar)");
         }
-        else if (targetMessyStudent.isInSubState(targetMessyStudent.troubleSubFSM, "Fighting"))
+        else if (targetStudent.isInSubState("Fighting"))
         {
-            targetMessyStudent.troubleSubFSM.Fire("Busted by teacher (fight)");
+            targetStudent.Fire("Busted by teacher (fight)");
         }
 
         patrolSubFSM.Fire("Ends identifying");

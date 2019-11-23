@@ -8,7 +8,7 @@ public class MessyStudent : Student
     #region StateMachines
     private StateMachineEngine messyStudentFSM;
     private StateMachineEngine punishmentSubFSM;
-    public StateMachineEngine troubleSubFSM;
+    private StateMachineEngine troubleSubFSM;
     #endregion
 
     #region InteractableCharacters
@@ -512,14 +512,17 @@ public bool isCausingTrouble()
         }
     }
 
-    public bool isInSubState(StateMachineEngine subFSM, params string[] states)
+    public override bool isInSubState(params string[] states)
     {
         try
         {
             foreach (string state in states)
             {
-                Perception isIn = messyStudentFSM.CreatePerception<IsInStatePerception>(subFSM, state);
-                if (isIn.Check())
+                Perception isInSub1 = messyStudentFSM.CreatePerception<IsInStatePerception>(troubleSubFSM, state);
+                if (isInSub1.Check())
+                    return true;
+                Perception isInSub2 = messyStudentFSM.CreatePerception<IsInStatePerception>(punishmentSubFSM, state);
+                if (isInSub2.Check())
                     return true;
             }
 
