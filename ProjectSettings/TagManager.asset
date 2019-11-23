@@ -12,6 +12,7 @@ TagManager:
   - Bar
   - Desk
   - CanvasPrincipal
+  - CanvasUI
   layers:
   - Default
   - TransparentFX

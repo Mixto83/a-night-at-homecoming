@@ -373,11 +373,18 @@ public class Teacher : Authority
     }
 
 
-    public override string Description()
+    public override string DebugDescription()
     {
         var desc = "NAME: " + getName() + ", ROLE: " + getRole() + ", STATE: " + teacherFSM.GetCurrentState().Name;
 
         return desc + "\n";
+    }
+
+    public override string AgentInfoUI()
+    {
+        var info = "NAME: " + getName() + "\nROLE: " + getRole() + "\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
+
+        return info;
     }
 
     protected void DebugInputs()

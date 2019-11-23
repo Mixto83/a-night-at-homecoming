@@ -373,10 +373,17 @@ public class CalmStudent : Student
         calmStudentFSM.Fire("Like Person from playground");
     }
 
-    public override string Description()
+    public override string DebugDescription()
     {
         var desc = "NAME: " + getName() + ", ROLE: " + getRole() + ", STATE: " + calmStudentFSM.GetCurrentState().Name;
         
         return desc + "\n";
+    }
+
+    public override string AgentInfoUI()
+    {
+        var info = "NAME: " + getName() + "\n\nROLE: " + getRole() + "\n\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
+
+        return info;
     }
 }

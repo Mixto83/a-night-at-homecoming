@@ -286,7 +286,7 @@ public class GameManager : MonoBehaviour
                     changeBarState = true;
                 }
 
-                gameStateDesc += character.Description();
+                gameStateDesc += character.DebugDescription();
 
                 character.animationUpdate();
 
@@ -334,8 +334,14 @@ public class GameManager : MonoBehaviour
                 createMessageOnGUI(gameStateDesc, Color.blue);
             } else
             {
-                clearTexts();
+                clearTexts(GameObject.FindGameObjectWithTag("CanvasPrincipal"));
             }
+
+            /*foreach (GameObject agent in Agents) {
+                showAgentInfo(agent);
+            }*/
+
+            showAgentInfo(Agents[0]);
         }
     }
 
@@ -395,7 +401,6 @@ public class GameManager : MonoBehaviour
     public void changeMusic()
     {
         soundingMusic = Music[Random.Range(0, MUSICS_NUM)];
-        //createMessageOnGUI(soundingMusic, Color.blue);
     }
 
     public Character GetCharacter(GameObject obj)
@@ -432,7 +437,7 @@ public class GameManager : MonoBehaviour
 
     private void createMessageOnGUI(string text, Color color)
     {
-        clearTexts();
+        clearTexts(GameObject.FindGameObjectWithTag("CanvasPrincipal"));
 
         if (color == null)
         {
@@ -455,14 +460,39 @@ public class GameManager : MonoBehaviour
 
         newText.transform.SetParent(GameObject.FindGameObjectWithTag("CanvasPrincipal").transform);
 
-        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 700);
+        newText.GetComponent<RectTransform>().anchorMax = Vector2.one;
+        newText.GetComponent<RectTransform>().anchorMin = Vector2.one;
+        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 600);
         newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 350);
-        newText.transform.localPosition = new Vector3(0, 0, 0);
+        newText.GetComponent<RectTransform>().anchoredPosition = new Vector2(-350, -200);
     }
 
-    private void clearTexts()
+    private void showAgentInfo(GameObject agent)
     {
-        foreach (Text txt in GameObject.FindGameObjectWithTag("CanvasPrincipal").GetComponentsInChildren<Text>())
+        clearTexts(GameObject.FindGameObjectWithTag("CanvasUI"));
+
+        GameObject newText = new GameObject("AgentInfo", typeof(RectTransform));
+        var newTextComp = newText.AddComponent<Text>();
+        if (newText.GetComponent<CanvasRenderer>() == null) newText.AddComponent<CanvasRenderer>();
+
+        newTextComp.text = GetCharacter(agent).AgentInfoUI();
+        newTextComp.color = Color.blue;
+        newTextComp.font = Resources.Load<Font>("AdobeGothicStdB");
+        newTextComp.alignment = TextAnchor.UpperLeft;
+        newTextComp.fontSize = 10;
+
+        newText.transform.SetParent(GameObject.FindGameObjectWithTag("CanvasUI").transform);
+
+        newText.GetComponent<RectTransform>().anchorMax = new Vector2(1, 0);
+        newText.GetComponent<RectTransform>().anchorMin = new Vector2(1, 0);
+        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 150);
+        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 200);
+        newText.GetComponent<RectTransform>().anchoredPosition = new Vector2(-100, 120);
+    }
+
+    private void clearTexts(GameObject parent)
+    {
+        foreach (Text txt in parent.GetComponentsInChildren<Text>())
         {
             GameObject.Destroy(txt.gameObject);
         }

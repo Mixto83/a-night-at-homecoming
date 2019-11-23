@@ -287,7 +287,12 @@ public class Character
 
     }
 
-    public virtual string Description()
+    public virtual string DebugDescription()
+    {
+        return "\n";
+    }
+
+    public virtual string AgentInfoUI()
     {
         return "\n";
     }
