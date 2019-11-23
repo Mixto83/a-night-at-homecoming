@@ -298,4 +298,10 @@ public class Character
             animationController.SetBool("isWalking", false);
         }
     }
+
+    public void thirstIncrement()
+    {
+        thirst++;
+        Debug.Log(thirst);
+    }
 }
