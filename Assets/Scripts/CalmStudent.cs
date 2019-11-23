@@ -82,7 +82,7 @@ public class CalmStudent : Student
         // Perceptions
         Perception push = calmStudentFSM.CreatePerception<PushPerception>();
         pushFight = calmStudentFSM.CreatePerception<PushPerception>();
-        Perception pushThirsty = calmStudentFSM.CreatePerception<PushPerception>();
+        Perception pushThirsty = calmStudentFSM.CreatePerception<ValuePerception>(() => thirst > thirstThreshold);
         Perception fatigueCheck = calmStudentFSM.CreatePerception<ValuePerception>(() => fatigue >= fatigueThreshold);
         Perception timer = calmStudentFSM.CreatePerception<TimerPerception>(5);
         Perception timerTired = calmStudentFSM.CreatePerception<TimerPerception>(20);
@@ -249,8 +249,6 @@ public class CalmStudent : Student
         {
             createMessage("What a virgin!", Color.blue);
         }*/
-
-        Debug.Log("Aff: " + affinity + ". Thres: " + affinityThreshold);
 
         return affinity;
     }

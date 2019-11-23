@@ -43,8 +43,9 @@ public class SimpleTimer
         isStarted = true;
     }
 
-    public void reset()
+    public void reset(float newCount = -1)
     {
+        if(newCount != -1) count = newCount;
         runningCount = count;
         start();
     }

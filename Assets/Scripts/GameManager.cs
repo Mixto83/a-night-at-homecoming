@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     private volatile int peopleOnPunishmentRoom = 0;
     [HideInInspector] public string soundingMusic;
     private SimpleTimer musicTimer;
+    private SimpleTimer thirstTimer;
     public SimpleTimer sabotageAvailable;
 
 
@@ -254,6 +255,9 @@ public class GameManager : MonoBehaviour
         musicTimer = new SimpleTimer(10);
         sabotageAvailable = new SimpleTimer(10);//No empieza de primeras
         musicTimer.start();
+
+        thirstTimer = new SimpleTimer(Random.Range(5f, 31f));
+        thirstTimer.start();
     }
 
     // Update is called once per frame
@@ -284,6 +288,13 @@ public class GameManager : MonoBehaviour
                 gameStateDesc += character.Description();
 
                 character.animationUpdate();
+
+                thirstTimer.Update();
+                if (thirstTimer.isFinished())
+                {
+                    character.thirstIncrement();
+                    thirstTimer.reset(Random.Range(5f, 31f));
+                }
             }
 
             if (forceDoorAttended)
