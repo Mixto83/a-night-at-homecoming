@@ -16,7 +16,7 @@ public class OrganizerStudent : Authority
     private Perception isInStateChasing;
 
     float tired = 0;
-    float tiredTime = 50;
+    float tiredTime = 30;
     float negotiateRandom;
     protected float distanceToBarOrg;
 
@@ -175,10 +175,10 @@ public class OrganizerStudent : Authority
         }
 
         if (isInState("Door")) {
-            if (tired <= tiredTime) tired += 0.03f;
+            if (tired <= tiredTime) tired += Time.deltaTime;
         } else
         {
-            if (tired >= 0.1f) tired -= 0.03f;
+            if (tired >= 0.1f) tired -= Time.deltaTime;
         }
 
         if(Input.GetKeyDown(KeyCode.Alpha2))
@@ -202,10 +202,10 @@ public class OrganizerStudent : Authority
             foreach (string state in states)
             {
                 Perception isIn = organizerStudentFSM.CreatePerception<IsInStatePerception>(organizerStudentFSM, state);
-                Perception exclusion1 = organizerStudentFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Walking to door");
-                Perception exclusion2 = organizerStudentFSM.CreatePerception<IsInStatePerception>(servingSubFSM, "Walking to bar");
+                Perception exclusionDoor = organizerStudentFSM.CreatePerception<IsInStatePerception>(doorSubFSM, "Walking to door");
+                Perception exclusionBar = organizerStudentFSM.CreatePerception<IsInStatePerception>(servingSubFSM, "Walking to bar");
 
-                if (state == "Door" && (exclusion1.Check() || exclusion2.Check()))
+                if ((state == "Door" && exclusionDoor.Check()) || (state == "Serve Drink" && exclusionBar.Check()))
                 {
                     break;
                 }
