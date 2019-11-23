@@ -11,9 +11,7 @@ public class OrganizerStudent : Authority
 
     private WatchingPerception watchingBar;
     private Perception timerPatrol;
-    private Perception timerChasing;
     private Perception isInStatePatrol;
-    private Perception isInStateChasing;
 
     float tired = 0;
     float tiredTime = 30;
@@ -67,7 +65,7 @@ public class OrganizerStudent : Authority
 
         // Perceptions
         Perception push = patrolSubFSM.CreatePerception<PushPerception>();
-        WatchingPerception seeMessyStudentInTroubleState = patrolSubFSM.CreatePerception<WatchingPerception>(watchingMessy);
+        WatchingPerception seeMessyStudentInTroubleState = patrolSubFSM.CreatePerception<WatchingPerception>(watchingTrouble);
         Perception caughtStudent = patrolSubFSM.CreatePerception<ValuePerception>(() => targetStudent != null ? Vector3.Distance(targetStudent.GetGameObject().transform.position, GetGameObject().transform.position) < 1 : false);
         Perception lostSightOfStudent = patrolSubFSM.CreatePerception<ValuePerception>(() => targetStudent != null ? Vector3.Distance(targetStudent.GetGameObject().transform.position, GetGameObject().transform.position) >= 15 : false);
         Perception convinced = patrolSubFSM.CreatePerception<ValuePerception>(() => CheckConvinced());
@@ -84,7 +82,7 @@ public class OrganizerStudent : Authority
         State callTeacherState = patrolSubFSM.CreateState("Call Teacher", CallTeacher);
 
         timerPatrol = patrolSubFSM.CreatePerception<TimerPerception>(5);
-        timerChasing = patrolSubFSM.CreatePerception<TimerDecoratorNode>(1);
+        timerChasing = patrolSubFSM.CreatePerception<TimerPerception>(1);
         isInStatePatrol = patrolSubFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Patroling");
         isInStateChasing = patrolSubFSM.CreatePerception<IsInStatePerception>(patrolSubFSM, "Chasing");
 
@@ -231,6 +229,7 @@ public class OrganizerStudent : Authority
 
     protected void Negotiate()
     {
+        createMessage(8);
         Debug.Log("[" + name + ", " + getRole() + "] I shouldn't let you go, but...");
         //createMessage("I shouldn't let you go, but...", Color.blue);
         negotiateRandom = Random.value;
@@ -238,6 +237,7 @@ public class OrganizerStudent : Authority
 
     protected void CallTeacher()
     {
+        createMessage(4);
         Debug.Log("[" + name + ", " + getRole() + "] Sir, get that kid!");
         //createMessage("Sir, get that kid!", Color.blue);
     }

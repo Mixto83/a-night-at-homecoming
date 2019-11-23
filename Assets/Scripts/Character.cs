@@ -302,6 +302,10 @@ public class Character
     public void thirstIncrement()
     {
         thirst++;
-        Debug.Log(thirst);
+    }
+
+    public virtual bool Fire(string transition)
+    {
+        return false;
     }
 }

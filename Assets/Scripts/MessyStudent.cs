@@ -7,7 +7,7 @@ public class MessyStudent : Student
     //parameters
     #region StateMachines
     private StateMachineEngine messyStudentFSM;
-    public StateMachineEngine punishmentSubFSM;
+    private StateMachineEngine punishmentSubFSM;
     public StateMachineEngine troubleSubFSM;
     #endregion
 
@@ -381,7 +381,6 @@ public class MessyStudent : Student
     protected void Arguing()
     {
         createMessage(8);
-
     }
     //Escape de la sala de castigo
     protected void Escape()
@@ -548,5 +547,18 @@ public bool isCausingTrouble()
         var desc = "NAME: " + getName() + ", ROLE: " + getRole() + ", STATE: " + messyStudentFSM.GetCurrentState().Name;
 
         return desc + "\n";
+    }
+
+    public override bool Fire(string transition)
+    {
+        try
+        {
+            troubleSubFSM.Fire(transition);
+            return true;
+        }
+        catch (KeyNotFoundException)
+        {
+            return false;
+        }
     }
 }

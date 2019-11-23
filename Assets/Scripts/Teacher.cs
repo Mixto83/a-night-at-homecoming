@@ -11,7 +11,6 @@ public class Teacher : Authority
     private StateMachineEngine chaseSubFSM;
     public StateMachineEngine punishmentRoomSubFSM;
 
-    private WatchingPerception watchingTrouble;
     private WatchingPerception watchingScaping;
 
     float distractionRandom;
@@ -25,8 +24,8 @@ public class Teacher : Authority
     private Vector3 gymPosition = new Vector3(18.0f, 7.0f, 0.0f);
     private Vector3 punishTablePosition = new Vector3(17.5f, 36.0f, 0.0f);
 
-    MessyStudent targetMessyStudent;
-    MessyStudent targetEscapingStudent;
+    //MessyStudent targetMessyStudent;
+    //MessyStudent targetEscapingStudent;
 
     private volatile bool availableForMess = true;
 
@@ -37,8 +36,6 @@ public class Teacher : Authority
         this.strictness = 1;
 
         this.distractionRandom = Random.Range(2, 10);
-        this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() != Roles.MessyStudent,
-            () => watchingTrouble.getTargetCharacter().isInState("Trouble"));
         
         CreatePatrolSubStateMachine();
         CreatePunishmentSubStateMachine();
@@ -84,15 +81,19 @@ public class Teacher : Authority
 
         // Perceptions
         
-        Perception reachedMessy = chaseSubFSM.CreatePerception<ValuePerception>(() => distanceToMessy <= 1.8f);
+        Perception reachedMessy = chaseSubFSM.CreatePerception<ValuePerception>(() => targetStudent != null ? Vector3.Distance(targetStudent.GetGameObject().transform.position, GetGameObject().transform.position) < 1 : false);
         Perception arguingTimer = chaseSubFSM.CreatePerception<TimerPerception>(4);
-        Perception stillChasing = chaseSubFSM.CreatePerception<TimerPerception>(2);
+        //Perception stillChasing = chaseSubFSM.CreatePerception<TimerPerception>(2);
         // States
-        State chasingStudentState = chaseSubFSM.CreateEntryState("Chasing Student", ChaseMessyStudent);
+        State chasingStudentState = chaseSubFSM.CreateEntryState("Chasing Student", ChaseStudent);
         State arguingState = chaseSubFSM.CreateState("Arguing", Arguing);
         State toPunishmentRoomState = chaseSubFSM.CreateState("Taking student to punishment room", ToPunishmentRoom);
+
+        timerChasing = chaseSubFSM.CreatePerception<TimerPerception>(1);
+        isInStateChasing = chaseSubFSM.CreatePerception<IsInStatePerception>(chaseSubFSM, "Chasing Student");
+
         // Transitions
-        chaseSubFSM.CreateTransition("Keep chasing", chasingStudentState, stillChasing, chasingStudentState);
+        //chaseSubFSM.CreateTransition("Keep chasing", chasingStudentState, stillChasing, chasingStudentState);
         chaseSubFSM.CreateTransition("Caught", chasingStudentState, reachedMessy, arguingState);
         chaseSubFSM.CreateTransition("Finish arguing", arguingState, arguingTimer, toPunishmentRoomState);
     }
@@ -128,7 +129,10 @@ public class Teacher : Authority
 
         Perception atGym = teacherFSM.CreatePerception<ValuePerception>(() => distanceToGym <= 0.5f);
 
+        Perception lostSightOfStudent = patrolSubFSM.CreatePerception<ValuePerception>(() => targetStudent != null ? Vector3.Distance(targetStudent.GetGameObject().transform.position, GetGameObject().transform.position) >= 15 : false);
         Perception loseStudentPush = teacherFSM.CreatePerception<PushPerception>();
+
+        Perception lostStudent = patrolSubFSM.CreateOrPerception<OrPerception>(lostSightOfStudent, loseStudentPush);
 
         Perception isGoingToPR = teacherFSM.CreatePerception<IsInStatePerception>(chaseSubFSM, "Taking student to punishment room");
         Perception atPR = teacherFSM.CreatePerception<ValuePerception>(() => distanceToPunish <= 1.5f);
@@ -167,7 +171,7 @@ public class Teacher : Authority
         teacherFSM.CreateTransition("Start", startState, startPush, patrolState);
         patrolSubFSM.CreateExitTransition("Sees trouble / Finishes talking to organizer", patrolState, readyToChase, chaseState);
         teacherFSM.CreateTransition("Gets to gym from punishment room", returnToGym, atGym, patrolState);
-        chaseSubFSM.CreateExitTransition("Student escaped", chaseState, loseStudentPush, patrolState);
+        chaseSubFSM.CreateExitTransition("Student escaped", chaseState, lostStudent, patrolState);
         chaseSubFSM.CreateExitTransition("Teacher at PR, returns to gym", chaseState, notStayAtPR, returnToGym);
         chaseSubFSM.CreateExitTransition("No other teacher at PR, stays", chaseState, stayAtPR, punishmentRoomState);
         punishmentRoomSubFSM.CreateExitTransition("No students left, returns to gym", punishmentRoomState, noStudentsAtPR, leavePRState);
@@ -183,7 +187,6 @@ public class Teacher : Authority
 
     public override void Update()
     {
-        if (targetMessyStudent != null) distanceToMessy = Vector3.Distance(this.GetGameObject().transform.position, targetMessyStudent.GetGameObject().transform.position);
         distanceToPunish = Vector3.Distance(this.GetGameObject().transform.position, punishPosition);
         distanceToGym = Vector3.Distance(this.GetGameObject().transform.position, gymPosition);
         distanceToPunishTable = Vector3.Distance(this.GetGameObject().transform.position, punishTablePosition);
@@ -194,6 +197,20 @@ public class Teacher : Authority
         teacherFSM.Update();
         punishmentRoomSubFSM.Update();
         DebugInputs();
+
+        if (isInStateChasing.Check())
+        {
+            if (timerChasing.Check())
+            {
+                if (targetStudent != null)
+                {
+                    timerChasing.Reset();
+
+                    Vector3 offset = GetGameObject().transform.position - targetStudent.GetGameObject().transform.position;
+                    Move(targetStudent.GetGameObject().transform.position - offset.normalized);
+                }
+            }
+        }
     }
 
     public override bool isInState(params string[] states)
@@ -240,7 +257,11 @@ public class Teacher : Authority
 
     protected void Arguing()
     {
-        if (targetMessyStudent != null) { targetMessyStudent.troubleSubFSM.Fire("Busted by teacher"); }
+        if (targetStudent != null)
+        {
+             if (!targetStudent.Fire("Busted by teacher")) Debug.Log("Transición no existe");
+        }
+
         createMessage(11);
     }
 
@@ -277,15 +298,6 @@ public class Teacher : Authority
         Move(new Vector3(currentOcuppiedPos[0], currentOcuppiedPos[1]));
     }
 
-    protected void ChaseMessyStudent()
-    {
-        if (targetMessyStudent != null)
-        {
-            createMessage(11);
-            Move(targetMessyStudent.GetGameObject().transform.position + new Vector3(1.5f, 0.0f, 0.0f));
-        }
-    }
-
     protected void WaitForMessy()
     {
         Move(this.GetGameObject().transform.position);
@@ -294,14 +306,14 @@ public class Teacher : Authority
 
     public void SetMessyStudent(MessyStudent ms)
     {
-        targetMessyStudent = ms;
+        targetStudent = ms;
     }
     
     protected void TriggerMessy()
     {
-        if (targetMessyStudent != null)
+        if (targetStudent != null)
         {
-            targetMessyStudent.troubleSubFSM.Fire("Finished bothering teacher");
+            if (!targetStudent.Fire("Finished bothering teacher")) Debug.Log("Transición no existe");
             patrolSubFSM.Fire("Pursuit messy");
         }
     }

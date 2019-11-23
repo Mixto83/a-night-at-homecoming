@@ -8,10 +8,12 @@ public class Authority : Character
     //parameters
     protected StateMachineEngine doorSubFSM;
     private WatchingPerception watchingDoor;
-    protected WatchingPerception watchingMessy;
+    protected WatchingPerception watchingTrouble;
 
     protected Character targetStudent;
-    
+    protected Perception isInStateChasing;
+    protected Perception timerChasing;
+
     protected float distanceToDoor;
 
     #region Stats
@@ -24,8 +26,8 @@ public class Authority : Character
     {
         this.watchingDoor = new WatchingPerception(this.gameObject, () => !watchingDoor.getTargetCharacter().getGreeted(),
             () => watchingDoor.getTargetCharacter().getRole() == Roles.CalmStudent || watchingDoor.getTargetCharacter().getRole() == Roles.MessyStudent);
-        this.watchingMessy = new WatchingPerception(this.gameObject, () => watchingMessy.getTargetCharacter().getRole() == Roles.MessyStudent,
-            () => watchingMessy.getTargetCharacter().isInState("Trouble"));
+        this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() == Roles.MessyStudent,
+            () => watchingTrouble.getTargetCharacter().isInState("Trouble"));
 
         CreateDoorSubStateMachine();
     }
@@ -78,9 +80,9 @@ public class Authority : Character
 
     protected void ChaseStudent()
     {
+        createMessage(11);
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
-        targetStudent = watchingDoor.getTargetCharacter();
+        targetStudent = watchingTrouble.getTargetCharacter();
         Debug.Log("[" + name + ", " + getRole() + "] Come back here, you little...");
-        //createMessage("Come back here, you little...", Color.blue);
     }
 }
