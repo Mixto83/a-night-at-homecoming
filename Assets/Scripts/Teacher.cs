@@ -9,9 +9,10 @@ public class Teacher : Authority
     private StateMachineEngine teacherSubFSM;
     public StateMachineEngine patrolSubFSM;
     private StateMachineEngine chaseSubFSM;
-    private StateMachineEngine punishmentRoomSubFSM;
+    public StateMachineEngine punishmentRoomSubFSM;
 
     private WatchingPerception watchingTrouble;
+    private WatchingPerception watchingScaping;
 
     float distractionRandom;
 
@@ -25,9 +26,9 @@ public class Teacher : Authority
     private Vector3 punishTablePosition = new Vector3(17.5f, 36.0f, 0.0f);
 
     MessyStudent targetMessyStudent;
+    MessyStudent targetEscapingStudent;
 
     private volatile bool availableForMess = true;
-    private bool distracted = false;
 
     //methods
     public Teacher(string name, Genders gender, Transform obj, GameManager gameState) : base(name, gender, obj, gameState)
@@ -38,7 +39,7 @@ public class Teacher : Authority
         this.distractionRandom = Random.Range(2, 10);
         this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() != Roles.MessyStudent,
             () => watchingTrouble.getTargetCharacter().isInState("Trouble"));
-
+        
         CreatePatrolSubStateMachine();
         CreatePunishmentSubStateMachine();
         CreateChaseSubStateMachine();
@@ -308,7 +309,8 @@ public class Teacher : Authority
     //Punishment Room State FSM: Teachers
     protected void Watching()
     {
-        distracted = false;
+        LookAt(GameObject.FindGameObjectWithTag("Desk").transform);
+        this.gameState.SetTeacherDistracted(false);
         Debug.Log("[" + name + ", " + getRole() + "] Don't think you're gonna escape...");
         
     }
@@ -317,12 +319,12 @@ public class Teacher : Authority
     {
         Debug.Log("[" + name + ", " + getRole() + "] President Tremp did what again?");
         distractionRandom = Random.Range(2, 10);
-        distracted = true;
+        this.gameState.SetTeacherDistracted(true);
     }
 
     protected void LeavePR()
     {
-        distracted = false;
+        this.gameState.SetTeacherDistracted(false);
         gameState.setPunishRoomAttended(false);
     }
 
@@ -336,10 +338,6 @@ public class Teacher : Authority
         availableForMess = targeted;
     }
 
-    public bool GetDistracted()
-    {
-        return distracted;
-    }
 
     public override string Description()
     {

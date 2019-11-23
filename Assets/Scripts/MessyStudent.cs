@@ -7,7 +7,7 @@ public class MessyStudent : Student
     //parameters
     #region StateMachines
     private StateMachineEngine messyStudentFSM;
-    private StateMachineEngine punishmentSubFSM;
+    public StateMachineEngine punishmentSubFSM;
     public StateMachineEngine troubleSubFSM;
     #endregion
 
@@ -51,9 +51,9 @@ public class MessyStudent : Student
             () => ((CalmStudent)watchingCalmStudent.getTargetCharacter()).GetMessyFlag(), () => watchingCalmStudent.getTargetCharacter().isInState("Enjoying"));
         this.watchingTeacher = new WatchingPerception(this.gameObject, () => watchingTeacher.getTargetCharacter().getRole() == Roles.Teacher, () => watchingTeacher.getTargetCharacter().isInState("Patrol"),
             () => ((Teacher)watchingTeacher.getTargetCharacter()).isInSubState(((Teacher)watchingTeacher.getTargetCharacter()).patrolSubFSM, "Patroling"),
-            () => ((Teacher)watchingTeacher.getTargetCharacter()).GetMessyFlag());//Cambiar estado
+            () => ((Teacher)watchingTeacher.getTargetCharacter()).GetMessyFlag());
         this.watchingOrganizerStudent = new WatchingPerception(this.gameObject, () => watchingOrganizerStudent.getTargetCharacter().getRole() == Roles.OrganizerStudent);
-        
+
         this.whiteFlagStudents = new List<CalmStudent>();
         this.thirst = 0.0f;
         this.fatigue = 0.0f;
@@ -168,7 +168,7 @@ public class MessyStudent : Student
         Perception push = punishmentSubFSM.CreatePerception<PushPerception>(); //temporal
         Perception roomReached = punishmentSubFSM.CreatePerception<ValuePerception>(() => distanceToPunishmentRoom < 0.5);
         Perception seatReached = punishmentSubFSM.CreatePerception<ValuePerception>(() => distanceToPunishPos < 0.5);
-        Perception teacherDistracted = punishmentSubFSM.CreatePerception<ValuePerception>();
+        Perception teacherDistracted = punishmentSubFSM.CreatePerception<ValuePerception>(() => this.gameState.GetTeacherDistracted());
         Perception bustedByTeacher = punishmentSubFSM.CreatePerception<PushPerception>();
         Perception reachedEscape = punishmentSubFSM.CreatePerception<ValuePerception>(() => distanceToEscapePos < 0.5);
         Perception punishTimer = punishmentSubFSM.CreatePerception<TimerPerception>(35);//Cambiar a algo mucho mas grande
@@ -422,6 +422,7 @@ public class MessyStudent : Student
         }
         
     }
+
     #endregion
 
     #region Movement Methods
@@ -507,6 +508,7 @@ public bool isCausingTrouble()
             return false;
         }
     }
+
 
     protected void DebugInputs()
     {

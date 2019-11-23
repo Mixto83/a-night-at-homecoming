@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     private bool barAttended = false;
     private bool punishRoomAttended = false;
     private volatile bool barBeingSabotaged = false;
+    private bool teacherDistracted = false;
     private volatile int peopleOnPunishmentRoom = 0;
     [HideInInspector] public string soundingMusic;
     private SimpleTimer musicTimer;
@@ -410,6 +411,16 @@ public class GameManager : MonoBehaviour
     public int GetPeoplePunished()
     {
         return peopleOnPunishmentRoom;
+    }
+
+    public bool GetTeacherDistracted()
+    {
+        return teacherDistracted;
+    }
+
+    public void SetTeacherDistracted(bool distracted)
+    {
+        teacherDistracted = distracted;
     }
 
     public void ChangePeoplePunished(bool positive)
