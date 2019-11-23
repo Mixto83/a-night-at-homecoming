@@ -30,7 +30,6 @@ public class GameManager : MonoBehaviour
     private SimpleTimer thirstTimer;
     public SimpleTimer sabotageAvailable;
 
-
     List<GameObject> Agents;
     List<Character> People;
     [SerializeField] bool debugMode;
@@ -56,6 +55,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public List<float> possiblePosPunishment;
 
     private int queueNum;
+    private GameObject currentAgent;
 
     private void Awake()
     {
@@ -337,11 +337,28 @@ public class GameManager : MonoBehaviour
                 clearTexts(GameObject.FindGameObjectWithTag("CanvasPrincipal"));
             }
 
-            /*foreach (GameObject agent in Agents) {
-                showAgentInfo(agent);
-            }*/
+            if (Input.GetMouseButtonDown(0))
+            {
+                RaycastHit hitInfo = new RaycastHit();
+                bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
+                if (hit)
+                {
+                    if (Agents.Contains(hitInfo.transform.gameObject))
+                    {
+                        selectAgent(hitInfo.transform.gameObject);
+                    }
+                    else
+                    {
+                        selectAgent(null);
+                    }
+                }
+                else
+                {
+                    selectAgent(null);
+                }
+            }
 
-            showAgentInfo(Agents[0]);
+            showAgentInfo(currentAgent);
         }
     }
 
@@ -469,13 +486,15 @@ public class GameManager : MonoBehaviour
 
     private void showAgentInfo(GameObject agent)
     {
+        Debug.Log("funsiona");
+
         clearTexts(GameObject.FindGameObjectWithTag("CanvasUI"));
 
         GameObject newText = new GameObject("AgentInfo", typeof(RectTransform));
         var newTextComp = newText.AddComponent<Text>();
         if (newText.GetComponent<CanvasRenderer>() == null) newText.AddComponent<CanvasRenderer>();
 
-        newTextComp.text = GetCharacter(agent).AgentInfoUI();
+        if(agent != null) newTextComp.text = GetCharacter(agent).AgentInfoUI();
         newTextComp.color = Color.blue;
         newTextComp.font = Resources.Load<Font>("AdobeGothicStdB");
         newTextComp.alignment = TextAnchor.UpperLeft;
@@ -496,5 +515,11 @@ public class GameManager : MonoBehaviour
         {
             GameObject.Destroy(txt.gameObject);
         }
+    }
+
+    private void selectAgent(GameObject agent)
+    {
+        Debug.Log("heeey");
+        currentAgent = agent;
     }
 }

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2049020526946959062}
   - component: {fileID: 7967280573403342700}
+  - component: {fileID: 1808743622282601748}
   m_Layer: 0
   m_Name: Alumno Tranquilo
   m_TagString: CalmStudent
@@ -56,6 +57,19 @@ NavMeshAgent:
   m_BaseOffset: 0.4
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!135 &1808743622282601748
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2357061272959043825}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.7
+  m_Center: {x: 0.11, y: 0, z: -0.11}
 --- !u!1 &3756364656320593907
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,7 +192,7 @@ SpriteRenderer:
   m_Size: {x: 0.8, y: 0.8}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!95 &9034253889907704149
