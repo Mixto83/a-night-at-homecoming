@@ -7,16 +7,17 @@ using UnityEngine.UI;
 public enum Roles { CalmStudent, MessyStudent, Teacher, OrganizerStudent }
 public enum Genders { Male, Female }
 
+
 public class GameManager : MonoBehaviour
 {
     protected readonly int MALENAMES_NUM = 7;
     protected readonly int FOODS_NUM = 10;
     protected readonly int ANIMALS_NUM = 12;
     protected readonly int HOBBIES_NUM = 12;
-    protected readonly int MUSICS_NUM = 9;
+    protected readonly int MUSICS_NUM = 11;
 
     [SerializeField] bool paused = false;
-
+    
     private bool forceDoorAttended = false;
     private bool doorAttended = false;
     private bool forceBarAttended = false;
@@ -35,6 +36,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] bool debugMode;
     [SerializeField] GameObject door;
     [SerializeField] GameObject bar;
+    public AudioManager audioManager;
 
     public Image InfoFrame;
     public List<Sprite> bocadillos;
@@ -43,7 +45,7 @@ public class GameManager : MonoBehaviour
     string[] Hobbies = new string[] { "Comic books", "Videogames", "Movies", "Books", "Cooking", "Board games", "Trading card games", "Sports", "School shooting", "Music", "Dancing", "Gym" };
     string[] Animals = new string[] { "Dog", "Cat", "Bird", "Bee", "Sheep", "Whale", "Possum", "Crocodile", "Bat", "Spider", "Lizard", "Turtle" };
     string[] Foods = new string[] { "Hamburgers", "Pizza", "Pasta", "Sandwich", "Fish", "Eggs", "Salad", "Chocolate", "Children", "Apple" };
-    string[] Music = new string[] { "Rock", "Rap", "Classical", "Punk", "Techno", "Disco", "Romantic", "Pop", "Rumba" }; 
+    string[] Music = new string[] { "Rock", "Rap", "Classical", "Punk", "Techno", "Disco", "Romantic", "Pop", "Blues", "Ska", "Salsa" }; 
 
     [SerializeField] List<int> friendsGroups;
     List<Group> groups;
@@ -257,6 +259,7 @@ public class GameManager : MonoBehaviour
         musicTimer = new SimpleTimer(10);
         sabotageAvailable = new SimpleTimer(10);//No empieza de primeras
         musicTimer.start();
+        audioManager.PlayCrowd();
 
         thirstTimer = new SimpleTimer(Random.Range(5f, 31f));
         thirstTimer.start();
@@ -419,6 +422,7 @@ public class GameManager : MonoBehaviour
     public void changeMusic()
     {
         soundingMusic = Music[Random.Range(0, MUSICS_NUM)];
+        audioManager.ChangeSong(soundingMusic);
     }
 
     public Character GetCharacter(GameObject obj)
