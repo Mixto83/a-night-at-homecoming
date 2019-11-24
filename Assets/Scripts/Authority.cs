@@ -84,6 +84,7 @@ public class Authority : Character
         if(targetStudent == null) targetStudent = (MessyStudent) watchingTrouble.getTargetCharacter();
         if (this.role == Roles.OrganizerStudent && targetStudent != null)
         {
+            targetStudent.SetNegotiator((OrganizerStudent)this);
             targetStudent.SetCausingTrouble(false);
             targetStudent.Fire("Busted by organizer");
         }

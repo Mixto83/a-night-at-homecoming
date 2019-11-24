@@ -230,6 +230,7 @@ public class OrganizerStudent : Authority
     protected void Negotiate()
     {
         createMessage(8);
+        if (targetStudent != null) targetStudent.Fire("Negotiation starts");
         Debug.Log("[" + name + ", " + getRole() + "] I shouldn't let you go, but...");
         //createMessage("I shouldn't let you go, but...", Color.blue);
         negotiateRandom = Random.value;

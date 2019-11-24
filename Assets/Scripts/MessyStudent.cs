@@ -196,11 +196,6 @@ public class MessyStudent : Student
     {
         messyStudentFSM = new StateMachineEngine(false);
 
-        // Perceptions
-        Perception push = messyStudentFSM.CreatePerception<PushPerception>(); //temporal
-        Perception push1 = messyStudentFSM.CreatePerception<PushPerception>(); //temporal
-        Perception push2 = messyStudentFSM.CreatePerception<PushPerception>(); //temporal
-
         //Comprueban si está cansado, sediento, ambas y cuál de las dos más
         Perception tired = messyStudentFSM.CreatePerception<ValuePerception>(() => fatigue > fatigueThreshold);
         Perception notTired = messyStudentFSM.CreatePerception<ValuePerception>(() => fatigue < fatigueThreshold);
@@ -209,6 +204,8 @@ public class MessyStudent : Student
         Perception moreThirsty = messyStudentFSM.CreatePerception<ValuePerception>(() => thirst > fatigue);
         Perception moreTired = messyStudentFSM.CreatePerception<ValuePerception>(() => thirst < fatigue);
         Perception thirstyAndTired = messyStudentFSM.CreateAndPerception<AndPerception>(tired, thirsty);
+        Perception thirstyOrMoreThirsty = messyStudentFSM.CreateAndPerception<AndPerception>(thirsty, moreThirsty);
+        Perception tiredOrMoreTired = messyStudentFSM.CreateAndPerception<AndPerception>(tired, moreTired);
 
         //Comprueban estado actual
         timeOut = messyStudentFSM.CreatePerception<TimerPerception>(2);
@@ -222,19 +219,12 @@ public class MessyStudent : Student
         Perception exitDrinkTired = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateDrink, tired);
         Perception exitDrinkNotTired = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateDrink, notTired);
 
-        //Sale de sentado: sediento o sin sed
-        //En principio no son necesarios: deberia valer usando thirsty y not thirsty
-        //TODO: Borrar tras comprobar
-        Perception exitBenchThirsty = messyStudentFSM.CreateAndPerception<AndPerception>(inBench, thirsty);
-        Perception exitBenchNotThirsty = messyStudentFSM.CreateAndPerception<AndPerception>(inBench, notThirsty);
-
         //Sale de trouble: sediendo, cansado (o una mas que la otra) o castigado
-        Perception exitTroubleThirsty = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateTrouble, thirsty);
-        Perception exitTroubleTired = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateTrouble, tired);
-        Perception exitTroublePunished = messyStudentFSM.CreatePerception<PushPerception>();//Eliminar
+        Perception exitTroubleThirsty = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateTrouble, thirstyOrMoreThirsty);
+        Perception exitTroubleTired = messyStudentFSM.CreateAndPerception<AndPerception>(isInStateTrouble, tiredOrMoreTired);
 
         //Salida del castigo
-        Perception exitPunishment = messyStudentFSM.CreatePerception<PushPerception>();//WIP
+        Perception exitPunishment = messyStudentFSM.CreatePerception<PushPerception>();
 
         // States
         State startState = messyStudentFSM.CreateEntryState("Start", Start);
@@ -245,7 +235,6 @@ public class MessyStudent : Student
 
         // Transitions
         messyStudentFSM.CreateTransition("Starting trouble", startState, enterParty, troubleState);
-        //messyStudentFSM.CreateTransition("Starting trouble", startState, enterParty, punishmentState);//Testing
 
         messyStudentFSM.CreateTransition("Out of trouble thirsty", troubleState, exitTroubleThirsty, drinkingState);
         messyStudentFSM.CreateTransition("Out of trouble tired", troubleState, exitTroubleTired, benchState);
@@ -415,7 +404,7 @@ public class MessyStudent : Student
     //Negociacion tras sabotear bebida y ser pillado por organizador
     protected void StartNegotation()
     {
-        negotiatorStudent = (OrganizerStudent)watchingOrganizerStudent.getTargetCharacter();
+        //negotiatorStudent = (OrganizerStudent)watchingOrganizerStudent.getTargetCharacter();
         createMessage(8);
         Move(this.gameObject.transform.position - new Vector3(0, 2, 0));
     }
@@ -519,6 +508,10 @@ public class MessyStudent : Student
         causingTrouble = b;
     }
 
+    public void SetNegotiator(OrganizerStudent os)
+    {
+        negotiatorStudent = os;
+    }
 
 
     public override bool isInState(params string[] states)
@@ -567,33 +560,13 @@ public class MessyStudent : Student
     {
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            troubleSubFSM.Fire("Busted by teacher (fight)");
+            messyStudentFSM.Fire("Out of trouble thirsty");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            troubleSubFSM.Fire("Busted by teacher (bar)");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha6))
-        {
-            troubleSubFSM.Fire("Busted by organizer");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha7))
-        {
-            troubleSubFSM.Fire("Negotiation starts");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha8))
-        {
-            troubleSubFSM.Fire("Convinced organizer");
-        }
-        
-        if (Input.GetKeyDown(KeyCode.Alpha9))
-        {
-            troubleSubFSM.Fire("Didn't convince organizer");
-        }
+            messyStudentFSM.Fire("Out of trouble tired");
+        }    
     }
 
     public override string DebugDescription()
