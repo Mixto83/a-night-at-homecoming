@@ -256,7 +256,7 @@ public class GameManager : MonoBehaviour
         }
 
         changeMusic();
-        musicTimer = new SimpleTimer(10);
+        musicTimer = new SimpleTimer(30);
         sabotageAvailable = new SimpleTimer(10);//No empieza de primeras
         musicTimer.start();
         audioManager.PlayCrowd();
