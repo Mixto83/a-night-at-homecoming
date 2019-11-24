@@ -486,8 +486,6 @@ public class GameManager : MonoBehaviour
 
     private void showAgentInfo(GameObject agent)
     {
-        Debug.Log("funsiona");
-
         clearTexts(GameObject.FindGameObjectWithTag("CanvasUI"));
 
         GameObject newText = new GameObject("AgentInfo", typeof(RectTransform));

@@ -238,6 +238,29 @@ public class OrganizerStudent : Authority
     protected void CallTeacher()
     {
         createMessage(4);
+        List<Character> people = gameState.GetPeople();
+        bool teacherFound = false;
+        foreach(Character chara in people)
+        {
+            if(chara.getRole() == Roles.Teacher)
+            {
+                float distance = Vector3.Distance(GetGameObject().transform.position, chara.GetGameObject().transform.position);
+
+                if((distance <= 8f) && ((Teacher)chara).isInSubState(patrolSubFSM, "Patrolling"))
+                {
+                    if (targetStudent != null) ((Teacher)chara).SetMessyStudent(targetStudent);
+                    ((Teacher)chara).patrolSubFSM.Fire("Sees organizer call");
+                    teacherFound = true;
+                    break;
+                }
+            }
+        }
+        if (!teacherFound)
+        {
+            Debug.Log("Teacher not found");
+            targetStudent.Fire("Convinced organizer");
+            patrolSubFSM.Fire("Teacher got the call");            
+        }
         Debug.Log("[" + name + ", " + getRole() + "] Sir, get that kid!");
         //createMessage("Sir, get that kid!", Color.blue);
     }
