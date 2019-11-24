@@ -373,7 +373,7 @@ public class CalmStudent : Student
 
     public override string AgentInfoUI()
     {
-        var info = "NAME: " + getName() + "\nGENDER: " + getGender() + "\nLIKES: " + sexuality + "\nROLE: " + getRole() + "\nTHIRST: " + thirst / thirstThreshold * 100 + "%"
+        var info = "NAME: " + getName() + "\nGENDER: " + getGender() + "\nLIKES: " + sexuality + "\nROLE: " + getRole() + "\nTHIRST: " + thirst / thirstThreshold * 100 + "%\nFATIGUE: " + fatigue / fatigueThreshold * 100 + "%"
             + "\nHOBBIES: " + listToString(Hobbies) + "\nFAV ANIMALS: " + listToString(FavAnimals) + "\nFAV FOODS: " + listToString(FavFoods);
 
         return info;

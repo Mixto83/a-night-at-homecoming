@@ -321,7 +321,7 @@ public class Teacher : Authority
 
     protected void ReadingNewspaper()
     {
-        createMessage(3);
+        createMessage(14);
         distractionRandom = Random.Range(8, 20);
         this.gameState.SetTeacherDistracted(true);
     }
