@@ -232,14 +232,14 @@ public class MessyStudent : Student
         // Transitions
         messyStudentFSM.CreateTransition("Starting trouble", startState, enterParty, troubleState);
 
-        messyStudentFSM.CreateTransition("Out of trouble thirsty", troubleState, exitTroubleThirsty, drinkingState);
+        /*messyStudentFSM.CreateTransition("Out of trouble thirsty", troubleState, exitTroubleThirsty, drinkingState);
         messyStudentFSM.CreateTransition("Out of trouble tired", troubleState, exitTroubleTired, benchState);
 
         drinkSubFSM.CreateExitTransition("Out of drink tired", drinkingState, exitDrinkTired, benchState);
         drinkSubFSM.CreateExitTransition("Out of drink troubling", drinkingState, exitDrinkNotTired, troubleState);
 
         messyStudentFSM.CreateTransition("Out of bench thirsty", benchState, thirsty, drinkingState);
-        messyStudentFSM.CreateTransition("Out of bench troubling", benchState, notThirsty, troubleState);
+        messyStudentFSM.CreateTransition("Out of bench troubling", benchState, notThirsty, troubleState);*/
 
         troubleSubFSM.CreateExitTransition("Finished arguing", troubleState, isInStateReadyToPunish, punishmentState);
         punishmentSubFSM.CreateExitTransition("End of punishment", punishmentState, exitPunishment, troubleState);
