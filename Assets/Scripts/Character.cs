@@ -220,12 +220,14 @@ public class Character
 
     protected void WaitingQueue()
     {
+        createMessage(6);
         Debug.Log("[" + name + ", " + getRole() + "] Waiting at queue");
         canBeServed = true;
     }
 
     protected void Drinking()
     {
+        clearSprites();
         Debug.Log("[" + name + ", " + getRole() + "] Drinking!");
         this.thirst = 0.0f;
         gameState.reduceBarQueue(this);
@@ -233,35 +235,6 @@ public class Character
 
     protected void createMessage(int index)
     {
-        /*
-        clearTexts();
-
-        if (color == null)
-        {
-            color = Color.green;
-        }
-        if (text == null)
-        {
-            text = "";
-        }
-        
-        GameObject newText = new GameObject(text.Replace(" ", "-"), typeof(RectTransform));
-        var newTextComp = newText.AddComponent<Text>();
-        if (newText.GetComponent<CanvasRenderer>() == null) newText.AddComponent<CanvasRenderer>();
-
-        newTextComp.text = text;
-        newTextComp.color = color;
-        newTextComp.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        newTextComp.alignment = TextAnchor.MiddleCenter;
-        newTextComp.fontSize = 30;
-
-        newText.transform.SetParent(this.gameObject.GetComponentInChildren<Canvas>().transform);
-
-        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 200);
-        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 100);
-        newText.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-        newText.transform.localPosition = new Vector3(0, 1, 0);*/
-
         clearSprites();
 
         GameObject newSprite = new GameObject(gameState.bocadillos[index].name);

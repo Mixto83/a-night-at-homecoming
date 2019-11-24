@@ -95,7 +95,7 @@ public class OrganizerStudent : Authority
         patrolSubFSM.CreateTransition("Convinced", negotiateState, negotiationEndConvinced, patrollingState);
         patrolSubFSM.CreateTransition("Not convinced", negotiateState, negotiationEndNotConvinced, callTeacherState);
 
-        patrolSubFSM.CreateTransition("Teacher got the call", callTeacherState, push, patrollingState); //Hacer push desde Teacher
+        patrolSubFSM.CreateTransition("Teacher got the call", callTeacherState, push, patrollingState);
     }
 
     public override void CreateStateMachine()
@@ -222,8 +222,8 @@ public class OrganizerStudent : Authority
     //Behaviours
     protected void ServeDrink()
     {
+        clearSprites();
         Debug.Log("[" + name + ", " + getRole() + "] Serving drink");
-        //createMessage("Have a drink!", Color.blue);
         watchingBar.getTargetCharacter().setServed();
     }
 
@@ -232,7 +232,6 @@ public class OrganizerStudent : Authority
         createMessage(8);
         if (targetStudent != null) targetStudent.Fire("Negotiation starts");
         Debug.Log("[" + name + ", " + getRole() + "] I shouldn't let you go, but...");
-        //createMessage("I shouldn't let you go, but...", Color.blue);
         negotiateRandom = Random.value;
     }
 
@@ -264,7 +263,6 @@ public class OrganizerStudent : Authority
             patrolSubFSM.Fire("Teacher got the call");            
         }
         Debug.Log("[" + name + ", " + getRole() + "] Sir, get that kid!");
-        //createMessage("Sir, get that kid!", Color.blue);
     }
 
     public bool CheckConvinced()

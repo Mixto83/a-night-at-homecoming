@@ -73,8 +73,8 @@ public class Authority : Character
 
     protected void Patrol()
     {
+        clearSprites();
         Debug.Log("[" + name + ", " + getRole() + "] I'm watching you!");
-        //createMessage("I'm watching you!", Color.blue);
     }
 
     protected void ChaseStudent()

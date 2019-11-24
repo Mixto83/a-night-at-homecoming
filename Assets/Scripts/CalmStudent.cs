@@ -102,7 +102,6 @@ public class CalmStudent : Student
         Perception enterParty = calmStudentFSM.CreatePerception<ValuePerception>(() => distanceToMeetPos < 1);
         timeOut = calmStudentFSM.CreatePerception<TimerPerception>(2);
         isInStateDrink = calmStudentFSM.CreatePerception<IsInStatePerception>(drinkSubFSM, "Drink");
-        Perception exitDrink = calmStudentFSM.CreateAndPerception<AndPerception>(isInStateDrink, timeOut); //not used
         Perception likeMusic = calmStudentFSM.CreatePerception<ValuePerception>(() => musicLikes.IndexOf(gameState.soundingMusic) != -1);
         Perception dislikeMusic = calmStudentFSM.CreatePerception<ValuePerception>(() => musicLikes.IndexOf(gameState.soundingMusic) == -1);
         Perception beautyCheck = calmStudentFSM.CreatePerception<WatchingPerception>(watching);
@@ -241,14 +240,6 @@ public class CalmStudent : Student
             affinity++;
         if (FavFoods[2] == targetStudent.FavFoods[0] || FavFoods[2] == targetStudent.FavFoods[1] || FavFoods[2] == targetStudent.FavFoods[2])
             affinity++;
-
-        /*if (affinity > affinityThreshold)
-        {
-            createMessage("This dude is a total chad!", Color.blue);
-        } else
-        {
-            createMessage("What a virgin!", Color.blue);
-        }*/
 
         return affinity;
     }

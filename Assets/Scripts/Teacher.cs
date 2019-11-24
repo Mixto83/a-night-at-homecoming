@@ -106,7 +106,7 @@ public class Teacher : Authority
 
         // Perceptions
         Perception atTable = punishmentRoomSubFSM.CreatePerception<ValuePerception>(() => distanceToPunishTable <= 1.0f);
-        Perception randomTimer = punishmentRoomSubFSM.CreatePerception<TimerPerception>(distractionRandom); //temporal
+        Perception randomTimer = punishmentRoomSubFSM.CreatePerception<TimerPerception>(distractionRandom);
         Perception randomTimer2 = punishmentRoomSubFSM.CreatePerception<TimerPerception>(distractionRandom);
 
         // States
@@ -190,7 +190,6 @@ public class Teacher : Authority
         chaseSubFSM.Update();
         teacherFSM.Update();
         punishmentRoomSubFSM.Update();
-        DebugInputs();
 
         if (isInStateChasing.Check())
         {
@@ -199,9 +198,6 @@ public class Teacher : Authority
                 if (targetStudent != null)
                 {
                     timerChasing.Reset();
-                    /*
-                    Vector3 offset = GetGameObject().transform.position - targetStudent.GetGameObject().transform.position;
-                    Move(targetStudent.GetGameObject().transform.position - offset.normalized);*/
                     Move(targetStudent.GetGameObject().transform.position + new Vector3(1.5f, 0.0f, 0.0f));
                 }
             }
@@ -262,6 +258,7 @@ public class Teacher : Authority
 
     protected void ToPunishmentRoom()
     {
+        createMessage(11);
         Move(punishPosition);
         targetStudent = null;
     }
@@ -275,6 +272,7 @@ public class Teacher : Authority
 
     protected void MoveToPRTable()
     {
+        clearSprites();
         gameState.setPunishRoomAttended(true);
         Move(punishTablePosition);
     }
@@ -301,10 +299,7 @@ public class Teacher : Authority
         patrolSubFSM.Fire("Warn messy");
     }
 
-    public void SetMessyStudent(MessyStudent ms)
-    {
-        targetStudent = ms;
-    }
+    
     
     protected void TriggerMessy()
     {
@@ -315,7 +310,6 @@ public class Teacher : Authority
         }
     }
 
-    //Punishment Room State FSM: Teachers
     protected void Watching()
     {
         clearSprites();
@@ -334,6 +328,7 @@ public class Teacher : Authority
 
     protected void LeavePR()
     {
+        clearSprites();
         this.gameState.SetTeacherDistracted(false);
         gameState.setPunishRoomAttended(false);
     }
@@ -364,6 +359,16 @@ public class Teacher : Authority
         availableForMess = targeted;
     }
 
+    public void SetMessyStudent(MessyStudent ms)
+    {
+        targetStudent = ms;
+    }
+
+    public void setOrganizer(OrganizerStudent org)
+    {
+        callingOrganizer = org;
+    }
+
 
     public override string DebugDescription()
     {
@@ -377,22 +382,5 @@ public class Teacher : Authority
         var info = "NAME: " + getName() + "\n\nROLE: " + getRole() + "\n\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
 
         return info;
-    }
-
-    public void setOrganizer(OrganizerStudent org)
-    {
-        callingOrganizer = org;
-    }
-
-    protected void DebugInputs()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            chaseSubFSM.Fire("Caught");
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            teacherFSM.Fire("No students left, returns to gym");
-        }
     }
 }
