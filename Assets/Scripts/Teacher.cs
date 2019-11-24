@@ -35,7 +35,7 @@ public class Teacher : Authority
         this.role = Roles.Teacher;
         this.strictness = 1;
 
-        this.distractionRandom = Random.Range(2, 10);
+        this.distractionRandom = Random.Range(5, 12);
         this.watchingTrouble = new WatchingPerception(this.gameObject, () => watchingTrouble.getTargetCharacter().getRole() == Roles.MessyStudent,
             () => ((MessyStudent)watchingTrouble.getTargetCharacter()).isCausingTrouble());
         
@@ -181,7 +181,7 @@ public class Teacher : Authority
         chaseSubFSM.CreateExitTransition("Teacher at PR, returns to gym", chaseState, notStayAtPR, returnToGym);
         chaseSubFSM.CreateExitTransition("No other teacher at PR, stays", chaseState, stayAtPR, punishmentRoomState);
         punishmentRoomSubFSM.CreateExitTransition("No students left, returns to gym", punishmentRoomState, noStudentsAtPR, leavePRState);
-        teacherFSM.CreateTransition("Table left, go back to gym", leavePRState,exitTimer, returnToGym);
+        teacherFSM.CreateTransition("Table left, go back to gym", leavePRState, exitTimer, returnToGym);
 
         /*patrolSubFSM.CreateExitTransition("Door unattended", patrolState, goToDoor, doorState);
         doorSubFSM.CreateExitTransition("Back from door", doorState, outOfDoor, patrolState);*/
@@ -329,16 +329,17 @@ public class Teacher : Authority
     //Punishment Room State FSM: Teachers
     protected void Watching()
     {
+        clearSprites();
+        distractionRandom = Random.Range(5, 12);
         LookAt(GameObject.FindGameObjectWithTag("Desk").transform);
         this.gameState.SetTeacherDistracted(false);
-        Debug.Log("[" + name + ", " + getRole() + "] Don't think you're gonna escape...");
         
     }
 
     protected void ReadingNewspaper()
     {
-        Debug.Log("[" + name + ", " + getRole() + "] President Tremp did what again?");
-        distractionRandom = Random.Range(2, 10);
+        createMessage(3);
+        distractionRandom = Random.Range(8, 20);
         this.gameState.SetTeacherDistracted(true);
     }
 

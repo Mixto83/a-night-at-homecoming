@@ -10,7 +10,7 @@ public class Authority : Character
     private WatchingPerception watchingDoor;
     protected WatchingPerception watchingTrouble;
 
-    protected Character targetStudent;
+    protected MessyStudent targetStudent;
     protected Perception isInStateChasing;
     protected Perception timerChasing;
 
@@ -81,7 +81,12 @@ public class Authority : Character
     {
         createMessage(11);
         if (currentOcuppiedPos != null) this.gameState.possiblePosGym.AddRange(currentOcuppiedPos);
-        if(targetStudent == null) targetStudent = watchingTrouble.getTargetCharacter();
+        if(targetStudent == null) targetStudent = (MessyStudent) watchingTrouble.getTargetCharacter();
+        if (this.role == Roles.OrganizerStudent && targetStudent != null)
+        {
+            targetStudent.SetCausingTrouble(false);
+            targetStudent.Fire("Busted by organizer");
+        }
         Debug.Log("[" + name + ", " + getRole() + "] Come back here, you little...");
     }
 }
