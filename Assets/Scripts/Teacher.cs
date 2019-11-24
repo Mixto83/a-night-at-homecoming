@@ -11,7 +11,7 @@ public class Teacher : Authority
     private StateMachineEngine chaseSubFSM;
     public StateMachineEngine punishmentRoomSubFSM;
 
-    private WatchingPerception watchingScaping;
+    private OrganizerStudent callingOrganizer;
 
     float distractionRandom;
 
@@ -57,7 +57,7 @@ public class Teacher : Authority
         Perception warningPush = patrolSubFSM.CreatePerception<PushPerception>();
         Perception pursuitPush = patrolSubFSM.CreatePerception<PushPerception>();
         Perception identifiedPush = patrolSubFSM.CreatePerception<PushPerception>();
-
+        
         // States
         State patrolingState = patrolSubFSM.CreateEntryState("Patroling", TeacherPatrol);
         State waitingForMessyState = patrolSubFSM.CreateState("Waiting For Messy", WaitForMessy);
@@ -248,6 +248,7 @@ public class Teacher : Authority
     protected void Talking()
     {
         createMessage(8);
+        if (callingOrganizer != null) callingOrganizer.Fire("Teacher got the call");
     }
 
     protected void Arguing()
@@ -326,7 +327,7 @@ public class Teacher : Authority
 
     protected void ReadingNewspaper()
     {
-        createMessage(14);
+        createMessage(3);
         distractionRandom = Random.Range(8, 20);
         this.gameState.SetTeacherDistracted(true);
     }
@@ -373,9 +374,14 @@ public class Teacher : Authority
 
     public override string AgentInfoUI()
     {
-        var info = "NAME: " + getName() + "\nGENDER: " + getGender() + "\nROLE: " + getRole() + "\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
+        var info = "NAME: " + getName() + "\n\nROLE: " + getRole() + "\n\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
 
         return info;
+    }
+
+    public void setOrganizer(OrganizerStudent org)
+    {
+        callingOrganizer = org;
     }
 
     protected void DebugInputs()

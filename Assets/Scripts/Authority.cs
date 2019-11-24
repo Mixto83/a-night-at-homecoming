@@ -67,7 +67,7 @@ public class Authority : Character
     protected void Welcome()
     {
         Debug.Log("[" + name + ", " + getRole() + "] Welcome to the party!");
-        //createMessage("Welcome to the party!", Color.blue);
+        createMessage(7);
         watchingDoor.getTargetCharacter().setGreeted(true);
     }
 

@@ -250,6 +250,7 @@ public class OrganizerStudent : Authority
                 if((distance <= 8f) && ((Teacher)chara).isInSubState(patrolSubFSM, "Patrolling"))
                 {
                     if (targetStudent != null) ((Teacher)chara).SetMessyStudent(targetStudent);
+                    ((Teacher)chara).setOrganizer(this);
                     ((Teacher)chara).patrolSubFSM.Fire("Sees organizer call");
                     teacherFound = true;
                     break;
@@ -283,5 +284,18 @@ public class OrganizerStudent : Authority
         var info = "NAME: " + getName() + "\nGENDER: " + getGender() + "\nROLE: " + getRole() + "\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
 
         return info;
+    }
+
+    public override bool Fire(string transition)
+    {
+        try
+        {
+            patrolSubFSM.Fire(transition);
+            return true;
+        }
+        catch (KeyNotFoundException)
+        {
+            return false;
+        }
     }
 }
