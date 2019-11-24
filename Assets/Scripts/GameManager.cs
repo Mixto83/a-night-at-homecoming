@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject door;
     [SerializeField] GameObject bar;
 
+    public Image InfoFrame;
     public List<Sprite> bocadillos;
 
     string[] Names = new string[] { "Diego", "Mario", "Juan", "Cesar", "Daniel", "Pedro", "Manuel", "Maria", "Marta", "Carmen", "Raquel", "Lucia", "Ana", "Laura" };
@@ -337,7 +338,7 @@ public class GameManager : MonoBehaviour
                 clearTexts(GameObject.FindGameObjectWithTag("CanvasPrincipal"));
             }
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonUp(0))
             {
                 RaycastHit hitInfo = new RaycastHit();
                 bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
@@ -488,31 +489,38 @@ public class GameManager : MonoBehaviour
     {
         clearTexts(GameObject.FindGameObjectWithTag("CanvasUI"));
 
-        GameObject newText = new GameObject("AgentInfo", typeof(RectTransform));
-        var newTextComp = newText.AddComponent<Text>();
-        if (newText.GetComponent<CanvasRenderer>() == null) newText.AddComponent<CanvasRenderer>();
+        //Frame
+        if (agent != null)
+        {
+            InfoFrame.color = new Color(255, 255, 255, 1);
 
-        if(agent != null) newTextComp.text = GetCharacter(agent).AgentInfoUI();
-        newTextComp.color = Color.blue;
-        newTextComp.font = Resources.Load<Font>("AdobeGothicStdB");
-        newTextComp.alignment = TextAnchor.UpperLeft;
-        newTextComp.fontSize = 10;
+            //Text
+            GameObject newText = new GameObject("AgentInfo", typeof(RectTransform));
+            var newTextComp = newText.AddComponent<Text>();
+            if (newText.GetComponent<CanvasRenderer>() == null) newText.AddComponent<CanvasRenderer>();
 
-        newText.transform.SetParent(GameObject.FindGameObjectWithTag("CanvasUI").transform);
+            newTextComp.text = GetCharacter(agent).AgentInfoUI();
+            newTextComp.color = Color.blue;
+            newTextComp.font = Resources.Load<Font>("AdobeGothicStdB");
+            newTextComp.alignment = TextAnchor.UpperLeft;
+            newTextComp.fontSize = 10;
 
-        newText.GetComponent<RectTransform>().anchorMax = new Vector2(1, 0);
-        newText.GetComponent<RectTransform>().anchorMin = new Vector2(1, 0);
-        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 150);
-        newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 200);
-        newText.GetComponent<RectTransform>().anchoredPosition = new Vector2(-100, 120);
+            newText.transform.SetParent(GameObject.FindGameObjectWithTag("CanvasUI").transform);
+
+            newText.GetComponent<RectTransform>().anchorMax = new Vector2(1, 0);
+            newText.GetComponent<RectTransform>().anchorMin = new Vector2(1, 0);
+            newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 150);
+            newText.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 250);
+            newText.GetComponent<RectTransform>().anchoredPosition = new Vector2(-100, 120);
+        }
     }
 
     private void clearTexts(GameObject parent)
     {
+        InfoFrame.color = new Color(255, 255, 255, 0);
+
         foreach (Text txt in parent.GetComponentsInChildren<Text>())
-        {
             GameObject.Destroy(txt.gameObject);
-        }
     }
 
     private void selectAgent(GameObject agent)

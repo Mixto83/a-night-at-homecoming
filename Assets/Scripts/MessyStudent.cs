@@ -286,6 +286,7 @@ public class MessyStudent : Student
     #region Behaviour Methods
     public override void LookForTrouble()
     {
+        createMessage(13);
         causingTrouble = false;
         if (currentOcuppiedBench != null) this.gameState.possiblePosBench.AddRange(currentOcuppiedBench);
         if (targetStudent != null) { targetStudent.SetMessyFlag(true); }
@@ -296,6 +297,7 @@ public class MessyStudent : Student
     //Sabotea la bebida
     protected void SabotageDrink()
     {
+        createMessage(13);
         causingTrouble = true;
         thirst += 2;
         gameState.sabotageAvailable.reset();
@@ -390,7 +392,7 @@ public class MessyStudent : Student
     {
         thirst--;
         fatigue--;
-        createMessage(12);
+        createMessage(13);
         Move(escapePosition);
     }
     //Fin del estado
@@ -578,7 +580,8 @@ public class MessyStudent : Student
 
     public override string AgentInfoUI()
     {
-        var info = "NAME: " + getName() + "\n\nROLE: " + getRole() + "\n\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
+        var info = "NAME: " + getName() + "\nGENDER: " + getGender() + "\nROLE: " + getRole() + "\nTHIRST: " + thirst / thirstThreshold * 100 + "%"
+            + "\nHOBBIES: " + listToString(Hobbies) + "\nFAV ANIMALS: " + listToString(FavAnimals) + "\nFAV FOODS: " + listToString(FavFoods);
 
         return info;
     }

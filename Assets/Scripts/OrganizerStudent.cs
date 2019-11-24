@@ -280,7 +280,7 @@ public class OrganizerStudent : Authority
 
     public override string AgentInfoUI()
     {
-        var info = "NAME: " + getName() + "\n\nROLE: " + getRole() + "\n\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
+        var info = "NAME: " + getName() + "\nGENDER: " + getGender() + "\nROLE: " + getRole() + "\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
 
         return info;
     }

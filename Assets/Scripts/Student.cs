@@ -64,4 +64,27 @@ public class Student : Character
         Move(randomPunishSeat);
     }
 
+    protected string listToString(List<string> list)
+    {
+        string res = "";
+        var firstElem = true;
+
+        List<string> auxList = new List<string>();
+
+        foreach (string elem in list)
+        {
+            if(!auxList.Contains(elem)) auxList.Add(elem);
+        }
+
+        foreach (string elem in auxList)
+        {
+            if (!firstElem) res += ", ";
+
+            res += elem;
+
+            firstElem = false;
+        }
+
+        return res;
+    }
 }

@@ -326,7 +326,7 @@ public class Teacher : Authority
 
     protected void ReadingNewspaper()
     {
-        createMessage(3);
+        createMessage(14);
         distractionRandom = Random.Range(8, 20);
         this.gameState.SetTeacherDistracted(true);
     }
@@ -373,7 +373,7 @@ public class Teacher : Authority
 
     public override string AgentInfoUI()
     {
-        var info = "NAME: " + getName() + "\n\nROLE: " + getRole() + "\n\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
+        var info = "NAME: " + getName() + "\nGENDER: " + getGender() + "\nROLE: " + getRole() + "\nTHIRST: " + thirst / thirstThreshold * 100 + "%";
 
         return info;
     }
